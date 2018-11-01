@@ -1,0 +1,7 @@
+# TODO: Comment this, set default values, write python code to wrap them up in an object which can then be passed to all the python functions.
+
+use_seaice
+hFacMin
+hFacMinDr
+topo_prec
+digging
