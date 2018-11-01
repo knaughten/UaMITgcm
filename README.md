@@ -7,7 +7,7 @@ Since this repository contains the submodule mitgcm_python, use `git clone --rec
 
 Also note that `git pull` will not pull any changes to submodules. To do this, run `git submodule update --remote`.
 
-*Jan: we will probably add UaSource later as another submodule, but let's wait and see what happens with Matlab Compiler first. If Ua gets compiled on one machine and run on another, it might make more sense to have an additional repository.*
+*Jan: we will probably add UaSource later as another submodule, but let's wait and see what happens with Matlab Compiler first. If Ua gets compiled on one machine and run on another, it might make more sense to have two repositories. What do you think?*
 
 ## System requirements
 
