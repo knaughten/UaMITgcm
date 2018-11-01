@@ -10,7 +10,7 @@ git submodule init
 git submodule update
 ```
 
-Whenever you do a `git pull` on UaMITgcm, make sure you update mitgcm_python too:
+Also note that `git pull` on UaMITgcm will not pull changes from mitgcm_python. To do this, run
 
 ```
 git submodule update --remote
