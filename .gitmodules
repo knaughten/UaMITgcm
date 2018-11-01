@@ -1,0 +1,3 @@
+[submodule "mitgcm_python"]
+	path = mitgcm_python
+	url = https://github.com/knaughten/mitgcm_python
