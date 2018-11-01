@@ -1,6 +1,6 @@
-#######################################################
-# Send data from MITgcm to Ua.
-#######################################################
+################################################################################
+# Functions to exchange data between MITgcm and Ua, and prepare MITgcm for the next segment.
+################################################################################
 
 import numpy as np
 from scipy.io import savemat
@@ -10,7 +10,7 @@ from MITgcmutils import rdmds
 from mitgcm_python.utils import real_dir, convert_ismr
 
 
-# Put melt rates in the right format for Ua. No need to interpolate.
+# Put MITgcm melt rates in the right format for Ua. No need to interpolate.
 
 # Arguments:
 # mit_dir: path to directory containing MITgcm binary output files (*.data and *.meta). In particular, the grid files XC and YC, and whichever files contain the SHIfwFlx variable at each diagnostic step.
