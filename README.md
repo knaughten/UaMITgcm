@@ -1,7 +1,14 @@
 # UaMITgcm
-Coupling scripts for Ua and MITgcm. Note the submodule mitgcm_python (https://github.com/knaughten/mitgcm_python).
+Coupling scripts for Ua and MITgcm.
 
-*Jan: we will probably add UaSource later as another submodule, but let's wait and see what happens with Matlab Compiler first.*
+Note the submodule mitgcm_python (https://github.com/knaughten/mitgcm_python). After you clone the UaMITgcm repository, you will need to populate mitgcm_python as follows:
+
+```
+git submodule init
+git submodule update
+```
+
+*Jan: we will probably add UaSource later as another submodule, but let's wait and see what happens with Matlab Compiler first. If Ua gets compiled on one machine and run on another, it might make more sense to have an additional repository.*
 
 Some functions use the python tools distributed with MITgcm. Make sure they are in your `PYTHONPATH`. At the bottom of your `~/.bashrc`, add:
 
