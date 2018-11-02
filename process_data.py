@@ -108,6 +108,15 @@ def find_open_cells (bathy, draft, grid, options):
     return (z_3d <= edge_above_draft)*(z_3d >= edge_below_bathy)
 
 
+# Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment.
+# Any cells which have opened up since the last segment (due to Ua's simulated ice shelf draft changes + MITgcm's adjustments eg digging) will have temperature and salinity set to the average of their nearest neighbours, and velocity to zero.
+# Sea ice (if active) will also set to zero area, thickness, snow depth, and velocity in the event of a retreat of the ice shelf front.
+# Also set the new pressure load anomaly.
+
+# Arguments:
+# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and TODO: output/pickup?
+# grid: Grid object
+# options: TODO define this
 
 def set_mit_ics (mit_dir, grid, options):
 
