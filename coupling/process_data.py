@@ -5,7 +5,7 @@
 import numpy as np
 from scipy.io import savemat
 
-# Must add MITgcmutils and mitgcm_python to python path. 3 options here:
+# TODO: add MITgcmutils and mitgcm_python to python path. 3 options here:
 # 1. In the control script which calls these files, use sys.path.insert(0, path) relative to os.get_cwd()
 # 2. Get the user to edit PYTHONPATH in their .bashrc
 # 3. Edit PYTHONPATH in all PBS job scripts that use these files
@@ -13,7 +13,7 @@ from scipy.io import savemat
 
 from MITgcmutils import rdmds
 
-from mitgcm_python.utils import convert_ismr, z_to_xyz, real_dir
+from mitgcm_python.utils import convert_ismr, xy_to_xyz, z_to_xyz, real_dir
 from mitgcm_python.make_domain import model_bdry, level_vars, do_digging, do_zapping
 from mitgcm_python.file_io import read_binary, write_binary
 from mitgcm_python.interpolation import discard_and_fill
@@ -107,11 +107,13 @@ def find_open_cells (bathy, draft, grid, options):
     # Find the depth of the first dry z-level edge below the bathymetry
     edge_below_bathy = level_vars(bathy_model, grid.dz, grid.z_edges, include_edge='bottom')[2]
 
-    # Tile the z-level centres to be 3D
-    z_3d = z_to_xyz(z, grid)
+    # Tile everything to be 3D
+    edge_above_draft = xy_to_xyz(edge_above_draft, grid)
+    edge_below_bathy = xy_to_xyz(edge_below_bathy, grid)
+    z_3d = z_to_xyz(grid.z, grid)
     
-    # Identify all z-centres between the two edges. This should be equivalent to ceil(hFacC). TODO: test this equivalence.
-    return (z_3d <= edge_above_draft)*(z_3d >= edge_below_bathy)
+    # Identify all z-centres between the two edges, and remove any cells with bathymetry 0. This is equivalent to ceil(hFacC). 
+    return (z_3d <= edge_above_draft)*(z_3d >= edge_below_bathy)*(bathy_model < 0)
 
 
 # Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment.
