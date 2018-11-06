@@ -3,23 +3,12 @@ Coupling scripts for Ua and MITgcm.
 
 ## Installation
 
-Since this repository contains the submodule mitgcm_python, use `git clone --recursive` instead of just `git clone`.
+Since this repository contains submodules, use `git clone --recursive` instead of just `git clone`.
 
 Also note that `git pull` will not pull any changes to submodules. To do this, run `git submodule update --remote`.
 
-*Jan: we will probably add UaSource later as another submodule, but let's wait and see what happens with Matlab Compiler first. If Ua gets compiled on one machine and run on another, it might make more sense to have two repositories. What do you think?*
-
 ## System requirements
 
-Some functions use the python tools distributed with MITgcm. Make sure they are in your `PYTHONPATH`. At the bottom of your `~/.bashrc`, add:
+You will require the python packages numpy and scipy. These are pre-installed on most systems; on Archer, `module load anaconda` will give you access to them.
 
-```
-export PYTHONPATH=$PYTHONPATH:$ROOTDIR/utils/python/MITgcmutils
-```
-
-where `$ROOTDIR` is the path to your copy of the MITgcm source code distribution (latest version here https://github.com/MITgcm/MITgcm). If you don't have/want the entire source code on your machine, you can also just copy the utils/python/MITgcmutils directory and point `PYTHONPATH` to that.
-
-*Jan: should we instead make MITgcm a submodule of this repository? Should we just grab the MITgcmutils subdirectory instead of making the user get it themselves, or does this raise ownership issues?*
-
-You will also need the python packages numpy and scipy.
-
+If you are using xmitgcm to convert your MITgcm output from binary to NetCDF, you will also need the python package xarray. This is not pre-installed on Archer but you can do a local install with `easy_install --user xarray`.

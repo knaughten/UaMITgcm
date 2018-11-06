@@ -1,0 +1,9 @@
+[submodule "MITgcm"]
+	path = MITgcm
+	url = https://github.com/MITgcm/MITgcm.git
+[submodule "tools/mitgcm_python"]
+	path = tools/mitgcm_python
+	url = https://github.com/knaughten/mitgcm_python.git
+[submodule "tools/xmitgcm"]
+	path = tools/xmitgcm
+	url = https://github.com/xgcm/xmitgcm.git

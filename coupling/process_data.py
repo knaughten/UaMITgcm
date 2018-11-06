@@ -5,6 +5,12 @@
 import numpy as np
 from scipy.io import savemat
 
+# Must add MITgcmutils and mitgcm_python to python path. 3 options here:
+# 1. In the control script which calls these files, use sys.path.insert(0, path) relative to os.get_cwd()
+# 2. Get the user to edit PYTHONPATH in their .bashrc
+# 3. Edit PYTHONPATH in all PBS job scripts that use these files
+# I think option 3 is preferable. No work for the user, and it makes sure the paths are correct.
+
 from MITgcmutils import rdmds
 
 from mitgcm_python.utils import convert_ismr, z_to_xyz, real_dir
