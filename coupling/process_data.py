@@ -26,7 +26,7 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 # mit_dir: MITgcm directory containing SHIfwFlx output
 # ua_out_file: desired path to .mat file for Ua to read melt rates from.
 # grid: Grid object (for the MITgcm segment that just finished)
-# options: TODO define this
+# options: Options object
 
 def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 
@@ -54,8 +54,8 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 # Given the updated ice shelf draft from Ua, adjust the draft and/or bathymetry so that MITgcm is happy. In order to have fully connected adjacent water columns, they must overlap by at least two wet cells.
 # There are three ways to do this (set in options.digging):
 #    'none': ignore the 2-cell rule and don't dig anything
-#    'bathy': dig bathymetry which is too deep
-#    'draft': dig ice shelf drafts which are too shallow
+#    'bathy': dig bathymetry which is too shallow
+#    'draft': dig ice shelf drafts which are too deep
 # In all cases, also remove ice shelf drafts which are too thin.
 # Ua does not see these changes to the geometry.
 
@@ -63,7 +63,7 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 # ua_draft_file: path to ice shelf draft file written by Ua at the end of the last segment (TODO: define format)
 # mit_dir: path to MITgcm directory containing binary files for bathymetry and ice shelf draft
 # grid: Grid object
-# options: TODO define this
+# options: Options object
 
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
@@ -73,7 +73,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     # Save in variable 'draft'
     
     # Read MITgcm bathymetry file from last segment
-    bathy = read_binary(mit_dir+options.bathy_file, [grid.nx, grid.ny], 'xy', prec=options.mit_prec)
+    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
 
     if options.digging == 'none':
         print 'Not doing digging as per user request'
@@ -88,10 +88,10 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr)
     
     # Ice shelf draft could change in all three cases
-    write_binary(draft, mit_dir+options.draft_file, prec=options.mit_prec)
+    write_binary(draft, mit_dir+options.draftFile, prec=options.readBinaryPrec)
     if options.digging == 'bathy':
         # Bathymetry can only change in one case
-        write_binary(bathy, mit_dir+options.bathy_file, prec=options.mit_prec)
+        write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
     
 
 # Helper function for set_mit_ics
@@ -124,7 +124,7 @@ def find_open_cells (bathy, draft, grid, options):
 # Arguments:
 # mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and TODO: output/pickup?
 # grid: Grid object
-# options: TODO define this
+# options: Options object
 
 def set_mit_ics (mit_dir, grid, options):
 
@@ -136,8 +136,8 @@ def set_mit_ics (mit_dir, grid, options):
         pass
     
     # Read the new ice shelf draft, and also the bathymetry
-    draft = read_binary(mit_dir+options.draft_file, [grid.nx, grid.ny], 'xy', prec=options.mit_prec)
-    bathy = read_binary(mit_dir+options.bathy_file, [grid.nx, grid.ny], 'xy', prec=options.mit_prec)
+    draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
 
     print 'Selecting newly opened cells'
     # Figure out which cells will be (at least partially) open in the next segment
@@ -153,22 +153,22 @@ def set_mit_ics (mit_dir, grid, options):
     salt_new = discard_and_fill(salt, [], newly_open, missing_val=0)
     
     # Write the new initial conditions, masked with 0s (important in case maskIniTemp and/or maskIniSalt are off)
-    write_binary(temp_new*mask_new, mit_dir+options.ini_temp_file, prec=mit_prec)
-    write_binary(salt_new*mask_new, mit_dir+options.ini_salt_file, prec=mit_prec)
+    write_binary(temp_new*mask_new, mit_dir+options.ini_temp_file, prec=readBinaryPrec)
+    write_binary(salt_new*mask_new, mit_dir+options.ini_salt_file, prec=readBinaryPrec)
 
     # Write the initial conditions which haven't changed
     # No need to mask them, as velocity and sea ice variables are always masked when they're read in
-    write_binary(u, mit_dir+options.ini_u_file, prec=mit_prec)
-    write_binary(v, mit_dir+options.ini_v_file, prec=mit_prec)
+    write_binary(u, mit_dir+options.ini_u_file, prec=readBinaryPrec)
+    write_binary(v, mit_dir+options.ini_v_file, prec=readBinaryPrec)
     if options.use_seaice:
-        write_binary(aice, mit_dir+options.ini_area_file, prec=mit_prec)
-        write_binary(hice, mit_dir+options.ini_heff_file, prec=mit_prec)
-        write_binary(hsnow, mit_dir+options.ini_hsnow_file, prec=mit_prec)
-        write_binary(uice, mit_dir+options.ini_uice_file, prec=mit_prec)
-        write_binary(vice, mit_dir+options.ini_vice_file, prec=mit_prec)
+        write_binary(aice, mit_dir+options.ini_area_file, prec=readBinaryPrec)
+        write_binary(hice, mit_dir+options.ini_heff_file, prec=readBinaryPrec)
+        write_binary(hsnow, mit_dir+options.ini_hsnow_file, prec=readBinaryPrec)
+        write_binary(uice, mit_dir+options.ini_uice_file, prec=readBinaryPrec)
+        write_binary(vice, mit_dir+options.ini_vice_file, prec=readBinaryPrec)
 
     print 'Calculating pressure load anomaly'
-    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=pload_temp, constant_s=pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eos_type=options.eos_type, rhoConst=options.rhoConst, Talpha=options.Talpha, Sbeta=options.Sbeta, Tref=options.Tref, Sref=options.Sref, prec=options.mit_prec)
+    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=pload_temp, constant_s=pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, Talpha=options.tAlpha, Sbeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
 
 
     
