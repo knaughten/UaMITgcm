@@ -22,8 +22,8 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 
 # Helper function for extract_melt_rates and set_mit_ics
 # Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D' or 'pickup') and extract all the variables in the given list of names. Note that temporary pickup files (eg pickup.ckptA.data) will be ignored.
-# If there is an expected value for the timestep number corresponding to this output, check that it agrees. Can print a custom error message if it doesn't, suggesting what the likely source of the problem is.
-def read_last_output (directory, file_head, var_names, timestep=None, error_message=None):
+# If there is an expected value for the timestep number corresponding to this output, check that it agrees.
+def read_last_output (directory, file_head, var_names, timestep=None):
 
     # Check if var_names is a string rather than a list
     if isinstance(var_names, str):
@@ -35,8 +35,6 @@ def read_last_output (directory, file_head, var_names, timestep=None, error_mess
     # Make sure it agrees with any expected timestep number
     if timestep is not None and its != timestep:
         print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + timestep
-        if error_message is not None:
-            print error_message
         sys.exit()
     # Extract one variable at a time and wrap them up in a list
     var_data = []
@@ -65,8 +63,8 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
     mit_dir = real_dir(mit_dir)
 
     # Read the most recent ice shelf melt rate output and convert to m/y
-    # TODO: check timestep against calendar and pass error message
-    ismr = convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx'))
+    # Make sure it's from the last timestep of the previous simulation.
+    ismr = convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
 
     # Put everything in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
     lon_points = np.ravel(grid.lon_1d)[:,None].astype('float64')
@@ -158,12 +156,10 @@ def set_mit_ics (mit_dir, grid, options):
     mit_dir = real_dir(mit_dir)
 
     # Read the final state of ocean variables
-    # TODO: Check timestep against calendar and pass error message
-    temp, salt, u, v = read_last_output(mit_dir, options.final_state_name, ['THETA', 'SALT', 'UVEL', 'VVEL'])
+    temp, salt, u, v = read_last_output(mit_dir, options.final_state_name, ['THETA', 'SALT', 'UVEL', 'VVEL'], timestep=options.last_timestep)
     if options.use_seaice:
         # Read the final state of sea ice variables
-        # TODO: Check timestep against calendar and pass error message
-        aice, hice, hsnow, uice, vice = read_last_output(mit_dir, options.seaice_final_state_name, ['SIarea', 'SIheff', 'SIhsnow', 'SIuice', 'SIvice'])
+        aice, hice, hsnow, uice, vice = read_last_output(mit_dir, options.seaice_final_state_name, ['SIarea', 'SIheff', 'SIhsnow', 'SIuice', 'SIvice'], timestep=options.last_timestep)
     
     # Read the new ice shelf draft, and also the bathymetry
     draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)

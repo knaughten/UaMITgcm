@@ -12,8 +12,18 @@ mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
 
 ###### 2. Coupling options ######
 
-### Does the x-coordinate of your domain refer to longitude?
-x_is_lon = False
+### Length of coupling timestep (months)
+couple_step = 6
+### Length of averaging period for ice shelf melt rates
+### sent from MITgcm to Ua (months)
+### 1 means Ua sees melt rates averaged over the last month
+### of the previous simulation segment
+melt_average_step = 1
+### Calendar type. 3 options:
+### 'standard': full calendar with leap years
+### 'noleap': every year is 365 days
+### '360-day': every month is 30 days
+calendar_type = '360-day'
 
 ### How should we deal with digging of the MITgcm domain
 ### (to ensure adjacent water columns are properly connected)?
@@ -22,6 +32,9 @@ x_is_lon = False
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
 digging = 'draft'
+
+### Does the x-coordinate of your domain refer to longitude?
+x_is_lon = False
 
 ### How should we calculate the pressure load anomaly of the ice shelf draft?
 ### This involves making an assumption about the properties of the water
@@ -46,6 +59,7 @@ use_seaice = False
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
 ### to find what they have been set to by default.
+deltaT = 300
 hFacMin = 0.05
 hFacMinDr = 0.
 readBinaryPrec = 64
@@ -67,6 +81,10 @@ Sref = 34.2
 ### Don't include any directories in these file names.
 ### The code will look for them in the appropriate directories.
 
+### Name of plain-text file to keep track of calendar info
+### (this will be created for you during the first segment):
+calendar_file = 'calendar'
+
 ### Bathymetry file read by MITgcm. Should match the value in input/data.
 bathyFile = 'bathymetry.shice'
 
@@ -75,6 +93,7 @@ bathyFile = 'bathymetry.shice'
 draftFile = 'shelfice_topo.bin'
 
 ### Initial conditions files read by MITgcm:
+###
 ### Temperature (match hydrogThetaFile in input/data)
 ini_temp_file = 'lev_t.shice'
 ### Salinity (match hydrogSaltFile in input/data)
@@ -86,6 +105,7 @@ ini_v_file = 'v_init.bin'
 
 ### Sea ice initial conditions files read by MITgcm
 ### (only matters if use_seaice=True):
+###
 ### Sea ice area (match AreaFile in input/data.seaice)
 ini_area_file = ''
 ### Sea ice thickness (match HeffFile in input/data.seaice)
@@ -104,8 +124,11 @@ pload_file = 'phi0surf.bin'
 ### Beginnings of the filenames of various output diagnostic files
 ### containing the given variables.
 ### Should match filename(x) in input/data.diagnostics
-### for whichever value of x has those variables in fields(1,x).
-### Contains SHIfwFlx time-averaged over last TODO: define
+### for whichever value of x has those variables in fields(1,x)
+###
+### Contains SHIfwFlx time-averaged over last melt_average_step months
+### (you can have SHIfwFlx on another output stream too if you want
+### output at a different frequency for analysis)
 ismr_name = 'MITout_2D'
 ### Contains THETA, SALT, UVEL, VVEL snapshot at end of simulation
 final_state_name = 'FinalState'
