@@ -1,5 +1,5 @@
 ################################################################################
-# Functions to exchange data between MITgcm and Ua, and prepare MITgcm for the next segment.
+# Functions to exchange data between MITgcm and Ua, and adjust the MITgcm geometry/initial conditions as needed.
 ################################################################################
 
 import numpy as np
@@ -20,6 +20,37 @@ from mitgcm_python.interpolation import discard_and_fill
 from mitgcm_python.ics_obcs import calc_load_anomaly
 
 
+# Helper function for extract_melt_rates and set_mit_ics
+# Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D' or 'pickup') and extract all the variables in the given list of names. Note that temporary pickup files (eg pickup.ckptA.data) will be ignored.
+# If there is an expected value for the timestep number corresponding to this output, check that it agrees. Can print a custom error message if it doesn't, suggesting what the likely source of the problem is.
+def read_last_output (directory, file_head, var_names, timestep=None, error_message=None):
+
+    # Check if var_names is a string rather than a list
+    if isinstance(var_names, str):
+        var_names = [var_names]
+
+    # Read the most recent file
+    data, its, meta = rdmds(directory+file_head, itrs=np.Inf, returnmeta=True)
+    print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
+    # Make sure it agrees with any expected timestep number
+    if timestep is not None and its != timestep:
+        print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + timestep
+        if error_message is not None:
+            print error_message
+        sys.exit()
+    # Extract one variable at a time and wrap them up in a list
+    var_data = []
+    for var in var_names:
+        # Figure out which index contains this variable
+        i = meta['fldlist'].index(var)
+        var_data.append(data[i,:])
+    # Check for single variable
+    if len(var_data) == 1:
+        return var_data[0]
+    else:
+        return var_data
+        
+
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
 
 # Arguments:
@@ -33,13 +64,9 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
     # Make sure directory ends in /
     mit_dir = real_dir(mit_dir)
 
-    # Read the most recent file containing ice shelf melt rate
-    data, its, meta = rdmds(mit_dir+options.ismr_head, itrs=np.Inf, returnmeta=True)
-    print 'Reading melt rates from ocean timestep ' + str(its)
-    # Figure out which index contains SHIfwflx
-    i = meta['fldlist'].index('SHIfwFlx')
-    # Extract the ice shelf melt rate and convert to m/y
-    ismr = convert_ismr(data[i,:,:])
+    # Read the most recent ice shelf melt rate output and convert to m/y
+    # TODO: check timestep against calendar and pass error message
+    ismr = convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx'))
 
     # Put everything in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
     lon_points = np.ravel(grid.lon_1d)[:,None].astype('float64')
@@ -92,8 +119,8 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     if options.digging == 'bathy':
         # Bathymetry can only change in one case
         write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
-    
 
+    
 # Helper function for set_mit_ics
 # Given 2D fields for bathymetry and ice shelf draft, and information about the vertical grid (which doesn't change over time, so Grid object from last segment is fine), figure out which cells in the 3D grid are (at least partially) open. Return a 3D boolean array.
 def find_open_cells (bathy, draft, grid, options):
@@ -130,10 +157,13 @@ def set_mit_ics (mit_dir, grid, options):
 
     mit_dir = real_dir(mit_dir)
 
-    # TODO: Read temp, salt, u, v. From last pickup (need pickup frequency set correctly, or dump last)? Or diagnostic at the right time?
+    # Read the final state of ocean variables
+    # TODO: Check timestep against calendar and pass error message
+    temp, salt, u, v = read_last_output(mit_dir, options.final_state_name, ['THETA', 'SALT', 'UVEL', 'VVEL'])
     if options.use_seaice:
-        # TODO: Read aice, hice, hsnow, uice, vice
-        pass
+        # Read the final state of sea ice variables
+        # TODO: Check timestep against calendar and pass error message
+        aice, hice, hsnow, uice, vice = read_last_output(mit_dir, options.seaice_final_state_name, ['SIarea', 'SIheff', 'SIhsnow', 'SIuice', 'SIvice'])
     
     # Read the new ice shelf draft, and also the bathymetry
     draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)

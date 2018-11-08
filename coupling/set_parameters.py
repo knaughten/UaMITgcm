@@ -1,5 +1,7 @@
 ##############################################################
-# Classes and functions to prepare for the coupled simulation.
+# Classes and functions to read/write model parameters to
+# prepare for the coupled simulation.
+# This includes keeping track of the calendar.
 ##############################################################
 
 from config_options import *
@@ -104,4 +106,9 @@ class Options:
             self.ini_uice_file = ''
             self.ini_vice_file = ''
         self.pload_file = check_value('pload_file', pload_file)
-        self.ismr_head = check_value('ismr_head', ismr_head)
+        self.ismr_name = check_value('ismr_name', ismr_name)
+        self.final_state_name = check_value('final_state_name', final_state_name)
+        if self.use_seaice:
+            self.seaice_final_state_name = check_value('seaice_final_state_name', seaice_final_state_name)
+        else:
+            self.seaice_final_state_name = ''

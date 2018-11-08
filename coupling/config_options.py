@@ -101,13 +101,18 @@ ini_vice_file = ''
 ### Should match SHELFICEloadAnomalyFile in input/data.shelfice.
 pload_file = 'phi0surf.bin'
 
-### Beginning of the filenames of output diagnostic files
-### containing the variable SHIfwFlx.
+### Beginnings of the filenames of various output diagnostic files
+### containing the given variables.
 ### Should match filename(x) in input/data.diagnostics
-### for whichever value of x has 'SHIfwFlx' in fields(1,x).
-### Output files will be in the form
-### ismr_head.yyyyyyyyyy.data and ismr_head.yyyyyyyyyy.meta
-### where yyyyyyyyyy is the timestep.
-ismr_head = 'MITout_2D'
+### for whichever value of x has those variables in fields(1,x).
+### Contains SHIfwFlx time-averaged over last TODO: define
+ismr_name = 'MITout_2D'
+### Contains THETA, SALT, UVEL, VVEL snapshot at end of simulation
+final_state_name = 'FinalState'
+### Contains SIarea, SIheff, SIhsnow, SIuice, SIvice snapshot
+### at end of simulation
+### (only matters if use_seaice = True)
+seaice_final_state_name = ''
+
 
 
