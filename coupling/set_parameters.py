@@ -8,6 +8,8 @@ import datetime
 import os
 
 from config_options import *
+from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between
+
 from mitgcm_python.utils import real_dir, is_leap_year
 
 # Global parameter
@@ -54,9 +56,9 @@ class Options:
                 except(ValueError):
                     throw_error(var_name, var, legal=legal)
             elif type == 'str':
-                # Everything can be convererted to a string
+                # Anything can be converted to a string
                 var = str(var)
-            # Now check against legal options
+            # Now check against any legal options given
             if legal is not None and var not in legal:
                 throw_error(var_name, var, legal=legal)
             return var
@@ -137,23 +139,8 @@ class Options:
         self.last_start_date = start_date
         self.last_timestep = ndays*sec_per_day
 
-# End of class Object
+# end class Object
 
-
-# Helper function for update_namelists. Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
-def extract_first_digits (string):
-
-    digits = ''
-    # Loop over the characters in the string
-    for s in string:
-        if s.isdigit() or s=='-':
-            # Accumulate the digits
-            digits += s
-        elif len(digits) > 0:
-            # It's not a digit, and we've already found the number.
-            # So the digits are finished.
-            break
-    return int(digits)
 
 
 # Update the "data" and "data.diagnostics" namelists to reflect the length of the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
@@ -161,64 +148,22 @@ def extract_first_digits (string):
 def update_namelists (mit_dir, endTime, options):
 
     # Set file paths
-    mit_dir = real_dir(mit_dir)
     namelist = mit_dir + 'data'
     namelist_diag = mit_dir + 'data.diagnostics'
-
-    # Inner function to check if a string contains the given substring, and is uncommented. Default not case sensitive.
-    def active_line_contains (line, substr, ignore_case=True):
-        if ignore_case:
-            return substr.lower() in line.lower() and not line.startswith('#')
-        else:
-            return substr in line and not line.startswith('#')
-
-    # Inner function to return the last line in a file satisfying active_line_contains. This is the line of the file that actually defines the given variable.
-    def line_that_matters (file_name, substr, ignore_case=True):
-        line_to_save = None
-        f = open(file_name, 'r')
-        # Loop over all the lines in the file and keep overwriting line_to_save
-        for line in f:
-            if active_line_contains(line, substr, ignore_case=ignore_case):
-                line_to_save = line
-        f.close()
-        # Make sure we found it
-        if line_to_save is None:
-            print 'Error (update_namelists): ' + file_name + ' does not contain ' + substr
-            sys.exit()
-        return line_to_save
 
     # Inner function to find the line defining the frequency of the given diagnostic file name in data.diagnostics, and also extract that frequency and its file index.
     def get_diag_freq (diag_file_head):
         # First find the line with that filename head
         filename_line = line_that_matters(namelist_diag, diag_file_head, ignore_case=False)
         # This will be of the form "filename(x)=name". Strip out the value of x.
-        index = extract_first_digits(filename_line)
+        index = extract_first_int(filename_line)
         # Now find the line defining "frequency(x)".
         freq_line = line_that_matters(namelist_diag, 'frequency('+str(index)+')')
         # Strip out the number after the equals sign
-        freq = extract_first_digits(freq_line[freq_line.index('=')+1:])
+        freq = extract_first_int(freq_line[freq_line.index('=')+1:])
         return freq_line, freq, index
 
-    # Inner function to replace one line with another in the given file.
-    def replace_line (file_name, old_line, new_line):
-        # Open the file for reading
-        f_r = open(file_name, 'r')
-        # Open another file to write to
-        f_w = open(file_name+'.tmp', 'w')
-        for line in f_r:
-            if line == old_line:
-                # Update this line in the new file
-                f_w.write(new_line)
-            else:
-                # Just copy the line over
-                f_w.write(line)
-        f_r.close()
-        f_w.close()
-        # Replace the old file with the new one
-        os.remove(file_name)
-        os.rename(file_name+'.tmp', file_name)
-
-    # Inner function to throw an error or a warning if the frequency is incorrect in a 360-day calendar (where every simulation segment should be the same length).
+    # Inner function to throw an error or a warning if the existing simulation length is incorrect in a 360-day calendar (where every simulation segment should be the same length).
     def throw_error_warning (var_string, file_name, error=True):
         if error:
             message = 'Error: '
@@ -242,7 +187,7 @@ def update_namelists (mit_dir, endTime, options):
     # Look for endTime in "data" namelist
     endTime_line = line_that_matters(namelist, 'endTime')
     # Strip out the number
-    old_endTime = extract_first_digits(line)
+    old_endTime = extract_first_int(line)
     # Update file if needed
     # TODO: set error=False if initial run
     check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime')
@@ -260,65 +205,17 @@ def update_namelists (mit_dir, endTime, options):
             # TODO: set error=False if initial run
             check_and_change(seaice_final_state_freq, -endTime, seaice_final_state_freq_line, ' frequency('+str(seaice_final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.seaice_final_state_name)
 
-# end of function update_namelists
-               
-        
-
-# Helper function for advance_calendar
-# Advance the given date (year and month) by num_months
-def add_months (year, month, num_months):
-    month += num_months
-    while month > 12:
-        month -= 12
-        year += 1
-    return year, month
+# end function update_namelists
 
 
-# Helper function for advance_calendar
-# Calculate the number of days between the given dates (assuming 1st of the month), depending on the calendar type
-def days_between (year_1, month_1, year_2, month_2, calendar_type):
-    
-    if calendar_type == '360-day':
-        # Every month has 30 days in this calendar
-        # First calculate the number of months
-        num_months = 12*(year_2 - year_1) + (month_2 - month_1)
-        return num_months*30
-    else:
-        # Calculate using date objects
-        date_1 = datetime.date(year_1, month_1, 1)
-        date_2 = datetime.date(year_2, month_2, 1)
-        num_days = (date_2-date_1).days
-        if calendar_type == 'standard':
-            # We're done
-            return num_days
-        elif calendar_time == 'noleap':
-            # Subtract the leap days
-            if year_1 == year_2:
-                # Dates are in the same year; maximum 1 leap day between them
-                if month_1 <= 2 and month_2 >= 3 and is_leap_year(year_1):
-                    num_days -= 1
-            else:
-                # Check the year of the first date
-                if month_1 <= 2 and is_leap_year(year_1):
-                    num_days -= 1
-                # Check any complete years between the dates
-                for year in range(year_1+1, year_2):
-                    if is_leap_year(year):
-                        num_days -= 1
-                # Check the year of the last date
-                if month_2 >= 3 and is_leap_year(year_2):
-                    num_days -= 1
-            return num_days
-                    
-                
+
 # Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir).
-# TODO: deal with initial case where the final doesn't exist yet.
+# TODO: deal with initial case where the file doesn't exist yet.
 def advance_calendar (directory, mit_dir, options):
 
     print 'Advancing calendar by ' + str(options.couple_step) + ' months'
 
     # Read the calendar file
-    directory = real_dir(directory)
     f = open(directory+options.calendar_file, 'r')
     date_code = f.readline().strip()
     ndays = int(f.readline())
@@ -355,6 +252,7 @@ def advance_calendar (directory, mit_dir, options):
     endTime = ndays_new*sec_per_day
     # Update/check endTime for next MITgcm segment, and diagnostic frequencies
     update_namelists(mit_dir, endTime, options)
+
         
 
     

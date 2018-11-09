@@ -11,42 +11,13 @@ from scipy.io import savemat
 # 3. Edit PYTHONPATH in all PBS job scripts that use these files
 # I think option 3 is preferable. No work for the user, and it makes sure the paths are correct.
 
-from MITgcmutils import rdmds
+from coupling_utils import read_last_output, find_open_cells
 
-from mitgcm_python.utils import convert_ismr, xy_to_xyz, z_to_xyz, real_dir
-from mitgcm_python.make_domain import model_bdry, level_vars, do_digging, do_zapping
+from mitgcm_python.utils import convert_ismr
+from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.file_io import read_binary, write_binary
 from mitgcm_python.interpolation import discard_and_fill
 from mitgcm_python.ics_obcs import calc_load_anomaly
-
-
-# Helper function for extract_melt_rates and set_mit_ics
-# Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D' or 'pickup') and extract all the variables in the given list of names. Note that temporary pickup files (eg pickup.ckptA.data) will be ignored.
-# If there is an expected value for the timestep number corresponding to this output, check that it agrees.
-def read_last_output (directory, file_head, var_names, timestep=None):
-
-    # Check if var_names is a string rather than a list
-    if isinstance(var_names, str):
-        var_names = [var_names]
-
-    # Read the most recent file
-    data, its, meta = rdmds(directory+file_head, itrs=np.Inf, returnmeta=True)
-    print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
-    # Make sure it agrees with any expected timestep number
-    if timestep is not None and its != timestep:
-        print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + timestep
-        sys.exit()
-    # Extract one variable at a time and wrap them up in a list
-    var_data = []
-    for var in var_names:
-        # Figure out which index contains this variable
-        i = meta['fldlist'].index(var)
-        var_data.append(data[i,:])
-    # Check for single variable
-    if len(var_data) == 1:
-        return var_data[0]
-    else:
-        return var_data
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
@@ -58,9 +29,6 @@ def read_last_output (directory, file_head, var_names, timestep=None):
 # options: Options object
 
 def extract_melt_rates (mit_dir, ua_out_file, grid, options):
-
-    # Make sure directory ends in /
-    mit_dir = real_dir(mit_dir)
 
     # Read the most recent ice shelf melt rate output and convert to m/y
     # Make sure it's from the last timestep of the previous simulation.
@@ -92,8 +60,6 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
-    mit_dir = real_dir(mit_dir)
-
     # TODO: Read Ua draft output and possibly reassemble
     # Save in variable 'draft'
     
@@ -118,28 +84,6 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
         # Bathymetry can only change in one case
         write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
 
-    
-# Helper function for set_mit_ics
-# Given 2D fields for bathymetry and ice shelf draft, and information about the vertical grid (which doesn't change over time, so Grid object from last segment is fine), figure out which cells in the 3D grid are (at least partially) open. Return a 3D boolean array.
-def find_open_cells (bathy, draft, grid, options):
-
-    # Calculate the actual bathymetry and ice shelf draft seen by MITgcm, based on hFac constraints
-    bathy_model = model_bdry(bathy, grid.dz, grid.z_edges, option='bathy', hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
-    draft_model = model_bdry(draft, grid.dz, grid.z_edges, option='draft', hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
-
-    # Find the depth of the last dry z-level edge above the draft
-    edge_above_draft = level_vars(draft_model, grid.dz, grid.z_edges, include_edge='top')[1]
-    # Find the depth of the first dry z-level edge below the bathymetry
-    edge_below_bathy = level_vars(bathy_model, grid.dz, grid.z_edges, include_edge='bottom')[2]
-
-    # Tile everything to be 3D
-    edge_above_draft = xy_to_xyz(edge_above_draft, grid)
-    edge_below_bathy = xy_to_xyz(edge_below_bathy, grid)
-    z_3d = z_to_xyz(grid.z, grid)
-    
-    # Identify all z-centres between the two edges, and remove any cells with bathymetry 0. This is equivalent to ceil(hFacC). 
-    return (z_3d <= edge_above_draft)*(z_3d >= edge_below_bathy)*(bathy_model < 0)
-
 
 # Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment.
 # Any cells which have opened up since the last segment (due to Ua's simulated ice shelf draft changes + MITgcm's adjustments eg digging) will have temperature and salinity set to the average of their nearest neighbours, and velocity to zero.
@@ -153,8 +97,6 @@ def find_open_cells (bathy, draft, grid, options):
 
 def set_mit_ics (mit_dir, grid, options):
 
-    mit_dir = real_dir(mit_dir)
-
     # Read the final state of ocean variables
     temp, salt, u, v = read_last_output(mit_dir, options.final_state_name, ['THETA', 'SALT', 'UVEL', 'VVEL'], timestep=options.last_timestep)
     if options.use_seaice:
@@ -167,7 +109,7 @@ def set_mit_ics (mit_dir, grid, options):
 
     print 'Selecting newly opened cells'
     # Figure out which cells will be (at least partially) open in the next segment
-    open_next = find_open_cells(bathy, draft, grid)
+    open_next = find_open_cells(bathy, draft, grid, options.hFacMin, options.hFacMinDr)
     # Also save this as a mask with 1s and 0s
     mask_new = open_next.astype(int)
     # Now select the open cells which weren't already open in the last segment
