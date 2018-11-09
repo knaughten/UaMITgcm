@@ -14,11 +14,6 @@ mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
 
 ### Length of coupling timestep (months)
 couple_step = 6
-### Length of averaging period for ice shelf melt rates
-### sent from MITgcm to Ua (months)
-### 1 means Ua sees melt rates averaged over the last month
-### of the previous simulation segment
-melt_average_step = 1
 ### Calendar type. 3 options:
 ### 'standard': full calendar with leap years
 ### 'noleap': every year is 365 days
@@ -126,7 +121,8 @@ pload_file = 'phi0surf.bin'
 ### Should match filename(x) in input/data.diagnostics
 ### for whichever value of x has those variables in fields(1,x)
 ###
-### Contains SHIfwFlx time-averaged over last melt_average_step months
+### Contains SHIfwFlx time-averaged over some period,
+### less than or equal to couple_step months
 ### (you can have SHIfwFlx on another output stream too if you want
 ### output at a different frequency for analysis)
 ismr_name = 'MITout_2D'

@@ -67,7 +67,6 @@ class Options:
         self.mit_run_dir = self.mit_case_dir + 'run/'
 
         self.couple_step = check_value('couple_step', couple_step, type='int')
-        self.melt_average_step = check_value('melt_average_step', melt_average_step, type='int')
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.x_is_lon = check_value('x_is_lon', x_is_lon, type='bool')
@@ -141,13 +140,13 @@ class Options:
 # End of class Object
 
 
-# Helper function for update_endTime and update_diagnostic_freq. Extract the first continuous group of digits in a string. Return as an integer.
+# Helper function for update_namelists. Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
 def extract_first_digits (string):
 
     digits = ''
     # Loop over the characters in the string
     for s in string:
-        if s.isdigit():
+        if s.isdigit() or s=='-':
             # Accumulate the digits
             digits += s
         elif len(digits) > 0:
@@ -157,59 +156,112 @@ def extract_first_digits (string):
     return int(digits)
 
 
-# Update endTime for the next MITgcm segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that endTime agrees with what we'd expect.
+# Update the "data" and "data.diagnostics" namelists to reflect the length of the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # TODO: deal with initial case where the check should give a warning, not an error.
-def update_endTime (mit_dir, endTime, options):
+def update_namelists (mit_dir, endTime, options):
 
     # Set file paths
     mit_dir = real_dir(mit_dir)
     namelist = mit_dir + 'data'
-    namelist_tmp = mit_dir + 'data.tmp'
+    namelist_diag = mit_dir + 'data.diagnostics'
 
-    # First check if we need to update the file at all
-    f = open(namelist, 'r')
-    for line in f:
-        # Search for lines that contains endTime (case-insensitive) and is not commented out. This can be overwritten if multiple such lines exist; the last one will be the one that counts (as it does for MITgcm)
-        if 'endtime' in line.lower() and not line.startswith('#'):
-            # Strip out the number
-            old_endTime = extract_first_digits(line)
-    f.close()
+    # Inner function to check if a string contains the given substring, and is uncommented. Default not case sensitive.
+    def active_line_contains (line, substr, ignore_case=True):
+        if ignore_case:
+            return substr.lower() in line.lower() and not line.startswith('#')
+        else:
+            return substr in line and not line.startswith('#')
 
-    # Check if endTime needs to be changed
-    if old_endTime != endTime:
-        
-        if options.calendar_type == '360-day':
-            # 360-day calendars should never need endTime to be changed
-            print 'Error (update_endTime): endTime has mysteriously changed in your namelist and is no longer correct.'
+    # Inner function to return the last line in a file satisfying active_line_contains. This is the line of the file that actually defines the given variable.
+    def line_that_matters (file_name, substr, ignore_case=True):
+        line_to_save = None
+        f = open(file_name, 'r')
+        # Loop over all the lines in the file and keep overwriting line_to_save
+        for line in f:
+            if active_line_contains(line, substr, ignore_case=ignore_case):
+                line_to_save = line
+        f.close()
+        # Make sure we found it
+        if line_to_save is None:
+            print 'Error (update_namelists): ' + file_name + ' does not contain ' + substr
             sys.exit()
+        return line_to_save
 
-        # Open the file for reading again
-        f_r = open(namelist, 'r')
+    # Inner function to find the line defining the frequency of the given diagnostic file name in data.diagnostics, and also extract that frequency and its file index.
+    def get_diag_freq (diag_file_head):
+        # First find the line with that filename head
+        filename_line = line_that_matters(namelist_diag, diag_file_head, ignore_case=False)
+        # This will be of the form "filename(x)=name". Strip out the value of x.
+        index = extract_first_digits(filename_line)
+        # Now find the line defining "frequency(x)".
+        freq_line = line_that_matters(namelist_diag, 'frequency('+str(index)+')')
+        # Strip out the number after the equals sign
+        freq = extract_first_digits(freq_line[freq_line.index('=')+1:])
+        return freq_line, freq, index
+
+    # Inner function to replace one line with another in the given file.
+    def replace_line (file_name, old_line, new_line):
+        # Open the file for reading
+        f_r = open(file_name, 'r')
         # Open another file to write to
-        f_w = open(namelist_tmp, 'w')
+        f_w = open(file_name+'.tmp', 'w')
         for line in f_r:
-            # Search for that line again, and update it
-            if 'endtime' in line.lower() and not line.startswith('#'):
-                f_w.write(' endTime='+str(endTime)+',\n')
+            if line == old_line:
+                # Update this line in the new file
+                f_w.write(new_line)
             else:
                 # Just copy the line over
                 f_w.write(line)
         f_r.close()
         f_w.close()
-
         # Replace the old file with the new one
-        os.remove(namelist)
-        os.rename(namelist_tmp, namelist)
+        os.remove(file_name)
+        os.rename(file_name+'.tmp', file_name)
 
+    # Inner function to throw an error or a warning if the frequency is incorrect in a 360-day calendar (where every simulation segment should be the same length).
+    def throw_error_warning (var_string, file_name, error=True):
+        if error:
+            message = 'Error: '
+        else:
+            message = 'Warning: '
+        message += var_string + ' has an incorrect value in ' + file_name
+        print message
+        if error:
+            sys.exit()
 
-# Update the diagnostic frequencies in data.diagnostics. The frequency of snapshots for the final state should equal the simulation length; as for update_endTime, update or check this depending on the calendar type. Also check that the frequency of averaging for ice shelf melt rate agrees with the user parameters.
-# TODO: deal with initial case where the checks should give warnings, not errors.
-def update_diag_freq (mit_dir, endTime, options):
+    # Inner function to check if a variable needs to be updated, and then update the file if needed, throwing an error/warning if it's a 360-day calendar.
+    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=False):
+        if old_var != new_var:
+            if options.calendar_type == '360-day':
+                throw_error_warning(var_string, file_name, error=error)
+            print 'Updating ' + var_string + ' in ' + file_name
+            replace_line(file_name, old_line, new_line)
 
-    # Set file paths
-    mit_dir = real_dir(mit_dir)
-    namelist = mit_dir + 'data.diagnostics'
-    namelist_tmp = mit_dir + 'data.diagnostics.tmp'
+    # Now the work starts
+
+    # Look for endTime in "data" namelist
+    endTime_line = line_that_matters(namelist, 'endTime')
+    # Strip out the number
+    old_endTime = extract_first_digits(line)
+    # Update file if needed
+    # TODO: set error=False if initial run
+    check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime')
+        
+    # Look for the frequency of the final state snapshot file in "data.diagnostics" namelist
+    final_state_freq, final_state_freq_line, final_state_index = get_diag_freq(options.final_state_name)
+    # Update if needed
+    # TODO: set error=False if initial run
+    check_and_change(final_state_freq, -endTime, final_state_freq_line, ' frequency('+str(final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.final_state_name)
+    if options.use_seaice:
+        # Sea ice final state snapshot might be a different file
+        seaice_final_state_freq, seaice_final_state_freq_line, seaice_final_state_index = get_diag_freq(options.seaice_final_state_name)
+        if seaice_final_state_index != final_state_index:
+            # Update if needed
+            # TODO: set error=False if initial run
+            check_and_change(seaice_final_state_freq, -endTime, seaice_final_state_freq_line, ' frequency('+str(seaice_final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.seaice_final_state_name)
+
+# end of function update_namelists
+               
         
 
 # Helper function for advance_calendar
@@ -301,10 +353,8 @@ def advance_calendar (directory, mit_dir, options):
 
     # Calculate simulation length in seconds
     endTime = ndays_new*sec_per_day
-    # Update/check endTime for next MITgcm segment
-    update_endTime(mit_dir, endTime, options)
-    # Update/check diagnostic frequencies
-    update_diag_freq(mit_dir, endTime, options)
+    # Update/check endTime for next MITgcm segment, and diagnostic frequencies
+    update_namelists(mit_dir, endTime, options)
         
 
     
