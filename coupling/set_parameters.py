@@ -4,13 +4,10 @@
 # This includes keeping track of the calendar.
 ##############################################################
 
-import datetime
-import os
-
 from config_options import *
 from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between
 
-from mitgcm_python.utils import real_dir, is_leap_year
+from mitgcm_python.utils import real_dir
 
 # Global parameter
 sec_per_day = 24*60*60

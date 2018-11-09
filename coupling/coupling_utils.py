@@ -3,11 +3,12 @@
 #####################################################
 
 import os
+import datetime
 
 from MITgcmutils import rdmds
 
 from mitgcm_python.make_domain import model_bdry, level_vars
-from mitgcm_python.utils import xy_to_xyz, z_to_xyz
+from mitgcm_python.utils import xy_to_xyz, z_to_xyz, is_leap_year
 
 # Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
 def extract_first_int (string):
@@ -18,7 +19,7 @@ def extract_first_int (string):
         if s.isdigit() or s=='-':
             # Accumulate the digits
             int_string += s
-        elif len(digits) > 0:
+        elif len(int_string) > 0:
             # It's not a digit, and we've already found the number.
             # So the digits are finished.
             break
@@ -101,7 +102,7 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
         if calendar_type == 'standard':
             # We're done
             return num_days
-        elif calendar_time == 'noleap':
+        elif calendar_type == 'noleap':
             # Subtract the leap days
             if year_1 == year_2:
                 # Dates are in the same year; maximum 1 leap day between them
