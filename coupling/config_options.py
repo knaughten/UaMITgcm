@@ -6,7 +6,6 @@
 ###### 1. Server workflow options ######
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
-### on whichever machine MITgcm is run
 mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
 
 
@@ -15,10 +14,16 @@ mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
 ### Length of coupling timestep (months)
 couple_step = 6
 ### Calendar type. 3 options:
-### 'standard': full calendar with leap years
+### 'standard': full calendar with leap years 
 ### 'noleap': every year is 365 days
 ### '360-day': every month is 30 days
+### For 'standard', you must use the calendar package in MITgcm.
 calendar_type = '360-day'
+### How often to do time-averaged diagnostic output?
+### 'monthly', 'daily', or 'end' (at the end of the segment)
+### Note 'monthly' does not work with calendar_type='noleap'.
+### Set output_names in part 4 so MITgcm uses this frequency.
+output_freq = 'monthly'
 
 ### How should we deal with digging of the MITgcm domain
 ### (to ensure adjacent water columns are properly connected)?
@@ -121,8 +126,8 @@ pload_file = 'phi0surf.bin'
 ### Should match filename(x) in input/data.diagnostics
 ### for whichever value of x has those variables in fields(1,x)
 ###
-### Contains SHIfwFlx time-averaged over some period,
-### less than or equal to couple_step months
+### Contains SHIfwFlx time-averaged over whichever period
+### you want Ua to see
 ### (you can have SHIfwFlx on another output stream too if you want
 ### output at a different frequency for analysis)
 ismr_name = 'MITout_2D'
@@ -132,6 +137,11 @@ final_state_name = 'FinalState'
 ### at end of simulation
 ### (only matters if use_seaice = True)
 seaice_final_state_name = ''
+### Any files you want to output at output_freq.
+### Will probably include ismr_name.
+### Should not include any snapshots including the final state.
+output_names = ['MITout_2D', 'MITout_3D']
+
 
 
 

@@ -7,7 +7,7 @@
 from config_options import *
 from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between
 
-from mitgcm_python.utils import real_dir
+from mitgcm_python.utils import real_dir, days_per_month
 
 # Global parameter
 sec_per_day = 24*60*60
@@ -55,6 +55,10 @@ class Options:
             elif type == 'str':
                 # Anything can be converted to a string
                 var = str(var)
+            elif type == 'list':
+                # Make sure it's actually a list
+                if not isinstance(var, list):
+                    throw_error(var_name, var, legal=legal)
             # Now check against any legal options given
             if legal is not None and var not in legal:
                 throw_error(var_name, var, legal=legal)
@@ -67,6 +71,11 @@ class Options:
 
         self.couple_step = check_value('couple_step', couple_step, type='int')
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
+        self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
+        if self.calendar_type=='noleap' and self.output_freq=='monthly':
+            print 'Error reading config_options.py'
+            print "output_freq='monthly' does not work with calendar_type='noleap'"
+            sys.exit()
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.x_is_lon = check_value('x_is_lon', x_is_lon, type='bool')
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
@@ -129,6 +138,7 @@ class Options:
             self.seaice_final_state_name = check_value('seaice_final_state_name', seaice_final_state_name)
         else:
             self.seaice_final_state_name = ''
+        self.output_names = check_value('output_names', output_names, type='list')
 
 
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).
@@ -141,6 +151,7 @@ class Options:
 
 
 # Update the "data" and "data.diagnostics" namelists to reflect the length of the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
+# Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
 # TODO: deal with initial case where the check should give a warning, not an error.
 def update_namelists (mit_dir, endTime, options):
 
@@ -171,10 +182,12 @@ def update_namelists (mit_dir, endTime, options):
         if error:
             sys.exit()
 
-    # Inner function to check if a variable needs to be updated, and then update the file if needed, throwing an error/warning if it's a 360-day calendar.
-    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=False):
+    # Inner function to check if a variable needs to be updated, and then update the file if needed.
+    # In some cases we don't think the variable should need to be changed; if so, throw an error (if error=True) or a warning (if error=False).
+    # Control which situations this error/warning is thrown with the keyword argument "check": check='360' throws an error/warning if it's a 360-day calendar and the variable needs to be changed; check='all' throws an error/warning if the variable needs to be changed, regardless of the calendar; check='none' will never throw errors or warnings.
+    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=False, check='360'):
         if old_var != new_var:
-            if options.calendar_type == '360-day':
+            if check=='all' or (check=='360' and options.calendar_type == '360-day'):
                 throw_error_warning(var_string, file_name, error=error)
             print 'Updating ' + var_string + ' in ' + file_name
             replace_line(file_name, old_line, new_line)
@@ -202,6 +215,25 @@ def update_namelists (mit_dir, endTime, options):
             # TODO: set error=False if initial run
             check_and_change(seaice_final_state_freq, -endTime, seaice_final_state_freq_line, ' frequency('+str(seaice_final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.seaice_final_state_name)
 
+    # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
+    if len(options.output_names) > 0:
+
+        # Figure out what the frequency should be
+        if options.output_freq == 'monthly':
+            # Set to 30 days. For 360-day calendars, every month is 30 days; for standard calendars, the MITgcm calendar package will update to make this a real month; we've already checked that noleap calendars don't use this option.
+            freq = 30*sec_per_day
+        elif options.output_freq == 'daily':
+            freq = sec_per_day
+        elif options.output_freq == 'end':
+            freq = endTime
+
+        # Loop over diagnostic filetypes
+        for fname in options.output_names:
+            curr_freq, curr_line, curr_index = get_diag_freq(fname)
+            # TODO: set error=False and check='none' if initial run
+            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check='all')
+            
+
 # end function update_namelists
 
 
@@ -212,7 +244,7 @@ def advance_calendar (directory, mit_dir, options):
 
     print 'Advancing calendar by ' + str(options.couple_step) + ' months'
 
-    # Read the calendar file
+    # Read the first 2 lines of the calendar file
     f = open(directory+options.calendar_file, 'r')
     date_code = f.readline().strip()
     ndays = int(f.readline())
@@ -239,10 +271,33 @@ def advance_calendar (directory, mit_dir, options):
     # Create the new date_code
     date_code_new = str(new_year) + str(new_month).zfill(2)
 
+    # Now decide what to write about the output intervals
+    if options.output_freq == 'daily':
+        # One line with a flag to tell Ua to output daily
+        output_intervals = [-1]
+    elif options.output_freq == 'monthly':
+        # One line for each month in the simulation, containing the number of days in that month
+        if options.calendar_type == '360-day':
+            # 30 days in every month
+            output_intervals = options.couple_step*[30]
+        elif options.calendar_type == 'standard':
+            # Loop through the months to find the number of days in each
+            curr_year = new_year
+            curr_month = new_month
+            output_intervals = []
+            for t in range(options.couple_step):
+                output_intervals.append(days_per_month(curr_month, curr_year))
+                curr_year, curr_month = add_months(curr_year, curr_month, 1)
+    elif options.output_freq == 'end':
+        # One line with the number of days in the simulation
+        output_intervals = [ndays_new]
+
     # Write a new calendar file
     f = open(directory+options.calendar_file, 'w')
     f.write(date_code_new + '\n')
-    f.write(str(ndays_new))
+    f.write(str(ndays_new) + '\n')
+    for interval in output_intervals:
+        f.write(str(interval) + '\n')
     f.close()
 
     # Calculate simulation length in seconds
