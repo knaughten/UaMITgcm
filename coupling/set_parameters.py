@@ -114,6 +114,10 @@ class Options:
 
         self.calendar_file = check_value('calendar_file', calendar_file)
         self.bathyFile = check_value('bathyFile', bathyFile)
+        if self.digging == 'bathy':
+            self.bathyFileOrig = check_value('bathyFileOrig', bathyFileOrig)
+        else:
+            self.bathyFileOrig = ''
         self.draftFile = check_value('draftFile', draftFile)
         self.ini_temp_file = check_value('ini_temp_file', ini_temp_file)
         self.ini_salt_file = check_value('ini_salt_file', ini_salt_file)

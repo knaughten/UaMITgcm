@@ -47,7 +47,7 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 # Given the updated ice shelf draft from Ua, adjust the draft and/or bathymetry so that MITgcm is happy. In order to have fully connected adjacent water columns, they must overlap by at least two wet cells.
 # There are three ways to do this (set in options.digging):
 #    'none': ignore the 2-cell rule and don't dig anything
-#    'bathy': dig bathymetry which is too shallow
+#    'bathy': dig bathymetry which is too shallow (starting with original, undug bathymetry so that digging is reversible)
 #    'draft': dig ice shelf drafts which are too deep
 # In all cases, also remove ice shelf drafts which are too thin.
 # Ua does not see these changes to the geometry.
@@ -62,9 +62,15 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
     # TODO: Read Ua draft output and possibly reassemble
     # Save in variable 'draft'
-    
-    # Read MITgcm bathymetry file from last segment
-    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+
+    # Read MITgcm bathymetry file
+    if options.digging == 'bathy':
+        # Read original (pre-digging) bathymetry, so that digging is reversible
+        bathyFile_read = options.bathyFileOrig
+    else:
+        # Read bathymetry from last segment
+        bathyFile_read = options.bathyFile    
+    bathy = read_binary(mit_dir+bathyFile_read, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
 
     if options.digging == 'none':
         print 'Not doing digging as per user request'
