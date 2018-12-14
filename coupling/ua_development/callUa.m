@@ -1,13 +1,15 @@
 %%%%%%%%%%%
 %% TO DO %%
 %%%%%%%%%%%
-%% Hardcode appropriate filenames for 
+%% Hardcode appropriate filenames and directory for 
 %   + melt output from MITgcm (MITout_2D.nc?)
 %   + calendar file
 %   + user variables
-%% Need to provide user with ll2psxy.m?
-%% Adjust Ua code so it can deal with writing output at variable intervals
-%% Code section on reading user input from file
+%% Need to provide user with ll2psxy.m
+%% Test changes to Ua code that can deal with writing output at variable intervals
+%% Write code for reading user input from file
+%% Which netcdf output do we want to generate?
+%% What format do I expect for the MITgcm file with melt rates, MITout_2D.nc or other?
 
 function callUa(UserVar,varargin)
 
@@ -26,13 +28,14 @@ UserVar.UaMITgcm.UaOutputsDirectory = '.';
 
 UserVar.UaMITgcm.MITgcmOutputsDirectory = '.';
 
+UserVar.UaMITgcm.OutputFormat = 'matlab'; % matlab or netcdf
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %% collect MITgcm input %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % read calendar file
-CAL = textread([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/sample_calendar_month']);
+CAL = textread([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/sample_calendar_monthly']);
 
 % save start year and start month in string format
 Start = num2str(CAL(1));
@@ -52,6 +55,11 @@ if OutputInterval(1)==-1
 else
     UserVar.UaMITgcm.OutputTimes = cumsum(OutputInterval)/365.25;
 end
+
+% based on the OutputTimes we set the ATStimeStepTarget to be the minimum
+% gap between successive output times. This should prevent Ua from
+% 'overstepping'. 
+UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.OutputTimes(2:end)-UserVar.UaMITgcm.OutputTimes(1:end-1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read MITgcm grid and check if it’s lat/lon or Cartesian %%

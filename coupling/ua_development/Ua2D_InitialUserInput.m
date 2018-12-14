@@ -1,61 +1,48 @@
 function [UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar)
 
-
-%%  This input file is used if Ua is run directly from the source code folder.
-%  
-% You will always need to create your own version of this file and put it into
-% you working directory together with the other user-input m-files. 
-%
-%
-
-
-%%
-UserVar.MisExperiment='ice0';            % This I use in DefineMassBalance
-UserVar.Outputsdirectory='ResultsFiles'; % This I use in UaOutputs
-
 %%
 
-CtrlVar.Experiment=['MismipPlus-',UserVar.MisExperiment];   
+CtrlVar.Experiment=UserVar.UaMITgcm.Experiment;   
 %% Types of run
 %
 CtrlVar.TimeDependentRun=1; 
-CtrlVar.TotalNumberOfForwardRunSteps=3;
-CtrlVar.TotalTime=100;
-CtrlVar.Restart=0;  
+CtrlVar.TotalNumberOfForwardRunSteps=10e10; % an arbitrary large number
+CtrlVar.TotalTime=UserVar.UaMITgcm.runTime;
+CtrlVar.Restart=1;
 
+CtrlVar.dt = 1e-3;
+CtrlVar.RestartTime=0; 
+CtrlVar.ResetTime=1;
+CtrlVar.ResetTimeStep=0;    % perhaps this has to be reconsidered if model has issues converging
 
-CtrlVar.dt=0.01; 
-CtrlVar.time=0; 
+CtrlVar.UaOutputsDt = UserVar.UaMITgcm.OutputTimes; 
+            % times (in years) at which Ua needs to produce output
 
-CtrlVar.UaOutputsDt=0; % interval between calling UaOutputs. 0 implies call it at each and every run step.
-                       % setting CtrlVar.UaOutputsDt=1; causes UaOutputs to be called every 1 years.
-                       % This is a more reasonable value once all looks OK.
-
-CtrlVar.ATStimeStepTarget=1;
-CtrlVar.WriteRestartFile=1;
+CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;
+CtrlVar.WriteRestartFile = 1;  
 
 %% Reading in mesh
 CtrlVar.ReadInitialMesh=0;    % if true then read FE mesh (i.e the MUA variable) directly from a .mat file
                               % unless the adaptive meshing option is used, no further meshing is done.
 CtrlVar.ReadInitialMeshFileName='AdaptMesh.mat';
 CtrlVar.SaveInitialMeshFileName='NewMeshFile.mat';
+
 %% Plotting options
-CtrlVar.doplots=1;
-CtrlVar.PlotMesh=1; 
+CtrlVar.doplots=0;
+CtrlVar.PlotMesh=0; 
 CtrlVar.PlotBCs=0;
 CtrlVar.WhenPlottingMesh_PlotMeshBoundaryCoordinatesToo=1;
-CtrlVar.doRemeshPlots=1;
+CtrlVar.doRemeshPlots=0;
 CtrlVar.PlotXYscale=1000; 
 %%
 
 CtrlVar.TriNodes=3;
-
+CtrlVar.kH=1;
+CtrlVar.nip=6;
+CtrlVar.niph=6;
 
 CtrlVar.NameOfRestartFiletoWrite=['Restart',CtrlVar.Experiment,'.mat'];
 CtrlVar.NameOfRestartFiletoRead=CtrlVar.NameOfRestartFiletoWrite;
-
-
-
 
 
 %% adapt mesh
@@ -174,17 +161,11 @@ CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan=10;
 CtrlVar.MeshAdapt.GLrange=[10000 5000 ; 3000 CtrlVar.MeshSizeMin];
 
 
-
 %% Pos. thickness constraints
 CtrlVar.ThickMin=1; % minimum allowed thickness without (potentially) doing something about it
 CtrlVar.ResetThicknessToMinThickness=0;  % if true, thickness values less than ThickMin will be set to ThickMin
 CtrlVar.ThicknessConstraints=1  ;        % if true, min thickness is enforced using active set method
 CtrlVar.ThicknessConstraintsItMax=5  ; 
 
-%%
 
-xd=640e3; xu=0e3 ; yr=0 ; yl=80e3 ;  
-MeshBoundaryCoordinates=[xu yr ; xu yl ; xd yl ; xd yr];
-
- 
 end
