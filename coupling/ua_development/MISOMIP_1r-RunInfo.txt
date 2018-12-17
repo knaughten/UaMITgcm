@@ -1411,3 +1411,5 @@ NR-STREAM(uvh):  1/0  g=1              , r/r0=1.616508e-12   ,  r0=4.879531e-12 
   t-dt-tCPU-it-itTotal-date-uvhAssembly-uvhSolution-WallTime , 0.0219028 , 0.00273785 , 02:22:48  ,  1 , 1 , 17-Dec-2018 12:11:47 , 00:00:05 , 00:00:00 , 00:00:13 
 NR-STREAM(uvh):  1/0  g=1              , r/r0=1.614678e-12   ,  r0=4.875259e-12   , r=7.871973e-24   , ruv=2.79275e-23    , rh=2.243495e-27   , du=1.61026e-06    , dh=3.094734e-07   , dl=2.274599e-05   , BCsNormuv=1.95641e-27 , BCsNormh=0  
   --->  SSTREAM(uvh/supg) 	 time=        0.02190 	 dt=0.00273785 	 r=7.87197e-24 	 #it= 1 	 CPUsec=1.07025 
+  Restart run starts on 17-Dec-2018 14:22:42 
+  Restart run starts on 17-Dec-2018 14:22:43 
