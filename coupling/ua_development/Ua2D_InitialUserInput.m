@@ -27,6 +27,9 @@ CtrlVar.ReadInitialMesh=0;    % if true then read FE mesh (i.e the MUA variable)
 CtrlVar.ReadInitialMeshFileName='AdaptMesh.mat';
 CtrlVar.SaveInitialMeshFileName='NewMeshFile.mat';
 
+xd=640e3; xu=0e3 ; yr=0 ; yl=80e3 ;  
+MeshBoundaryCoordinates=[xu yr ; xu yl ; xd yl ; xd yr];
+
 %% Plotting options
 CtrlVar.doplots=0;
 CtrlVar.PlotMesh=0; 
@@ -41,7 +44,7 @@ CtrlVar.kH=1;
 CtrlVar.nip=6;
 CtrlVar.niph=6;
 
-CtrlVar.NameOfRestartFiletoWrite=['Restart',CtrlVar.Experiment,'.mat'];
+CtrlVar.NameOfRestartFiletoWrite=[CtrlVar.Experiment,'-RestartFile.mat'];
 CtrlVar.NameOfRestartFiletoRead=CtrlVar.NameOfRestartFiletoWrite;
 
 

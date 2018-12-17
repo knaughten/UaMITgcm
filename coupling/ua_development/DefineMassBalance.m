@@ -51,6 +51,3 @@ h=s-b;
 I=(h<CtrlVar.ThickMin & ab<0); ab(I)=0; 
 
 end
-
-end
-

@@ -5,7 +5,8 @@
 %   + melt output from MITgcm (MITout_2D.nc?)
 %   + calendar file
 %   + user variables
-%% -> Write code for reading user data from file
+%% -> Test changes to Ua code that can deal with writing output at variable intervals
+%% -> Write code for reading user input from file
 %% -> Which netcdf output do we want to generate?
 %% -> What format do I expect for the MITgcm output file: SHIFwFlx in MITout_2D.nc or other?
 
@@ -33,7 +34,7 @@ UserVar.UaMITgcm.OutputFormat = 'matlab'; % options are 'matlab' or 'netcdf'
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % read calendar file
-CAL = textread([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/sample_calendar_monthly']);
+CAL = textread([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/sample_calendar_end']);
 
 % save start year and start month in string format
 Start = num2str(CAL(1));
@@ -50,8 +51,9 @@ end
 
 if OutputInterval(1)==-1
     UserVar.UaMITgcm.OutputTimes = [1:UserVar.UaMITgcm.runTime*365.25]/365.25;
-elseif OutputInterval(1)==CAL(2)
-    UserVar.UaMITgcm.OutputTimes = [OutputInterval(1) 2*OutputInterval(1)]/365.25;
+    UserVar.UaMITgcm.OutputTimes
+elseif
+    OutputInterval(1)==
 else
     UserVar.UaMITgcm.OutputTimes = cumsum(OutputInterval)/365.25;
 end
@@ -60,6 +62,8 @@ end
 % gap between successive output times. This should prevent Ua from
 % 'overstepping'. 
 UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.OutputTimes(2:end)-UserVar.UaMITgcm.OutputTimes(1:end-1));
+
+return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read MITgcm grid and check if it’s lat/lon or Cartesian %%
@@ -92,7 +96,8 @@ time = ncread(str2D,'TIME'); T=length(time);
 
 % MITgcm is kg w.e./s, convert to m/yr 
 % negative for melting
-UserVar.UaMITgcm.MITgcmMelt = double(ncread(str2D,'SHIfwFlx',[1,1,T],[I,J,1])/1000*365*24*60*60);
+%UserVar.UaMITgcm.MITgcmMelt = double(ncread(str2D,'SHIfwFlx',[1,1,T],[I,J,1])/1000*365*24*60*60);
+UserVar.UaMITgcm.MITgcmMelt = 0 * UserVar.UaMITgcm.MITgcmGridX;
 
 %%%%%%%%%%%%
 %% run Ua %%

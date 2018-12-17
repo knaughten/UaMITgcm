@@ -52,7 +52,6 @@ function [RunInfo,dtOut,dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,time,dtIn)
     
     dtOut=dtIn ;
     
-    
     %%
     if CtrlVar.AdaptiveTimeStepping && ~isnan(RunInfo.Forward.Iterations) 
         
@@ -69,18 +68,17 @@ function [RunInfo,dtOut,dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,time,dtIn)
         
         fprintf(CtrlVar.fidlog,' Adaptive Time Stepping:  #Non-Lin Iterations over last %-i time steps: (max|mean|min)=(%-g|%-g|%-g). Target is %-i. \t TimeStepUpRatio=%-g \n ',...
             nItVector,max(ItVector),mean(ItVector),min(ItVector),CtrlVar.ATSTargetIterations,TimeStepUpRatio);
-        
+
         if icount>2 && RunInfo.Forward.Iterations>25
             icount=0;
             dtOut=dtIn/CtrlVar.ATStimeStepFactorDown;
             fprintf(CtrlVar.fidlog,' ---------------- Adaptive Time Stepping: time step decreased from %-g to %-g \n ',dtIn,dtOut);
         else
-            
+ 
             if icount>CtrlVar.ATSintervalDown && nItVector >= CtrlVar.ATSintervalDown
                 %if mean(ItVector(1:CtrlVar.ATSintervalDown)) > 5
                 if all(ItVector(1:CtrlVar.ATSintervalDown) > 10 )
                     dtOut=dtIn/CtrlVar.ATStimeStepFactorDown; icount=0;
-                    
                     
                     fprintf(CtrlVar.fidlog,' ---------------- Adaptive Time Stepping: time step decreased from %-g to %-g \n ',dtIn,dtOut);
                 end
@@ -89,7 +87,6 @@ function [RunInfo,dtOut,dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,time,dtIn)
             if icount>CtrlVar.ATSintervalUp && nItVector >= CtrlVar.ATSintervalUp
                 if  TimeStepUpRatio<1
                     dtOut=min(CtrlVar.ATStimeStepTarget,dtIn*CtrlVar.ATStimeStepFactorUp); icount=0;
-
 %% This will now be fully controlled by the overstepping check                    
 %                     if  CtrlVar.UaOutputsDt>0  
 %                         
@@ -127,7 +124,6 @@ function [RunInfo,dtOut,dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,time,dtIn)
     dtOutCopy=dtOut;  % keep a copy of dtOut to be able to revert to previous time step
     % after this adjustment
     
-    
     if CtrlVar.WriteDumpFile && CtrlVar.WriteDumpFileTimeInterval>0
         temp=dtOut;
         dtOut=NoOverStepping(CtrlVar,time,dtOut,CtrlVar.WriteDumpFileTimeInterval);
@@ -137,9 +133,9 @@ function [RunInfo,dtOut,dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,time,dtIn)
     end
     
     %
-    if CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter)>0
+    if CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter+1)>0
         temp=dtOut;
-        dtOut=NoOverStepping(CtrlVar,time,dtOutCopy,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter));
+        dtOut=NoOverStepping(CtrlVar,time,dtOutCopy,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter+1));
         if abs(temp-dtOut)>100*eps
             fprintf(CtrlVar.fidlog,' Adaptive Time Stepping: dt modified to accomondate user output requirements and set to %-g \n ',dtOut);
         end
@@ -150,6 +146,7 @@ function [RunInfo,dtOut,dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,time,dtIn)
     %% make sure that run time does not exceed total run time as defined by user
     % also check if current time is very close to total time, in which case there 
     % is no need to change the time step
+    
     if time+dtOut>CtrlVar.TotalTime && abs(time-CtrlVar.TotalTime)>100*eps
         
         dtOutOld=dtOut;

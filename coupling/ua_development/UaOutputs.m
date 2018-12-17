@@ -23,8 +23,8 @@ v2struct(F);
 time=CtrlVar.time; 
     
 % check if folder 'UaOutputsDirectory' exists, if not create
-if exist(fullfile(cd,UserVar.MITgcm.UaOutputsDirectory),'dir')~=7
-    mkdir(UserVar.MITgcm.UaOutputsDirectory) ;
+if exist(fullfile(cd,UserVar.UaMITgcm.UaOutputsDirectory),'dir')~=7
+    mkdir(UserVar.UaMITgcm.UaOutputsDirectory) ;
 end
 
 % write output in matlab or netcdf format
@@ -32,7 +32,7 @@ end
 if strcmp(UserVar.UaMITgcm.OutputFormat,'matlab')
     
     FileName=sprintf('%s/%07i-Nodes%i-Ele%i-Tri%i-kH%i-%s.mat',...
-    UserVar.MITgcm.UaOutputsDirectory,round(100*time),MUA.Nnodes,MUA.Nele,MUA.nod,1000*CtrlVar.kH,CtrlVar.Experiment);
+    UserVar.UaMITgcm.UaOutputsDirectory,round(time*365.25),MUA.Nnodes,MUA.Nele,MUA.nod,1000*CtrlVar.kH,CtrlVar.Experiment);
     fprintf(' Saving data in %s \n',FileName)
     save(FileName,'UserVar','CtrlVar','MUA','time','s','b','S','B','h','ub','vb','C','dhdt','AGlen','m','n','rho','rhow','as','ab','GF');
     

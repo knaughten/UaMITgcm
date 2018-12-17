@@ -3,8 +3,6 @@ function Ua2D(UserVar,varargin)
 %% Driver for the 2HD �a model
 % 
 
-
-
 if nargin==0
     UserVar=[];
 end
@@ -266,20 +264,20 @@ if CtrlVar.doInverseStep   % -inverse
 end
 
 %% UaOutputs
-CtrlVar.UaOutputsCounter=1;
-if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5 || CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter)==0 )
-    CtrlVar.UaOutputsInfostring='First call';
-    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
-    
-    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
-    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-    
-    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
-        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
-            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
-        return
-    end
-end
+CtrlVar.UaOutputsCounter=0;
+% if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5 || CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter)==0 )
+%     CtrlVar.UaOutputsInfostring='First call';
+%     CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%     
+%     fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
+%     UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
+%     
+%     if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
+%         fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
+%             CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
+%         return
+%     end
+% end
 %
 
 CtrlVar.CurrentRunStepNumber0=CtrlVar.CurrentRunStepNumber;
@@ -601,7 +599,7 @@ while 1
     
     % UaOutputs
     
-    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
+    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter+1))<1e-5)
         CtrlVar.UaOutputsInfostring='inside transient loop and inside run-step loop';
         CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
         
@@ -651,7 +649,7 @@ end
 
 if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
     CtrlVar.UaOutputsInfostring='Last call';
-    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
     if CtrlVar.MassBalanceGeometryFeedback>0
         CtrlVar.time=CtrlVar.time+CtrlVar.dt;
         [UserVar,F]=GetMassBalance(UserVar,CtrlVar,MUA,F);
@@ -668,8 +666,6 @@ if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))
         return
     end
 end
-
-
 
 %% saving outputs
 
