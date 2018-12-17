@@ -67,8 +67,9 @@ UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.OutputTimes(2:end)-Use
 % MITgcm is kg w.e./s, convert to m/yr 
 % negative for melting
 MeltFile = [UserVar.UaMITgcm.MITgcmOutputsDirectory,'/MITout_2D.nc'];
-UserVar.UaMITgcm.MITgcmMelt = double(ncread(MeltFile,'SHIfwFlx')/1000*365*24*60*60);
-UserVar.UaMITgcm.MITgcmMelt = squeeze(UserVar.UaMITgcm.MITgcmMelt(:,:,end));
+Melt = double(ncread(MeltFile,'SHIfwFlx')/1000*365*24*60*60);
+Melt = squeeze(Melt(:,:,end));
+UserVar.UaMITgcm.MITgcmMelt = Melt(:);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read MITgcm grid and check if it’s lat/lon or Cartesian %%
@@ -81,14 +82,11 @@ lat=fread(fid,inf,'real*4'); fclose(fid);
 
 % check if grid is lat/lon and convert to cartesian if required
 if all(lon(:)>=-180) && all(lon(:)<=180) && all(lat(:)>=-90) && all(lat(:)<=90)
-    [x,y] = ll2psxy(lat,lon,-71,0);
+    [x,y] = ll2psxy(lat(:),lon(:),-71,0);
 else
-    x = lon;    y = lat;
+    x = lon(:);    y = lat(:);
 end
-    
-% reshape to 2D grid
-[I,J] = size(UserVar.UaMITgcm.MITgcmMelt);
-x = reshape(x,I,J); y = reshape(y,I,J);
+
 UserVar.UaMITgcm.MITgcmGridX = x;
 UserVar.UaMITgcm.MITgcmGridY = y;
 
