@@ -1,6 +1,8 @@
 from set_parameters import Options, advance_calendar
 from mitgcm_python.grid import Grid
 from process_data import extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
+from coupling_utils import submit_job
+
 
 print 'Reading parameters'
 options = Options()
@@ -30,7 +32,17 @@ if options.use_xmitgcm:
 print 'Gathering output'
 gather_output(options)
 
+print 'Submitting next MITgcm segment'
+mit_id = submit_job('run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
 
-# TODO: Submit next MITgcm job
-# TODO: Submit next Ua job
-# TODO: Submit itself with afterok
+print 'Submitting next Ua segment'
+if options.ua_option == 'compiled':
+    ua_id = submit_job('run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
+elif options.ua_option == 'matlab':
+    # TODO
+    pass
+
+print 'Submitting next coupler step to start when MITgcm and Ua are finished'
+submit_job('run_coupler.sh', afterok=[mit_id, ua_id])
+
+print 'Coupling successfully completed'

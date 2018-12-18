@@ -5,10 +5,23 @@
 
 ###### 1. Server workflow options ######
 
+### Specify how to run Ua. 2 options:
+### 'compiled': using Matlab Compiler Runtime,
+###             with an executable which was created by
+###             Matlab Compiler on another machine
+### 'matlab': using regular Matlab
+### TODO: consider 'matlab' case in code
+ua_option = 'compiled'
+
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
 mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
+### Path to the Ua directory containing executable
+ua_exe_dir = '/work/n02/n02/kaight/Ua_exe_MISOMIP_999/'
 ### Path to the directory to centrally gather output
 output_dir = '/work/n02/n02/kaight/MISOMIP_999_output/'
+
+### Archer budget to charge jobs to
+budget_code = 'n02-NEL013770'
 
 # Whether to convert MITgcm binary output to NetCDF using xmitgcm
 # (Even if this is False, the MNC package in MITgcm is not supported.)

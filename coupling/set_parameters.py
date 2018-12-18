@@ -65,10 +65,13 @@ class Options:
             return var
 
         # Check all the variables and save them to this object
+        self.ua_option = check_value('ua_option', ua_option, legal=['compiled', 'matlab'])
         self.mit_case_dir = real_dir(check_value('mit_case_dir', mit_case_dir))
+        self.ua_exe_dir = real_dir(check_value('ua_exe_dir', ua_exe_dir))
         # Save the run directory derived from this
         self.mit_run_dir = self.mit_case_dir + 'run/'
         self.output_dir = real_dir(check_value('output_dir', output_dir))
+        self.budget_code = check_value('budget_code', budget_code)
         self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
 
         self.couple_step = check_value('couple_step', couple_step, type='int')

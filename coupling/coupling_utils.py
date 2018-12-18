@@ -4,6 +4,7 @@
 
 import os
 import datetime
+import subprocess
 
 from MITgcmutils import rdmds
 
@@ -174,3 +175,38 @@ def find_open_cells (bathy, draft, grid, options, hFacMin, hFacMinDr):
 # Move a file from one directory to another, without changing its name.
 def move_to_dir (fname, old_dir, new_dir):
     os.rename(old_dir+fname, new_dir+fname)
+
+
+# Convert a list of strings to a single string with elements separated by commas.
+def list_with_commas (A):
+    s = ''
+    for elm in A:
+        s += A + ','
+    # Remove the last comma
+    return s[:-1]    
+
+
+# Submit the given PBS script and return the PBS job ID.
+# Optional keyword arguments:
+# input_var: a list of variable definitions to pass with -v option, eg 'MIT_DIR=directory_path'
+# afterok: a list of PBS job IDs of previously submitted jobs. If it is defined, this job will stay on hold until the given jobs successfully complete.
+def submit_job (pbs_script, input_var=None, afterok=None):
+
+    # Construct qsub call line by line.
+    command = 'qsub'
+    # Specify budget
+    command += ' -A ' + options.budget_code
+    if input_var is not None:
+        # Add variable definitions
+        command += ' -v '
+        command += list_with_commas(input_var)
+    if afterok is not None:
+        command += ' -W depend=afterok:'
+        command += list_with_commas(afterok)
+    # Specify script
+    command += ' ' + pbs_script
+
+    # Call the command and capture the output
+    pbs_id = subprocess.check_output(command, shell=True)
+    # Now extract the digits from the PBS job ID and return as a string
+    return str(extract_first_int(pbs_id))
