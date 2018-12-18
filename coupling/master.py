@@ -27,7 +27,7 @@ if not initial and not spinup and not finished:
     set_mit_ics(options.mit_run_dir, grid, options)
 
     
-# Is there any output we neeed to deal with?
+# Is there any output we need to deal with?
 if not initial:
     
     if options.use_xmitgcm:

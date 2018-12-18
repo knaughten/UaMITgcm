@@ -16,6 +16,7 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
+# TODO: check sign
 
 # Arguments:
 # mit_dir: MITgcm directory containing SHIfwFlx output
