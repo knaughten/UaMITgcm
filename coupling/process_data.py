@@ -168,8 +168,9 @@ def convert_mit_output (options):
 # Gather all output from MITgcm and Ua, moving it to a common subdirectory of options.output_dir.
 # Arguments:
 # options: Options object
+# spinup: boolean indicating we're in the ocean-only spinup phase, so there is no Ua output to deal with
 # TODO: Move Ua output into new folder
-def gather_output (options):
+def gather_output (options, spinup):
 
     # Make a subdirectory named after the starting date of the simulation segment
     new_dir = options.output_dir + options.last_start_date + '/'
@@ -195,11 +196,12 @@ def gather_output (options):
                 # Move binary files to output directory
                 move_to_dir(fname, options.mit_run_dir, new_dir)
 
-    # TODO: Move Ua output into this folder
-    
-    # Move coupling files into the subdirectory
-    move_to_dir(options.ua_melt_file, options.output_dir, new_dir)
-    move_to_dir(options.ua_draft_file, options.output_dir, new_dir
+    if not spinup:
+        # TODO: Move Ua output into this folder
+
+        # Move coupling files into the subdirectory
+        move_to_dir(options.ua_melt_file, options.output_dir, new_dir)
+        move_to_dir(options.ua_draft_file, options.output_dir, new_dir
     
 
 

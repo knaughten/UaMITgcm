@@ -4,6 +4,8 @@
 # This includes keeping track of the calendar.
 ##############################################################
 
+import os
+
 from config_options import *
 from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between
 
@@ -20,14 +22,19 @@ class Options:
     # Check and save all the options.
     def __init__ (self):
 
-        # Inner function to report an illegal value
-        def throw_error (var_name, var, legal=None):
+        # Inner function to throw an error and stop processing
+        def throw_error(message):
             print 'Error reading config_options.py'
-            print 'Invalid value of ' + var_name + ' = ' + str(var)
+            print message
+            sys.exit()        
+
+        # Inner function to report an illegal value
+        def var_error (var_name, var, legal=None):
+            message = 'Invalid value of ' + var_name + ' = ' + str(var)
             if legal is not None:
-                print 'Legal options are: '
-                print legal
-            sys.exit()
+                message += 'Legal options are: '
+                message += legal
+            throw_error(message)
 
         # Inner function to error check a variable
         def check_value (var_name, var, type='str', legal=None):
@@ -39,7 +46,7 @@ class Options:
                 elif var in [False, 'False', 'false', 'F', 'f', 0]:
                     return False
                 else:
-                    throw_error(var_name, var, legal=[True, False])
+                    var_error(var_name, var, legal=[True, False])
             elif type in ['float', 'int']:
                 # Try to convert to a number
                 try:
@@ -48,39 +55,46 @@ class Options:
                     elif type == 'int':
                         if var != int(var):
                             # Not a round number
-                            throw_error(var_name, var)
+                            var_error(var_name, var)
                         var = int(var)
                 except(ValueError):
-                    throw_error(var_name, var, legal=legal)
+                    var_error(var_name, var, legal=legal)
             elif type == 'str':
                 # Anything can be converted to a string
                 var = str(var)
             elif type == 'list':
                 # Make sure it's actually a list
                 if not isinstance(var, list):
-                    throw_error(var_name, var, legal=legal)
+                    var_error(var_name, var, legal=legal)
             # Now check against any legal options given
             if legal is not None and var not in legal:
-                throw_error(var_name, var, legal=legal)
+                var_error(var_name, var, legal=legal)
             return var
 
-        # Check all the variables and save them to this object
+        # Save all the variables to this object, doing error checking where needed
         self.ua_option = check_value('ua_option', ua_option, legal=['compiled', 'matlab'])
-        self.mit_case_dir = real_dir(check_value('mit_case_dir', mit_case_dir))
-        self.ua_exe_dir = real_dir(check_value('ua_exe_dir', ua_exe_dir))
+        self.mit_case_dir = real_dir(mit_case_dir)
         # Save the run directory derived from this
         self.mit_run_dir = self.mit_case_dir + 'run/'
-        self.output_dir = real_dir(check_value('output_dir', output_dir))
-        self.budget_code = check_value('budget_code', budget_code)
+        self.ua_exe_dir = real_dir(ua_exe_dir)
+        self.output_dir = real_dir(output_dir)
+        self.budget_code = budget_code
         self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
 
+        self.total_time = check_value('total_time', total_time, type='int')
+        self.spinup_time = check_value('spinup_time', spinup_time, type='int')
+        if self.spinup_time > self.total_time:
+            throw_error('spinup_time should not be larger than total_time')
         self.couple_step = check_value('couple_step', couple_step, type='int')
+        # Make sure couple_step evenly divides total_time and spinup_time
+        if self.total_time % self.couple_step != 0:
+            throw_error('couple_step must evenly divide total_time')
+        if self.spinup_time % self.couple_step != 0:
+            throw_error('couple_step must evenly divide spinup_time')
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
         if self.calendar_type=='noleap' and self.output_freq=='monthly':
-            print 'Error reading config_options.py'
-            print "output_freq='monthly' does not work with calendar_type='noleap'"
-            sys.exit()
+            throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.x_is_lon = check_value('x_is_lon', x_is_lon, type='bool')
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
@@ -96,9 +110,7 @@ class Options:
         self.deltaT = check_value('deltaT', deltaT, type='int')
         # Make sure ocean timestep evenly divides 1 day
         if sec_per_day % self.deltaT != 0:
-            print 'Error reading config_options.py'
-            print 'deltaT must evenly divide 1 day'
-            sys.exit()
+            throw_error('deltaT must evenly divide 1 day')
         self.hFacMin = check_value('hFacMin', hFacMin, type='float')
         self.hFacMinDr = check_value('hFacMinDr', hFacMinDr, type='float')
         self.readBinaryPrec = check_value('readBinaryPrec', readBinaryPrec, type='int', legal=[32, 64])
@@ -116,54 +128,52 @@ class Options:
             self.sBeta = 0.
             self.Tref = 0.
             self.Sref = 0.
-        self.startDate = check_value('startDate', startDate)
-        problem = len(self.startDate) != 8
+        # Make sure the start date is in the right format
+        problem = len(startDate) != 8
         try:
-            tmp = int(self.startDate)
+            tmp = int(startDate)
         except(ValueError):
             problem = True
         if problem:
-            print 'Error reading config_options.py'
-            print 'startDate should be an 8-digit code in the form YYYYMMDD'
+            throw_error('startDate should be an 8-digit code in the form YYYYMMDD')
+        self.startDate = startDate            
 
-        self.calendar_file = check_value('calendar_file', calendar_file)
-        self.bathyFile = check_value('bathyFile', bathyFile)
+        self.calendar_file = calendar_file
+        self.bathyFile = bathyFile
         if self.digging == 'bathy':
-            self.bathyFileOrig = check_value('bathyFileOrig', bathyFileOrig)
+            self.bathyFileOrig = bathyFileOrig
         else:
             self.bathyFileOrig = ''
-        self.draftFile = check_value('draftFile', draftFile)
-        self.ini_temp_file = check_value('ini_temp_file', ini_temp_file)
-        self.ini_salt_file = check_value('ini_salt_file', ini_salt_file)
-        self.ini_u_file = check_value('ini_u_file', ini_u_file)
-        self.ini_v_file = check_value('ini_v_file', ini_v_file)
+        self.draftFile = draftFile
+        self.ini_temp_file = ini_temp_file
+        self.ini_salt_file = ini_salt_file
+        self.ini_u_file = ini_u_file
+        self.ini_v_file = ini_v_file
         if self.use_seaice:
-            self.ini_area_file = check_value('ini_area_file', ini_area_file)
-            self.ini_heff_file = check_value('ini_heff_file', ini_heff_file)
-            self.ini_hsnow_file = check_value('ini_hsnow_file', ini_hsnow_file)
-            self.ini_uice_file = check_value('ini_uice_file', ini_uice_file)
-            self.ini_vice_file = check_value('ini_vice_file', ini_vice_file)
+            self.ini_area_file = ini_area_file
+            self.ini_heff_file = ini_heff_file
+            self.ini_hsnow_file = ini_hsnow_file
+            self.ini_uice_file = ini_uice_file
+            self.ini_vice_file = ini_vice_file
         else:
             self.ini_area_file = ''
             self.ini_heff_file = ''
             self.ini_hsnow_file = ''
             self.ini_uice_file = ''
             self.ini_vice_file = ''
-        self.pload_file = check_value('pload_file', pload_file)
-        self.ismr_name = check_value('ismr_name', ismr_name)
-        self.final_state_name = check_value('final_state_name', final_state_name)
+        self.pload_file = pload_file
+        self.ismr_name = ismr_name
+        self.final_state_name = final_state_name
         if self.use_seaice:
-            self.seaice_final_state_name = check_value('seaice_final_state_name', seaice_final_state_name)
+            self.seaice_final_state_name = seaice_final_state_name
         else:
             self.seaice_final_state_name = ''
         self.output_names = check_value('output_names', output_names, type='list')
-        self.mit_nc_name = check_value('mit_nc_name', mit_nc_name)
+        self.mit_nc_name = mit_nc_name
         if not self.mit_nc_name.endswith('.nc'):
-            print 'Error reading config_options.py'
-            print 'mit_nc_name must be a NetCDF file'
-            sys.exit()
-        self.ua_melt_file = check_value('ua_melt_file', ua_melt_file)
-        self.ua_draft_file = check_value('ua_draft_file', ua_draft_file)
+            throw_error('mit_nc_name must be a NetCDF file')
+        self.ua_melt_file = ua_melt_file
+        self.ua_draft_file = ua_draft_file
 
 
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).
@@ -171,8 +181,7 @@ class Options:
         self.last_start_date = start_date
         self.last_timestep = ndays*sec_per_day
 
-# end class Object
-
+# end class Options
 
 
 # Update the "data" and "data.diagnostics" namelists to reflect the length of the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
@@ -262,73 +271,107 @@ def update_namelists (mit_dir, endTime, options):
 # end function update_namelists
 
 
-
 # Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir).
-# TODO: deal with initial case where the file doesn't exist yet.
-def advance_calendar (directory, mit_dir, options):
+# Return three booleans:
+# initial: indicates whether the next segment is the very first segment
+# spinup: indicates whether the next segment is part of the ocean-only spinup period
+# finished: indicates whether the entire simulation is finished, so no more segments need to run.
+def set_calendar (directory, mit_dir, options):
 
-    print 'Advancing calendar by ' + str(options.couple_step) + ' months'
+    # Figure out if this the very first segment, based on whether the calendar file already exists
+    calfile = directory + options.calendar_file    
+    initial = not os.path.isfile(calfile)
 
-    # Read the first 2 lines of the calendar file
-    f = open(directory+options.calendar_file, 'r')
-    date_code = f.readline().strip()
-    ndays = int(f.readline())
-    f.close()
+    # Get the start year and month for the whole simulation
+    ini_year = int(options.startDate[:4])
+    ini_month = int(options.startDate[4:6])
+    
+    if initial:
+        print 'This is the first segment'
+        print 'Initialising calendar'
+        new_year = ini_year
+        new_month = ini_month
+    else:
+        print 'Advancing calendar by ' + str(options.couple_step) + ' months'
+        
+        # Read the first 2 lines of the calendar file
+        f = open(calfile, 'r')
+        date_code = f.readline().strip()
+        ndays = int(f.readline())
+        f.close()
 
-    # Save that info to the Options object
-    options.save_last_calendar(date_code, ndays)
+        # Save that info to the Options object
+        options.save_last_calendar(date_code, ndays)
 
-    # Parse the date code
-    old_year = int(date_code[:4])
-    old_month = int(date_code[4:])
-    # Get the date at the beginning of the next simulation
-    new_year, new_month = add_months(old_year, old_month, options.couple_step)
-    # and the simulation after that
-    newer_year, newer_month = add_months(new_year, new_month, options.couple_step)
+        # Parse the date code
+        old_year = int(date_code[:4])
+        old_month = int(date_code[4:])
+        # Get the date at the beginning of the next simulation
+        new_year, new_month = add_months(old_year, old_month, options.couple_step)
+        # Make sure ndays makes sense
+        if ndays != days_between(old_year, old_month, new_year, new_month, options.calendar_type):
+            print 'Error (set_calendar): number of days in last simulation does not agree with couple_step and/or calendar_type.'
+            sys.exit()
 
-    # Make sure ndays makes sense
-    if ndays != days_between(old_year, old_month, new_year, new_month, options.calendar_type):
-        print 'Error (advance_calendar): number of days in last simulation does not agree with couple_step and/or calendar_type.'
-        sys.exit()
+    # Figure out if we're in the ocean-only spinup period
+    # Find the year and month when coupling begins
+    couple_year, couple_month = add_months(ini_year, ini_month, options.spinup_time)
+    spinup = (new_year < couple_year) or (new_year==couple_year and new_month < couple_month)
+    if spinup:
+        print 'Simulation is in ocean-only spinup phase'
 
-    # Calculate number of days in the next simulation
-    ndays_new = days_between(new_year, new_month, newer_year, newer_month, options.calendar_type)    
-    # Create the new date_code
-    date_code_new = str(new_year) + str(new_month).zfill(2)
+    # Figure out if the simulation is finished
+    # Find the year and month after the simulation ends
+    end_year, end_month = add_months(ini_year, ini_month, options.total_time)
+    finished = new_year==end_year and new_month==end_month
 
-    # Now decide what to write about the output intervals
-    if options.output_freq == 'daily':
-        # One line with a flag to tell Ua to output daily
-        output_intervals = [-1]
-    elif options.output_freq == 'monthly':
-        # One line for each month in the simulation, containing the number of days in that month
-        if options.calendar_type == '360-day':
-            # 30 days in every month
-            output_intervals = options.couple_step*[30]
-        elif options.calendar_type == 'standard':
-            # Loop through the months to find the number of days in each
-            curr_year = new_year
-            curr_month = new_month
-            output_intervals = []
-            for t in range(options.couple_step):
-                output_intervals.append(days_per_month(curr_month, curr_year))
-                curr_year, curr_month = add_months(curr_year, curr_month, 1)
-    elif options.output_freq == 'end':
-        # One line with the number of days in the simulation
-        output_intervals = [ndays_new]
+    if finished:
+        print 'Simulation has finished'
+    else:
+        print 'Setting output intervals'
+        # Get the date at the beginning of the simulation after next
+        newer_year, newer_month = add_months(new_year, new_month, options.couple_step)
+        # Calculate number of days in the next simulation
+        ndays_new = days_between(new_year, new_month, newer_year, newer_month, options.calendar_type)    
+        # Create the new date_code
+        date_code_new = str(new_year) + str(new_month).zfill(2)
 
-    # Write a new calendar file
-    f = open(directory+options.calendar_file, 'w')
-    f.write(date_code_new + '\n')
-    f.write(str(ndays_new) + '\n')
-    for interval in output_intervals:
-        f.write(str(interval) + '\n')
-    f.close()
+        # Now decide what to write about the output intervals
+        if options.output_freq == 'daily':
+            # One line with a flag to tell Ua to output daily
+            output_intervals = [-1]
+        elif options.output_freq == 'monthly':
+            # One line for each month in the simulation, containing the number of days in that month
+            if options.calendar_type == '360-day':
+                # 30 days in every month
+                output_intervals = options.couple_step*[30]
+            elif options.calendar_type == 'standard':
+                # Loop through the months to find the number of days in each
+                curr_year = new_year
+                curr_month = new_month
+                output_intervals = []
+                for t in range(options.couple_step):
+                    output_intervals.append(days_per_month(curr_month, curr_year))
+                    curr_year, curr_month = add_months(curr_year, curr_month, 1)
+        elif options.output_freq == 'end':
+            # One line with the number of days in the simulation
+            output_intervals = [ndays_new]
 
-    # Calculate simulation length in seconds
-    endTime = ndays_new*sec_per_day
-    # Update/check endTime for next MITgcm segment, and diagnostic frequencies
-    update_namelists(mit_dir, endTime, options)
+        print 'Updating ' + calfile
+        f = open(calfile, 'w')
+        f.write(date_code_new + '\n')
+        f.write(str(ndays_new) + '\n')
+        for interval in output_intervals:
+            f.write(str(interval) + '\n')
+        f.close()
+
+        print 'Updating simulation length in namelists'
+        # Calculate simulation length in seconds
+        endTime = ndays_new*sec_per_day
+        # Update/check endTime for next MITgcm segment, and diagnostic frequencies
+        update_namelists(mit_dir, endTime, options)
+
+    return initial, spinup, finished
 
         
 

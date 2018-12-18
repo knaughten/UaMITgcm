@@ -6,9 +6,8 @@
 ###### 1. Server workflow options ######
 
 ### Specify how to run Ua. 2 options:
-### 'compiled': using Matlab Compiler Runtime,
-###             with an executable which was created by
-###             Matlab Compiler on another machine
+### 'compiled': using Matlab Compiler Runtime, with an executable
+###             which was created by Matlab Compiler on another machine
 ### 'matlab': using regular Matlab
 ### TODO: consider 'matlab' case in code
 ua_option = 'compiled'
@@ -30,8 +29,14 @@ use_xmitgcm = True
 
 ###### 2. Coupling options ######
 
+### Total length of simulation (months)
+total_time = 120
+### Length of ocean spinup period (months)
+spinup_time = 12
 ### Length of coupling timestep (months)
+### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 6
+
 ### Calendar type. 3 options:
 ### 'standard': full calendar with leap years 
 ### 'noleap': every year is 365 days
