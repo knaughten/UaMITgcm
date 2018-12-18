@@ -7,6 +7,12 @@
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
 mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
+### Path to the directory to centrally gather output
+output_dir = '/work/n02/n02/kaight/MISOMIP_999_output/'
+
+# Whether to convert MITgcm binary output to NetCDF using xmitgcm
+# (Even if this is False, the MNC package in MITgcm is not supported.)
+use_xmitgcm = True
 
 
 ###### 2. Coupling options ######
@@ -74,6 +80,11 @@ tAlpha = 3.733e-5
 sBeta = 7.843e-4
 Tref = -1.
 Sref = 34.2
+
+### Starting date of simulation
+### Should match startDate_1 in data.cal
+startDate = '19790101'
+
 
 
 ###### 4. Filenames ######
@@ -147,6 +158,15 @@ seaice_final_state_name = ''
 ### Will probably include ismr_name.
 ### Should not include any snapshots including the final state.
 output_names = ['MITout_2D', 'MITout_3D']
+### Name for NetCDF files converted by xmitgcm
+### Doesn't really matter what this is,
+### as long as it won't overwrite anything in run/
+mit_nc_name = 'output.nc'
+
+### Melt rate file read by Ua
+ua_melt_file = 'NewMeltrate.mat'
+### Ice shelf draft file written by Ua
+ua_draft_file = 'DataForMIT.mat'
 
 
 

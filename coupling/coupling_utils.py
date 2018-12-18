@@ -169,3 +169,8 @@ def find_open_cells (bathy, draft, grid, options, hFacMin, hFacMinDr):
     
     # Identify all z-centres between the two edges, and remove any cells with bathymetry 0. This is equivalent to ceil(hFacC). 
     return (z_3d <= edge_above_draft)*(z_3d >= edge_below_bathy)*(bathy_model < 0)
+
+
+# Move a file from one directory to another, without changing its name.
+def move_to_dir (fname, old_dir, new_dir):
+    os.rename(old_dir+fname, new_dir+fname)

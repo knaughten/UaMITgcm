@@ -68,6 +68,8 @@ class Options:
         self.mit_case_dir = real_dir(check_value('mit_case_dir', mit_case_dir))
         # Save the run directory derived from this
         self.mit_run_dir = self.mit_case_dir + 'run/'
+        self.output_dir = real_dir(check_value('output_dir', output_dir))
+        self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
 
         self.couple_step = check_value('couple_step', couple_step, type='int')
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
@@ -111,6 +113,15 @@ class Options:
             self.sBeta = 0.
             self.Tref = 0.
             self.Sref = 0.
+        self.startDate = check_value('startDate', startDate)
+        problem = len(self.startDate) != 8
+        try:
+            tmp = int(self.startDate)
+        except(ValueError):
+            problem = True
+        if problem:
+            print 'Error reading config_options.py'
+            print 'startDate should be an 8-digit code in the form YYYYMMDD'
 
         self.calendar_file = check_value('calendar_file', calendar_file)
         self.bathyFile = check_value('bathyFile', bathyFile)
@@ -143,6 +154,13 @@ class Options:
         else:
             self.seaice_final_state_name = ''
         self.output_names = check_value('output_names', output_names, type='list')
+        self.mit_nc_name = check_value('mit_nc_name', mit_nc_name)
+        if not self.mit_nc_name.endswith('.nc'):
+            print 'Error reading config_options.py'
+            print 'mit_nc_name must be a NetCDF file'
+            sys.exit()
+        self.ua_melt_file = check_value('ua_melt_file', ua_melt_file)
+        self.ua_draft_file = check_value('ua_draft_file', ua_draft_file)
 
 
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).
