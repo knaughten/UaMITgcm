@@ -265,7 +265,11 @@ def update_namelists (mit_dir, endTime, options, initial=False):
         # Loop over diagnostic filetypes
         for fname in options.output_names:
             curr_freq, curr_line, curr_index = get_diag_freq(fname)
-            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check='none', error=not initial)
+            if initial:
+                check = 'none'
+            else:
+                check = 'all'
+            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check=check, error=not initial)
             
 # end function update_namelists
 
