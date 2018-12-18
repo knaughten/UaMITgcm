@@ -267,7 +267,6 @@ def update_namelists (mit_dir, endTime, options):
             # TODO: set error=False and check='none' if initial run
             check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check='all')
             
-
 # end function update_namelists
 
 
@@ -324,7 +323,6 @@ def set_calendar (directory, mit_dir, options):
     # Find the year and month after the simulation ends
     end_year, end_month = add_months(ini_year, ini_month, options.total_time)
     finished = new_year==end_year and new_month==end_month
-
     if finished:
         print 'Simulation has finished'
     else:

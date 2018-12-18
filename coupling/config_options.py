@@ -30,7 +30,7 @@ use_xmitgcm = True
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 120
+total_time = 24
 ### Length of ocean spinup period (months)
 spinup_time = 12
 ### Length of coupling timestep (months)
