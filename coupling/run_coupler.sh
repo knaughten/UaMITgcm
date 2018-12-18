@@ -6,7 +6,9 @@
 #PBS -r n
 ###############################################################
 # Run coupling script to exchange data between MITgcm and Ua.
+# Pass the argument -v MITUTILS=<path to MITgcmutils package>,XMITGCM=<path to xmitgcm package>
 ###############################################################
 
+export PYTHONPATH=$PYTHONPATH:$MITUTILS:$XMITGCM
 python master.py
 

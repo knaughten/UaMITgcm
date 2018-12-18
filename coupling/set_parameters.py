@@ -73,13 +73,18 @@ class Options:
 
         # Save all the variables to this object, doing error checking where needed
         self.ua_option = check_value('ua_option', ua_option, legal=['compiled', 'matlab'])
+        self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
         self.mit_case_dir = real_dir(mit_case_dir)
         # Save the run directory derived from this
         self.mit_run_dir = self.mit_case_dir + 'run/'
         self.ua_exe_dir = real_dir(ua_exe_dir)
         self.output_dir = real_dir(output_dir)
+        self.mitgcmutils_dir = real_dir(mitgcm_utils_dir)
+        if self.use_xmitgcm:
+            self.xmitgcm_dir = real_dir(xmitgcm_dir)
+        else:
+            self.xmitgcm_dir = ''
         self.budget_code = budget_code
-        self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
 
         self.total_time = check_value('total_time', total_time, type='int')
         self.spinup_time = check_value('spinup_time', spinup_time, type='int')
@@ -186,8 +191,7 @@ class Options:
 
 # Update the "data" and "data.diagnostics" namelists to reflect the length of the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
-# TODO: deal with initial case where the check should give a warning, not an error.
-def update_namelists (mit_dir, endTime, options):
+def update_namelists (mit_dir, endTime, options, initial=False):
 
     # Set file paths
     namelist = mit_dir + 'data'
@@ -219,7 +223,7 @@ def update_namelists (mit_dir, endTime, options):
     # Inner function to check if a variable needs to be updated, and then update the file if needed.
     # In some cases we don't think the variable should need to be changed; if so, throw an error (if error=True) or a warning (if error=False).
     # Control which situations this error/warning is thrown with the keyword argument "check": check='360' throws an error/warning if it's a 360-day calendar and the variable needs to be changed; check='all' throws an error/warning if the variable needs to be changed, regardless of the calendar; check='none' will never throw errors or warnings.
-    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=False, check='360'):
+    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=True, check='360'):
         if old_var != new_var:
             if check=='all' or (check=='360' and options.calendar_type == '360-day'):
                 throw_error_warning(var_string, file_name, error=error)
@@ -233,21 +237,18 @@ def update_namelists (mit_dir, endTime, options):
     # Strip out the number
     old_endTime = extract_first_int(line)
     # Update file if needed
-    # TODO: set error=False if initial run
-    check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime')
+    check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime', error=not initial)
         
     # Look for the frequency of the final state snapshot file in "data.diagnostics" namelist
     final_state_freq, final_state_freq_line, final_state_index = get_diag_freq(options.final_state_name)
     # Update if needed
-    # TODO: set error=False if initial run
-    check_and_change(final_state_freq, -endTime, final_state_freq_line, ' frequency('+str(final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.final_state_name)
+    check_and_change(final_state_freq, -endTime, final_state_freq_line, ' frequency('+str(final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.final_state_name, error=not initial)
     if options.use_seaice:
         # Sea ice final state snapshot might be a different file
         seaice_final_state_freq, seaice_final_state_freq_line, seaice_final_state_index = get_diag_freq(options.seaice_final_state_name)
         if seaice_final_state_index != final_state_index:
             # Update if needed
-            # TODO: set error=False if initial run
-            check_and_change(seaice_final_state_freq, -endTime, seaice_final_state_freq_line, ' frequency('+str(seaice_final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.seaice_final_state_name)
+            check_and_change(seaice_final_state_freq, -endTime, seaice_final_state_freq_line, ' frequency('+str(seaice_final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.seaice_final_state_name, error=not initial)
 
     # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
     if len(options.output_names) > 0:
@@ -264,8 +265,7 @@ def update_namelists (mit_dir, endTime, options):
         # Loop over diagnostic filetypes
         for fname in options.output_names:
             curr_freq, curr_line, curr_index = get_diag_freq(fname)
-            # TODO: set error=False and check='none' if initial run
-            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check='all')
+            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check='none', error=not initial)
             
 # end function update_namelists
 
@@ -367,7 +367,7 @@ def set_calendar (directory, mit_dir, options):
         # Calculate simulation length in seconds
         endTime = ndays_new*sec_per_day
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
-        update_namelists(mit_dir, endTime, options)
+        update_namelists(mit_dir, endTime, options, initial=initial)
 
     return initial, spinup, finished
 

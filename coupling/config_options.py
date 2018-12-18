@@ -12,19 +12,28 @@
 ### TODO: consider 'matlab' case in code
 ua_option = 'compiled'
 
-### Path to the MITgcm case directory (containing run/, input/, etc.)
-mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
-### Path to the Ua directory containing executable
-ua_exe_dir = '/work/n02/n02/kaight/Ua_exe_MISOMIP_999/'
-### Path to the directory to centrally gather output
-output_dir = '/work/n02/n02/kaight/MISOMIP_999_output/'
-
-### Archer budget to charge jobs to
-budget_code = 'n02-NEL013770'
-
 # Whether to convert MITgcm binary output to NetCDF using xmitgcm
 # (Even if this is False, the MNC package in MITgcm is not supported.)
 use_xmitgcm = True
+
+# Optional base directory to simplify definition of directories below
+# This variable won't be read by the coupler, so you don't have to use it.
+work_dir = '/work/n02/n02/kaight/'
+
+### Path to the MITgcm case directory (containing run/, input/, etc.)
+mit_case_dir = work_dir+'mitgcm/cases/MISOMIP_999/'
+### Path to the Ua directory containing executable
+ua_exe_dir = work_dir+'Ua_exe_MISOMIP_999/'
+### Path to the directory to centrally gather output
+output_dir = work_dir+'MISOMIP_999_output/'
+### Path to MITgcmutils python package (within MITgcm source code distribution)
+mitgcmutils_dir = work_dir+'mitgcm/MITgcm/utils/python/MITgcmutils'
+### Path to xmitgcm python package
+### Only matters if use_xmitgcm=True
+xmitgcm_dir = work_dir+'python/xmitgcm'
+
+### Archer budget to charge jobs to
+budget_code = 'n02-NEL013770'
 
 
 ###### 2. Coupling options ######

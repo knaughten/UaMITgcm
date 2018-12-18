@@ -6,12 +6,6 @@ import numpy as np
 from scipy.io import savemat
 import os
 
-# TODO: add MITgcmutils and mitgcm_python to python path. 3 options here:
-# 1. In the control script which calls these files, use sys.path.insert(0, path) relative to os.get_cwd()
-# 2. Get the user to edit PYTHONPATH in their .bashrc
-# 3. Edit PYTHONPATH in all PBS job scripts that use these files
-# I think option 3 is preferable. No work for the user, and it makes sure the paths are correct.
-
 from coupling_utils import read_last_output, find_open_cells, move_to_dir
 
 from mitgcm_python.utils import convert_ismr
@@ -98,7 +92,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 # Also set the new pressure load anomaly.
 
 # Arguments:
-# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and TODO: output/pickup?
+# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and final state
 # grid: Grid object
 # options: Options object
 
