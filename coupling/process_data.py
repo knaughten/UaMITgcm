@@ -26,9 +26,10 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 
 def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 
-    # Read the most recent ice shelf melt rate output and convert to m/y
+    # Read the most recent ice shelf melt rate output and convert to m/y,
+    # melting is negative as per Ua convention.
     # Make sure it's from the last timestep of the previous simulation.
-    ismr = convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
+    ismr = -1*convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
 
     # Put everything in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
     lon_points = np.ravel(grid.lon_1d)[:,None].astype('float64')
