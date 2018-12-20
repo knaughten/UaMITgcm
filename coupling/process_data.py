@@ -3,7 +3,7 @@
 ################################################################################
 
 import numpy as np
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
 import os
 
 from coupling_utils import read_last_output, find_open_cells, move_to_dir
@@ -50,15 +50,20 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 # Ua does not see these changes to the geometry.
 
 # Arguments:
-# ua_draft_file: path to ice shelf draft file written by Ua at the end of the last segment (TODO: define format)
+# ua_draft_file: path to .mat ice shelf draft file written by Ua at the end of the last segment
 # mit_dir: path to MITgcm directory containing binary files for bathymetry and ice shelf draft
 # grid: Grid object
 # options: Options object
 
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
-    # TODO: Read Ua draft output and possibly reassemble
-    # Save in variable 'draft'
+    # Read the ice shelf draft and mask from Ua
+    f = loadmat(ua_draft_file)
+    # TODO: make sure correct dimensions. Row vs column major?
+    # TODO: check variable names
+    draft = f['draft']
+    mask = f['mask']
+    draft[mask==0] = 0
 
     # Read MITgcm bathymetry file
     if options.digging == 'bathy':
