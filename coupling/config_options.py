@@ -5,14 +5,47 @@
 
 ###### 1. Server workflow options ######
 
+### Specify how to run Ua. 2 options:
+### 'compiled': using Matlab Compiler Runtime, with an executable
+###             which was created by Matlab Compiler on another machine
+### 'matlab': using regular Matlab
+### TODO: consider 'matlab' case in code
+ua_option = 'compiled'
+
+# Whether to convert MITgcm binary output to NetCDF using xmitgcm
+# (Even if this is False, the MNC package in MITgcm is not supported.)
+use_xmitgcm = True
+
+# Optional base directory to simplify definition of directories below
+# This variable won't be read by the coupler, so you don't have to use it.
+work_dir = '/work/n02/n02/kaight/'
+
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
-mit_case_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/'
+mit_case_dir = work_dir+'mitgcm/cases/MISOMIP_999/'
+### Path to the Ua directory containing executable
+ua_exe_dir = work_dir+'Ua_exe_MISOMIP_999/'
+### Path to the directory to centrally gather output
+output_dir = work_dir+'MISOMIP_999_output/'
+### Path to MITgcmutils python package (within MITgcm source code distribution)
+mitgcmutils_dir = work_dir+'mitgcm/MITgcm/utils/python/MITgcmutils'
+### Path to xmitgcm python package
+### Only matters if use_xmitgcm=True
+xmitgcm_dir = work_dir+'python/xmitgcm'
+
+### Archer budget to charge jobs to
+budget_code = 'n02-NEL013770'
 
 
 ###### 2. Coupling options ######
 
+### Total length of simulation (months)
+total_time = 24
+### Length of ocean spinup period (months)
+spinup_time = 12
 ### Length of coupling timestep (months)
+### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 6
+
 ### Calendar type. 3 options:
 ### 'standard': full calendar with leap years 
 ### 'noleap': every year is 365 days
@@ -74,6 +107,11 @@ tAlpha = 3.733e-5
 sBeta = 7.843e-4
 Tref = -1.
 Sref = 34.2
+
+### Starting date of simulation
+### Should match startDate_1 in data.cal
+startDate = '19790101'
+
 
 
 ###### 4. Filenames ######
@@ -147,6 +185,15 @@ seaice_final_state_name = ''
 ### Will probably include ismr_name.
 ### Should not include any snapshots including the final state.
 output_names = ['MITout_2D', 'MITout_3D']
+### Name for NetCDF files converted by xmitgcm
+### Doesn't really matter what this is,
+### as long as it won't overwrite anything in run/
+mit_nc_name = 'output.nc'
+
+### Melt rate file read by Ua
+ua_melt_file = 'NewMeltrate.mat'
+### Ice shelf draft file written by Ua
+ua_draft_file = 'DataForMIT.mat'
 
 
 

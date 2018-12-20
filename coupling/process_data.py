@@ -3,15 +3,10 @@
 ################################################################################
 
 import numpy as np
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
+import os
 
-# TODO: add MITgcmutils and mitgcm_python to python path. 3 options here:
-# 1. In the control script which calls these files, use sys.path.insert(0, path) relative to os.get_cwd()
-# 2. Get the user to edit PYTHONPATH in their .bashrc
-# 3. Edit PYTHONPATH in all PBS job scripts that use these files
-# I think option 3 is preferable. No work for the user, and it makes sure the paths are correct.
-
-from coupling_utils import read_last_output, find_open_cells
+from coupling_utils import read_last_output, find_open_cells, move_to_dir
 
 from mitgcm_python.utils import convert_ismr
 from mitgcm_python.make_domain import do_digging, do_zapping
@@ -21,6 +16,7 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
+# TODO: check sign
 
 # Arguments:
 # mit_dir: MITgcm directory containing SHIfwFlx output
@@ -30,9 +26,10 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 
 def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 
-    # Read the most recent ice shelf melt rate output and convert to m/y
+    # Read the most recent ice shelf melt rate output and convert to m/y,
+    # melting is negative as per Ua convention.
     # Make sure it's from the last timestep of the previous simulation.
-    ismr = convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
+    ismr = -1*convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
 
     # Put everything in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
     lon_points = np.ravel(grid.lon_1d)[:,None].astype('float64')
@@ -53,15 +50,20 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 # Ua does not see these changes to the geometry.
 
 # Arguments:
-# ua_draft_file: path to ice shelf draft file written by Ua at the end of the last segment (TODO: define format)
+# ua_draft_file: path to .mat ice shelf draft file written by Ua at the end of the last segment
 # mit_dir: path to MITgcm directory containing binary files for bathymetry and ice shelf draft
 # grid: Grid object
 # options: Options object
 
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
-    # TODO: Read Ua draft output and possibly reassemble
-    # Save in variable 'draft'
+    # Read the ice shelf draft and mask from Ua
+    f = loadmat(ua_draft_file)
+    # TODO: make sure correct dimensions. Row vs column major?
+    # TODO: check variable names
+    draft = f['draft']
+    mask = f['mask']
+    draft[mask==0] = 0
 
     # Read MITgcm bathymetry file
     if options.digging == 'bathy':
@@ -97,7 +99,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 # Also set the new pressure load anomaly.
 
 # Arguments:
-# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and TODO: output/pickup?
+# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and final state
 # grid: Grid object
 # options: Options object
 
@@ -143,6 +145,65 @@ def set_mit_ics (mit_dir, grid, options):
 
     print 'Calculating pressure load anomaly'
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=pload_temp, constant_s=pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, Talpha=options.tAlpha, Sbeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
+
+
+# Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
+# Arguments:
+# options: Options object
+# TODO: check if this breaks with FinalState snapshots. Should we just convert output_names? Or convert output_names and final_state_name/seaice_final_state_name separately?
+def convert_mit_output (options):
+
+    # Wrap import statement inside this function, so that xmitgcm isn't required to be installed unless needed
+    from xmitgcm import open_mdsdataset
+
+    # Get startDate in the right format for NetCDF
+    ref_date = startDate[:4]+'-'+startDate[4:6]+'-'+startDate[6:8]+' 0:0:0'
+
+    # Read all the MDS files in run/
+    ds = open_mdsdataset(options.mit_run_dir, delta_t=options.deltaT, ref_date=ref_date)
+
+    # Save to NetCDF file
+    ds.to_netcdf(options.mit_run_dir+options.mit_nc_name, unlimited_dims=['time'])
+
+
+# Gather all output from MITgcm and Ua, moving it to a common subdirectory of options.output_dir.
+# Arguments:
+# options: Options object
+# spinup: boolean indicating we're in the ocean-only spinup phase, so there is no Ua output to deal with
+# TODO: Move Ua output into new folder
+def gather_output (options, spinup):
+
+    # Make a subdirectory named after the starting date of the simulation segment
+    new_dir = options.output_dir + options.last_start_date + '/'
+    print 'Creating ' + new_dir
+    os.mkdir(new_dir)    
+
+    if options.use_xmitgcm:
+        # Move the NetCDF file created by convert_mit_output into the new folder
+        # First check it actually exists
+        if not os.path.isfile(options.mit_run_dir+options.mit_nc_name):
+            print 'Error gathering output'
+            print 'xmitgcm conversion was unsuccessful'
+            sys.exit()
+        move_to_dir(options.mit_nc_name, options.mit_run_dir, new_dir)
+            
+    # Deal with MITgcm binary output files
+    for fname in os.listdir(options.mit_run_dir):
+        if fname.startswith('state') and (fname.endswith('.data') or fname.endswith('.meta')):
+            if options.use_xmitgcm:
+                # Delete binary files which were savely converted to NetCDF
+                os.remove(options.mit_run_dir+fname)
+            else:
+                # Move binary files to output directory
+                move_to_dir(fname, options.mit_run_dir, new_dir)
+
+    if not spinup:
+        # TODO: Move Ua output into this folder
+
+        # Move coupling files into the subdirectory
+        move_to_dir(options.ua_melt_file, options.output_dir, new_dir)
+        move_to_dir(options.ua_draft_file, options.output_dir, new_dir
+    
 
 
     
