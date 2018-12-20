@@ -10,5 +10,5 @@
 ###############################################################
 
 export PYTHONPATH=$PYTHONPATH:$MITUTILS:$XMITGCM
-python master.py
+python master.py &> coupler_stdout
 

@@ -275,9 +275,10 @@ def update_namelists (mit_dir, endTime, options, initial=False):
 
 
 # Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir).
-# Return three booleans:
+# Return four booleans:
 # initial: indicates whether the next segment is the very first segment
 # spinup: indicates whether the next segment is part of the ocean-only spinup period
+# first_coupled: indicates whether this is the first coupled timestep
 # finished: indicates whether the entire simulation is finished, so no more segments need to run.
 def set_calendar (directory, mit_dir, options):
 
@@ -322,6 +323,9 @@ def set_calendar (directory, mit_dir, options):
     spinup = (new_year < couple_year) or (new_year==couple_year and new_month < couple_month)
     if spinup:
         print 'Simulation is in ocean-only spinup phase'
+        
+    # Figure out if it's the first coupled timestep
+    first_coupled = new_year==couple_year and new_month==couple_month
 
     # Figure out if the simulation is finished
     # Find the year and month after the simulation ends
@@ -373,7 +377,7 @@ def set_calendar (directory, mit_dir, options):
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
         update_namelists(mit_dir, endTime, options, initial=initial)
 
-    return initial, spinup, finished
+    return initial, spinup, first_coupled, finished
 
         
 

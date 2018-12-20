@@ -8,7 +8,7 @@ print 'Reading parameters'
 options = Options()
 
 print 'Checking calendar'
-initial, spinup, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
+initial, spinup, first_coupled, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
 
 
 # Do we need to do any coupling?
@@ -20,11 +20,14 @@ if not initial and not spinup and not finished:
     print 'Sending melt rates from MITgcm to Ua'
     extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, grid, options)
 
-    print 'Adjusting MITgcm topography'
-    adjust_mit_geom(options.output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
+    # Do we need to change the ice shelf draft in MITgcm?
+    if not first_coupled:
 
-    print 'Setting new initial conditions for MITgcm'
-    set_mit_ics(options.mit_run_dir, grid, options)
+        print 'Adjusting MITgcm topography'
+        adjust_mit_geom(options.output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
+
+        print 'Setting new initial conditions for MITgcm'
+        set_mit_ics(options.mit_run_dir, grid, options)
 
     
 # Is there any output we need to deal with?
