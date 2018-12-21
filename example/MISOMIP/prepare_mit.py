@@ -4,6 +4,7 @@
 ######################################################
 
 import numpy as np
+from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
 # TODO: is this the best way to do it? Absolute path? .bashrc?
@@ -46,7 +47,7 @@ class BasicGrid:
         # Make them 2D
         self.x, self.y = np.meshgrid(x,y)
 
-        self.z_edges = np.arange(0, -(nz+1)*dz, dz)
+        self.z_edges = np.arange(0, -(nz+1)*dz, -dz)
         self.z = 0.5*(self.z_edges[:-1] + self.z_edges[1:])
 
         # Save grid dimensions
@@ -54,12 +55,17 @@ class BasicGrid:
         self.ny = ny
         self.nz = nz
 
-
     # Calculate hFacC given the bathymetry and ice shelf draft.
     # Save to the object.
     def save_hfac (self, bathy, draft):
-
         self.hfac = calc_hfac(bathy, draft, self.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr)
+
+    # Compatibility function with Grid.
+    def get_hfac (self, gtype='t'):
+        if gtype != 't':
+            print 'Error (BasicGrid.get_hfac): hfac only exists on tracer grid'
+            sys.exit()
+        return self.hfac
 
 # end BasicGrid object
         
@@ -85,19 +91,22 @@ def misomip_bathy (x, y):
 
 
 # Calculate the topography and write to binary files.
-def make_topo (grid, bathy_file, draft_file, prec=64):
+def make_topo (grid, ua_draft_file, bathy_file, draft_file, prec=64):
 
     # Average bathymetry function over 4 corners of grid cells
     bathy = (misomip_bathy(grid.x-dx/2, grid.y-dy/2) + misomip_bathy(grid.x-dx/2, grid.y+dy/2) + misomip_bathy(grid.x+dx/2, grid.y-dy/2) + misomip_bathy(grid.x+dx/2, grid.y+dy/2))
-    
-    # TODO: draft
-    draft = None
+
+    # Read initial ice shelf draft from Ua (end of MISMIP experiment)
+    f = loadmat(ua_draft_file)
+    draft = np.transpose(f['b_forMITgcm'])
+    mask = np.transpose(f['ISmask_forMITgcm'])
+    draft[mask==0] = 0
     
     # Build a wall at the north and south
-    bathy[:,0] = 0
-    draft[:,0] = 0
-    bathy[:,-1] = 0
-    draft[:,-1] = 0
+    bathy[0,:] = 0
+    draft[0,:] = 0
+    bathy[-1,:] = 0
+    draft[-1,:] = 0
 
     # Calculate hFacC and save to the grid for later
     grid.save_hfac(bathy, draft)
@@ -115,7 +124,7 @@ def ts_profile (z):
     Tbot = 1.
     S0 = 33.8
     Sbot = 34.7
-    zdeep = 720.
+    zdeep = -720.
 
     t_profile = T0 + (Tbot-T0)*z/zdeep
     s_profile = S0 + (Sbot-S0)*z/zdeep
@@ -161,10 +170,10 @@ print 'Building grid'
 grid = BasicGrid()
 
 print 'Creating topography'
-make_topo(grid, input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64)
+make_topo(grid, 'ua_initialdraft_misomip.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64)
 
 print 'Creating initial and boundary conditions'
-make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEs', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
+make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEt', input_dir+'OBEs', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
 
 
 
