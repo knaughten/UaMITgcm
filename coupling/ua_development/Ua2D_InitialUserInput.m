@@ -15,7 +15,7 @@ CtrlVar.RestartTime=0;
 CtrlVar.ResetTime=1;
 CtrlVar.ResetTimeStep=0;    % perhaps this has to be reconsidered if model has issues converging
 
-CtrlVar.UaOutputsDt = UserVar.UaMITgcm.OutputTimes; 
+CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes; 
             % times (in years) at which Ua needs to produce output
 
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;

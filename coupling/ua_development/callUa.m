@@ -1,13 +1,12 @@
 %%%%%%%%%%%
 %% TO DO %%
 %%%%%%%%%%%
-%% -> Hardcode appropriate filenames and directories for 
+%% -> code appropriate filenames and directories for 
 %   + melt output and tracer grid from MITgcm
 %   + calendar file
 %   + file with user variables
 %% -> Write code for reading user variables from file
 %% -> Which netcdf output do we want to generate?
-%% -> What format do I expect for the MITgcm output file: SHIFwFlx in MITout_2D.nc or other?
 
 function callUa(UserVar,varargin)
 
@@ -22,18 +21,17 @@ end
 UserVar.UaMITgcm.Experiment = 'MISOMIP_1r';
 
 UserVar.UaMITgcm.UaSourceDirectory = '/home/UNN/wchm8/Documents/Ua/UaMITgcm_Development/Ua_source/';
-UserVar.UaMITgcm.UaOutputsDirectory = './ResultsFiles';
+UserVar.UaMITgcm.UaOutputDirectory = './ResultsFiles';
+UserVar.UaMITgcm.UaOutputFormat = 'matlab'; % options are 'matlab' or 'netcdf'
 
-UserVar.UaMITgcm.MITgcmOutputsDirectory = '.';
-
-UserVar.UaMITgcm.OutputFormat = 'matlab'; % options are 'matlab' or 'netcdf'
+UserVar.UaMITgcm.MITgcmOutputDirectory = '.';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %% collect MITgcm input %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % read calendar file
-CAL = textread([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/sample_calendar_monthly']);
+CAL = textread([UserVar.UaMITgcm.MITgcmOutputDirectory,'/sample_calendar_monthly']);
 
 % save start year and start month in string format
 Start = num2str(CAL(1));
@@ -49,24 +47,24 @@ for ii=3:length(CAL)
 end
 
 if OutputInterval(1)==-1
-    UserVar.UaMITgcm.OutputTimes = [1:UserVar.UaMITgcm.runTime*365.25]/365.25;
+    UserVar.UaMITgcm.UaOutputTimes = [1:UserVar.UaMITgcm.runTime*365.25]/365.25;
 elseif OutputInterval(1)==CAL(2)
-    UserVar.UaMITgcm.OutputTimes = [OutputInterval(1) 2*OutputInterval(1)]/365.25;
+    UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)]/365.25;
 else
-    UserVar.UaMITgcm.OutputTimes = cumsum(OutputInterval)/365.25;
+    UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval)/365.25;
 end
 
 % based on the OutputTimes we set the ATStimeStepTarget to be the minimum
 % gap between successive output times. This should prevent Ua from
 % 'overstepping'. 
-UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.OutputTimes(2:end)-UserVar.UaMITgcm.OutputTimes(1:end-1));
+UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read MITgcm melt rates %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MITgcm is kg w.e./s, convert to m/yr 
-% negative for melting
-MeltFile = [UserVar.UaMITgcm.MITgcmOutputsDirectory,'/MITout_2D.nc'];
+
+% needs to be adjusted to read the correct input file
+MeltFile = [UserVar.UaMITgcm.MITgcmOutputDirectory,'/MITout_2D.nc'];
 Melt = double(ncread(MeltFile,'SHIfwFlx')/1000*365*24*60*60);
 Melt = squeeze(Melt(:,:,end));
 UserVar.UaMITgcm.MITgcmMelt = Melt(:);
@@ -75,16 +73,14 @@ UserVar.UaMITgcm.MITgcmMelt = Melt(:);
 %% Read MITgcm grid and check if it’s lat/lon or Cartesian %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % read tracer gridpoints
-fid=fopen([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/XC.data'],'r','b');
-lon=fread(fid,inf,'real*4');    Ilon = size(lon); fclose(fid);
-fid=fopen([UserVar.UaMITgcm.MITgcmOutputsDirectory,'/YC.data'],'r','b');
-lat=fread(fid,inf,'real*4'); fclose(fid);
+lon=rdmds('XC');
+lat=rdmds('YC');
 
 % check if grid is lat/lon and convert to cartesian if required
 if all(lon(:)>=-180) && all(lon(:)<=180) && all(lat(:)>=-90) && all(lat(:)<=90)
-    [x,y] = ll2psxy(lat(:),lon(:),-71,0);
+    [x,y] = ll2psxy(lat,lon,-71,0);
 else
-    x = lon(:);    y = lat(:);
+    x = lon;    y = lat;
 end
 
 UserVar.UaMITgcm.MITgcmGridX = x;
