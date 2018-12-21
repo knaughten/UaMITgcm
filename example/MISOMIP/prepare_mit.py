@@ -8,7 +8,7 @@ from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
 # TODO: is this the best way to do it? Absolute path? .bashrc?
-#sys.path.insert(0, '../../tools/')
+sys.path.insert(0, '../../tools/')
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz
 from mitgcm_python.make_domain import calc_hfac
@@ -94,7 +94,7 @@ def misomip_bathy (x, y):
 def make_topo (grid, ua_draft_file, bathy_file, draft_file, prec=64):
 
     # Average bathymetry function over 4 corners of grid cells
-    bathy = (misomip_bathy(grid.x-dx/2, grid.y-dy/2) + misomip_bathy(grid.x-dx/2, grid.y+dy/2) + misomip_bathy(grid.x+dx/2, grid.y-dy/2) + misomip_bathy(grid.x+dx/2, grid.y+dy/2))
+    bathy = (misomip_bathy(grid.x-dx/2, grid.y-dy/2) + misomip_bathy(grid.x-dx/2, grid.y+dy/2) + misomip_bathy(grid.x+dx/2, grid.y-dy/2) + misomip_bathy(grid.x+dx/2, grid.y+dy/2))/4.
 
     # Read initial ice shelf draft from Ua (end of MISMIP experiment)
     f = loadmat(ua_draft_file)
@@ -164,7 +164,7 @@ def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file, obcs_salt
 
 ############## USER INPUT HERE #########################
 # Path to MITgcm input/ directory for the MISOMIP case
-input_dir = './' #/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/input/'
+input_dir = './'#'/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/input/'
 
 print 'Building grid'
 grid = BasicGrid()
