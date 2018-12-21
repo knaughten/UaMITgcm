@@ -70,28 +70,52 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     FISmask = scatteredInterpolant(x,y,ISmask,'linear');
     ISmask_forMITgcm_firstapproximation = FISmask(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
     ISmask_forMITgcm_firstapproximation(isnan(ISmask_forMITgcm_firstapproximation)) = 0;
-    
-    % The approximate mask can indentify cells as 'grounded' whereas they
-    % may contain floating Ua nodes. Here we refine the mask to 
+    % set mask to zero outside Ua domain. Take holes in domain into
+    % account, and treat these as grounded.
+    I = find(isnan(MUA.Boundary.x));
+    if isempty(I)
+        J = find(~inpoly([UserVar.UaMITgcm.MITgcmGridX(:) UserVar.UaMITgcm.MITgcmGridY(:)],[MUA.Boundary.x(:) MUA.Boundary.y(:)]));
+    else
+        I(end+1) = length(MUA.Boundary.x)+1;
+        J = find(~inpoly([UserVar.UaMITgcm.MITgcmGridX(:) UserVar.UaMITgcm.MITgcmGridY(:)],[MUA.Boundary.x(1:I(1)-1) MUA.Boundary.y(1:I(1)-1)]));
+        for ii=1:length(I)-1
+            J2 = find(inpoly([UserVar.UaMITgcm.MITgcmGridX(:) UserVar.UaMITgcm.MITgcmGridY(:)],...
+                [MUA.Boundary.x(I(ii)+1:I(ii+1)-1) MUA.Boundary.y(I(ii)+1:I(ii+1)-1)]));
+            J = [J(:); J2(:)];
+        end
+    end
+        
+    ISmask_forMITgcm_firstapproximation(J) = 0;
+            
+    % The approximate mask will sometimes indentify cells as 'grounded' whereas they
+    % may contain floating Ua nodes due to the interpolation. Here we refine the mask to 
+    % change those errors, based on counting the number of floating nodes
+    % withing each MITgcm grid box. This is sloppy and very slow, and might have to be improved for large MITgcm
+    % grids. One can consider using histcounts2, but this only works for
+    % regular grids, which might not be true if the grid is converted
+    % from lat/lon to psxy
     dx = UserVar.UaMITgcm.MITgcmGridX(2:end,:)-UserVar.UaMITgcm.MITgcmGridX(1:end-1,:);
     dy = UserVar.UaMITgcm.MITgcmGridY(:,2:end)-UserVar.UaMITgcm.MITgcmGridY(:,1:end-1);
     XEdges = [UserVar.UaMITgcm.MITgcmGridX(1,:)-dx(1,:)/2; UserVar.UaMITgcm.MITgcmGridX(1:end-1,:)+dx/2; UserVar.UaMITgcm.MITgcmGridX(end,:)+dx(end,:)/2];
     XEdges = [XEdges(:,1) XEdges];
     YEdges = [UserVar.UaMITgcm.MITgcmGridY(:,1)-dy(:,1)/2 UserVar.UaMITgcm.MITgcmGridY(:,1:end-1)+dy/2 UserVar.UaMITgcm.MITgcmGridY(:,end)+dy(:,end)/2];
-    YEdges = [YEdges(1,:);YEdges];
-
-    % This is sloppy and slow. Might have to be improved for large MITgcm
-    % grids
+    YEdges = [YEdges(1,:);YEdges]; 
+    Nin=[]; Non = [];
     for ii=1:size(UserVar.UaMITgcm.MITgcmGridX,1)
         for jj=1:size(UserVar.UaMITgcm.MITgcmGridX,2)
-            N(ii,jj) = nnz(inpoly([x(MeltNodes),y(MeltNodes)],...
+            [in,on] = inpoly([x(MeltNodes),y(MeltNodes)],...
                 [[XEdges(ii,jj) XEdges(ii+1,jj) XEdges(ii+1,jj+1) XEdges(ii,jj+1)]',...
-                [YEdges(ii,jj) YEdges(ii+1,jj) YEdges(ii+1,jj+1) YEdges(ii,jj+1)]']));
+                [YEdges(ii,jj) YEdges(ii+1,jj) YEdges(ii+1,jj+1) YEdges(ii,jj+1)]']);
+            Nin(ii,jj) = nnz(in);
+            Non(ii,jj) = nnz(on);
         end
     end
+    N = Nin-Non;
     
     ISmask_forMITgcm = ISmask_forMITgcm_firstapproximation + (N>=1);
     ISmask_forMITgcm(ISmask_forMITgcm>1) = 1;
+    
+    b_forMITgcm = b_forMITgcm.*ISmask_forMITgcm;
     
     save([UserVar.UaMITgcm.UaOutputDirectory,'/ua_draft_file.mat'],'b_forMITgcm','ISmask_forMITgcm');
         
