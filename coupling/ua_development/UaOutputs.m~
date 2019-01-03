@@ -74,8 +74,8 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
         
     ISmask = NaN*x; ISmask(MeltNodes)=1;
     FISmask = scatteredInterpolant(x,y,ISmask,'linear');
-    mask_forMITgcm_firstapproximation = FISmask(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
-    mask_forMITgcm_firstapproximation(isnan(mask_forMITgcm_firstapproximation)) = 0;
+    ISmask_forMITgcm_firstapproximation = FISmask(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
+    ISmask_forMITgcm_firstapproximation(isnan(ISmask_forMITgcm_firstapproximation)) = 0;
     
     % Set mask value to 2 outside Ua domain as this is open ocean. 
     % Holes in the Ua domain are treated as grounded.
@@ -93,8 +93,8 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
         end
     end
     
-    mask_forMITgcm_firstapproximation(J_openocean) = 0;
-    mask_forMITgcm_firstapproximation(J_holes) = 0;
+    ISmask_forMITgcm_firstapproximation(J_openocean) = 0;
+    ISmask_forMITgcm_firstapproximation(J_holes) = 0;
             
     % The approximate mask will sometimes indentify cells as 'grounded' whereas they
     % may contain floating Ua nodes due to the interpolation. Here we refine the mask to 
@@ -121,27 +121,25 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     end
     N = Nin-Non;
     
-    mask_forMITgcm = mask_forMITgcm_firstapproximation + (N>=1);
-    mask_forMITgcm(mask_forMITgcm>1) = 1;
+    ISmask_forMITgcm = ISmask_forMITgcm_firstapproximation + (N>=1);
+    ISmask_forMITgcm(ISmask_forMITgcm>1) = 1;
       
-    % finally, we perform a few consistency checks:
-    % -> b_forMITgcm=0 for open ocean
-    % -> B_forMITgcm = b_forMITgcm whereever the mask indicates that the
+    % finally, we perform two consistency checks:
+    % 1. B_forMITgcm = b_forMITgcm whereever the mask indicates that the
     % ice is grounded
-    % -> B_forMITgcm < b_forMITgcm whereever the mask indicates that the
+    % 2. B_forMITgcm < b_forMITgcm whereever the mask indicates that the
     % ice is afloat. If this is not the case, then the bed is carved
     % away       
-    mask_forMITgcm(J_openocean) = 2;
+
     
-    b_forMITgcm(mask_forMITgcm==2) = 0;
+    B_forMITgcm(ISmask_forMITgcm==0) = b_forMITgcm(ISmask_forMITgcm==0);
     
-    B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
-    
-    Ifloating = mask_forMITgcm==1;
+    Ifloating = ISmask_forMITgcm==1;
     Ierr = find(B_forMITgcm(Ifloating)>=b_forMITgcm(Ifloating));
     B_forMITgcm(Ifloating(Ierr)) = b_forMITgcm(Ifloating(Ierr))-1;
     
+        ISmask_forMITgcm(J_openocean) = 2;
     % save B, b and mask
-    save([UserVar.UaMITgcm.UaOutputDirectory,'/ua_draft_file.mat'],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
+    save([UserVar.UaMITgcm.UaOutputDirectory,'/ua_draft_file.mat'],'B_forMITgcm','b_forMITgcm','ISmask_forMITgcm');
      
 end
