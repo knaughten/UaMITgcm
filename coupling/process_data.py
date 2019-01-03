@@ -59,10 +59,8 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
     # Read the ice shelf draft and mask from Ua
     f = loadmat(ua_draft_file)
-    # TODO: make sure correct dimensions. Row vs column major?
-    # TODO: check variable names
-    draft = f['draft']
-    mask = f['mask']
+    draft = np.transpose(f['b_forMITgcm'])
+    mask = np.transpose(f['ISmask_forMITgcm'])
     draft[mask==0] = 0
 
     # Read MITgcm bathymetry file
