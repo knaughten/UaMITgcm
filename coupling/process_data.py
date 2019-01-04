@@ -16,7 +16,6 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
-# TODO: check sign
 
 # Arguments:
 # mit_dir: MITgcm directory containing SHIfwFlx output
@@ -58,9 +57,10 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
     # Read the ice shelf draft and mask from Ua
+    # TODO: deal with changing land mask
     f = loadmat(ua_draft_file)
     draft = np.transpose(f['b_forMITgcm'])
-    mask = np.transpose(f['ISmask_forMITgcm'])
+    mask = np.transpose(f['mask_forMITgcm'])
     draft[mask==0] = 0
 
     # Read MITgcm bathymetry file

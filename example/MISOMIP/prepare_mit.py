@@ -17,13 +17,9 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 
 # Global parameters
 # These are all things set in the input/data namelist.
-x0 = 320e3  # xgOrigin in input/data
-y0 = -2e3   # ygOrigin
 nx = 240    # first part of delX
 ny = 42     # first part of delY
 nz = 36     # first part of delZ
-dx = 2e3    # second part of delX
-dy = 2e3    # second part of delY
 dz = 20.    # second part of delZ
 eosType = 'LINEAR'
 Tref = -1.
@@ -38,18 +34,10 @@ hFacMinDr = 0.
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
 
-    # Initialise by calculating the tracer points x, y, z.
     def __init__ (self):
-
-        # Get midpoints of cells
-        x = np.arange(x0, x0+nx*dx, dx) + dx/2
-        y = np.arange(y0, y0+ny*dy, dy) + dy/2
-        # Make them 2D
-        self.x, self.y = np.meshgrid(x,y)
-
+        # Build vertical grid
         self.z_edges = np.arange(0, -(nz+1)*dz, -dz)
         self.z = 0.5*(self.z_edges[:-1] + self.z_edges[1:])
-
         # Save grid dimensions
         self.nx = nx
         self.ny = ny
@@ -68,39 +56,22 @@ class BasicGrid:
         return self.hfac
 
 # end BasicGrid object
-        
-
-# MISOMIP bathymetry function
-def misomip_bathy (x, y):
-
-    Ly = 80e3
-    B0 = -150.
-    B2 = -728.8
-    B4 = 343.91
-    B6 = -50.57
-    xbar = 300e3
-    fc = 4e3
-    dc = 500.
-    wc = 24e3
-    Bmax = 720.
-
-    xtilde = x/xbar
-
-    B = B0 + B2*xtilde**2 + B4*xtilde**4 + B6*xtilde**6 + dc*(1/(1+np.exp(-2*(y-Ly/2-wc)/fc)) + 1/(1+np.exp(2*(y-Ly/2+wc)/fc)))
-    return np.maximum(B, -Bmax)
 
 
 # Calculate the topography and write to binary files.
-def make_topo (grid, ua_draft_file, bathy_file, draft_file, prec=64):
+def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64):
 
-    # Average bathymetry function over 4 corners of grid cells
-    bathy = (misomip_bathy(grid.x-dx/2, grid.y-dy/2) + misomip_bathy(grid.x-dx/2, grid.y+dy/2) + misomip_bathy(grid.x+dx/2, grid.y-dy/2) + misomip_bathy(grid.x+dx/2, grid.y+dy/2))/4.
-
-    # Read initial ice shelf draft from Ua (end of MISMIP experiment)
-    f = loadmat(ua_draft_file)
+    # Read bathymetry and initial ice shelf draft from Ua
+    # (end of MISMIP experiment)
+    f = loadmat(ua_topo_file)
+    bathy = np.transpose(f['B_forMITgcm'])
     draft = np.transpose(f['b_forMITgcm'])
-    mask = np.transpose(f['ISmask_forMITgcm'])
+    mask = np.transpose(f['mask_forMITgcm'])
+    # Mask grounded ice out of both fields
+    bathy[mask==0] = 0
     draft[mask==0] = 0
+    # Mask open ocean out of ice shelf draft, just in case there are interpolation errors
+    draft[mask==2] = 0
     
     # Build a wall at the north and south
     bathy[0,:] = 0
@@ -170,7 +141,7 @@ print 'Building grid'
 grid = BasicGrid()
 
 print 'Creating topography'
-make_topo(grid, 'ua_initialdraft_misomip.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64)
+make_topo(grid, 'ua_draft_file.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64)
 
 print 'Creating initial and boundary conditions'
 make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEt', input_dir+'OBEs', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
