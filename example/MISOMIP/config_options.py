@@ -64,7 +64,7 @@ output_freq = 'monthly'
 ### 'none': don't do any digging
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
-digging = 'draft'
+digging = 'none'
 
 ### Does the x-coordinate of your domain refer to longitude?
 x_is_lon = False

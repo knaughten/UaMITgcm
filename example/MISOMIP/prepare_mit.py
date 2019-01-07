@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, '../../tools/')
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz
-from mitgcm_python.make_domain import calc_hfac
+from mitgcm_python.make_domain import calc_hfac, do_digging, do_zapping
 from mitgcm_python.ics_obcs import calc_load_anomaly
 
 
@@ -59,7 +59,7 @@ class BasicGrid:
 
 
 # Calculate the topography and write to binary files.
-def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64):
+def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='none', bathy_orig_file=None):
 
     # Read bathymetry and initial ice shelf draft from Ua
     # (end of MISMIP experiment)
@@ -78,6 +78,23 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64):
     draft[0,:] = 0
     bathy[-1,:] = 0
     draft[-1,:] = 0
+
+    if dig_option == 'none':
+        print 'Not doing digging as per user request'
+    elif dig_option == 'bathy':
+        print 'Saving original bathymetry'
+        if bathy_orig_file is None:
+            print "Error (make_topo): must set bathy_orig_file if dig_option='bathy'"
+            sys.exit()
+        write_binary(bathy, bathy_orig_file, prec=prec)
+        print 'Digging bathymetry which is too shallow'
+        bathy = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr, dig_option='bathy')
+    elif dig_option == 'draft':
+        print 'Digging ice shelf drafts which are too deep'
+        draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr, dig_option='draft')
+
+    print 'Zapping ice shelf drafts which are too thin'
+    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=hFacMinDr)        
 
     # Calculate hFacC and save to the grid for later
     grid.save_hfac(bathy, draft)
