@@ -5,7 +5,7 @@ Coupling scripts for Ua and MITgcm.
 
 Since this repository contains submodules, use `git clone --recursive` instead of just `git clone`.
 
-Also note that `git pull` will not pull any changes to submodules. To do this, run `git submodule update --remote`.
+Also note that `git pull` will not pull any changes to submodules. If you need to do this, run `git submodule update --remote path_to_submodule`.
 
 ## System requirements
 
