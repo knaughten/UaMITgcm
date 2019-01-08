@@ -70,8 +70,6 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
     # Mask grounded ice out of both fields
     bathy[mask==0] = 0
     draft[mask==0] = 0
-    # Mask open ocean out of ice shelf draft, just in case there are interpolation errors
-    draft[mask==2] = 0
     
     # Build a wall at the north and south
     bathy[0,:] = 0

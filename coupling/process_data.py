@@ -61,6 +61,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     f = loadmat(ua_draft_file)
     draft = np.transpose(f['b_forMITgcm'])
     mask = np.transpose(f['mask_forMITgcm'])
+    # Mask grounded ice out of ice shelf draft
     draft[mask==0] = 0
 
     # Read MITgcm bathymetry file
