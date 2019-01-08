@@ -7,6 +7,3 @@
 [submodule "tools/xmitgcm"]
 	path = tools/xmitgcm
 	url = https://github.com/xgcm/xmitgcm.git
-[submodule "UaSource"]
-	path = UaSource
-	url = https://github.com/GHilmarG/UaSource.git
