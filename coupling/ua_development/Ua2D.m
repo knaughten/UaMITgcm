@@ -9,13 +9,14 @@ end
 
 SetUaPath() %% set path
 
-if ~exist(fullfile(cd,'Ua2D_InitialUserInput.m'),'file')
+% Remove this check because it doesn't work with the compiler.
+%if ~exist(fullfile(cd,'Ua2D_InitialUserInput.m'),'file')
     
-    fprintf('The input-file Ua2D_InitialUserInput.m not found in the working directory (%s).\n',pwd)
-    fprintf('This input-file is required for Ua to run.\n')
-    return
+%    fprintf('The input-file Ua2D_InitialUserInput.m not found in the working directory (%s).\n',pwd)
+%    fprintf('This input-file is required for Ua to run.\n')
+%    return
     
-end
+%end
 
 warning('off','MATLAB:triangulation:PtsNotInTriWarnId')
 

@@ -10,7 +10,10 @@
 # and -A <Archer budget>
 ####################################################################
 
+# Path to Matlab Compiler Runtime installation
+MCR=$WORK/MCR_2017a/v92/
+
 module swap PrgEnv-intel PrgEnv-gnu
 cd $UA_DIR
 
-./run_Ua.sh $WORK/MCR_2017a/v92/ 1>>matlab_std.out 2>>matlab_err.out
+./run_Ua.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
