@@ -10,6 +10,7 @@ if [ -d "../run" ]; then
 else
   echo 'Creating run directory'
   mkdir ../run
+  cd ../run
 fi
 
 # Link everything from the input directory
@@ -20,7 +21,7 @@ rm -f data
 cp -f ../input/data .
 # Similarly for data.diagnostics
 rm -f data.diagnostics
-cp -f ../input/data.diagnostics
+cp -f ../input/data.diagnostics .
 
 # Link executable
 ln -s ../build/mitgcmuv .

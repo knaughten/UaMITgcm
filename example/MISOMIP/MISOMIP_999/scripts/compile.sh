@@ -10,6 +10,7 @@ if [ -d "../build" ]; then
 else
   echo 'Creating build directory'
   mkdir ../build
+  cd ../build
 fi
 
 # Generate a Makefile
