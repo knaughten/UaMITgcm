@@ -19,7 +19,7 @@ sec_per_day = 24*60*60
 
 class Options:
 
-    # Check and save all the options.
+    # Check and save all the options. Write some in a plain text file for Ua to read.
     def __init__ (self):
 
         # Inner function to throw an error and stop processing
@@ -72,8 +72,10 @@ class Options:
             return var
 
         # Save all the variables to this object, doing error checking where needed
+        self.expt_name = check_value('expt_name', expt_name)
         self.ua_option = check_value('ua_option', ua_option, legal=['compiled', 'matlab'])
         self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
+        self.ua_output_format = check_value('ua_output_format', ua_output_format, legal=['matlab'])
         self.mit_case_dir = real_dir(mit_case_dir)
         # Save the run directory derived from this
         self.mit_run_dir = self.mit_case_dir + 'run/'
@@ -179,6 +181,15 @@ class Options:
             throw_error('mit_nc_name must be a NetCDF file')
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
+
+        # Now write the variables Ua needs in a plain text file.
+        f = open(self.ua_exe_dir+'options_for_ua', 'w')
+        f.write(self.expt_name+'\n')
+        f.write(self.output_dir+'\n')
+        f.write(self.calendar_file+'\n')
+        f.write(self.ua_melt_file+'\n')
+        f.write(self.ua_draft_file+'\n')
+        f.write(self.ua_output_format+'\n')
 
 
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).

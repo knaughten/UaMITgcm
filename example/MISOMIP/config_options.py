@@ -5,6 +5,9 @@
 
 ###### 1. Server workflow options ######
 
+### Experiment name, this will be stamped on some files
+expt_name = 'MISOMIP_999'
+
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
 ###             which was created by Matlab Compiler on another machine
@@ -16,16 +19,20 @@ ua_option = 'compiled'
 # (Even if this is False, the MNC package in MITgcm is not supported.)
 use_xmitgcm = True
 
+# Format for Ua output
+# For now the only option is 'matlab', later 'netcdf' will be added
+ua_output_format = 'matlab'
+
 # Optional base directory to simplify definition of directories below
 # This variable won't be read by the coupler, so you don't have to use it.
 work_dir = '/work/n02/n02/kaight/'
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
-mit_case_dir = work_dir+'mitgcm/cases/MISOMIP_999/'
+mit_case_dir = work_dir+'mitgcm/cases/'+expt_name+'/'
 ### Path to the Ua directory containing executable
-ua_exe_dir = work_dir+'Ua_exe_MISOMIP_999/'
+ua_exe_dir = work_dir+'Ua_exe_'+expt_name+'/'
 ### Path to the directory to centrally gather output
-output_dir = work_dir+'MISOMIP_999_output/'
+output_dir = work_dir+expt_name+'_output/'
 ### Path to MITgcmutils python package (within MITgcm source code distribution)
 mitgcmutils_dir = work_dir+'mitgcm/MITgcm/utils/python/MITgcmutils'
 ### Path to xmitgcm python package

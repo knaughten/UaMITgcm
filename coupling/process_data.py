@@ -29,15 +29,12 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
     # melting is negative as per Ua convention.
     # Make sure it's from the last timestep of the previous simulation.
     ismr = -1*convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
+    # Put it in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
+    ismr_points = np.ravel(np.transpose(ismr))[:,None].astype('float64')
 
-    # Put everything in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
-    lon_points = np.ravel(grid.lon_1d)[:,None].astype('float64')
-    lat_points = np.ravel(grid.lat_1d)[:,None].astype('float64')
-    ismr_points = np.ravel(ismr)[:,None].astype('float64')
-
-    # Write to Matlab file for Ua, as long 1D arrays
+    # Write to Matlab file for Ua, as long 1D array
     print 'Writing ' + ua_out_file
-    savemat(ua_out_file, {'meltrate':ismr_points, 'x':lon_points, 'y':lat_points})  
+    savemat(ua_out_file, {'meltrate':ismr_points})  
 
 
 # Given the updated ice shelf draft from Ua, adjust the draft and/or bathymetry so that MITgcm is happy. In order to have fully connected adjacent water columns, they must overlap by at least two wet cells.
@@ -170,6 +167,7 @@ def convert_mit_output (options):
 # options: Options object
 # spinup: boolean indicating we're in the ocean-only spinup phase, so there is no Ua output to deal with
 # TODO: Move Ua output into new folder
+# TODO: If some output we expect isn't there, stop the coupling
 def gather_output (options, spinup):
 
     # Make a subdirectory named after the starting date of the simulation segment
