@@ -5,6 +5,7 @@
 import numpy as np
 from scipy.io import savemat, loadmat
 import os
+from shutil import copyfile
 
 from coupling_utils import read_last_output, find_open_cells, move_to_dir
 
@@ -13,6 +14,15 @@ from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.file_io import read_binary, write_binary
 from mitgcm_python.interpolation import discard_and_fill
 from mitgcm_python.ics_obcs import calc_load_anomaly
+
+
+# Copy the XC and YC grid files from one directory to another.
+# In practice, they will be copied from the MITgcm run directory to the central output directory, so that Ua can read them.
+def copy_grid (mit_dir, out_dir):
+    copyfile(mit_dir+'XC.data', out_dir)
+    copyfile(mit_dir+'XC.meta', out_dir)
+    copyfile(mit_dir+'YC.data', out_dir)
+    copyfile(mit_dir+'YC.meta', out_dir)
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
@@ -54,7 +64,6 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
     # Read the ice shelf draft and mask from Ua
-    # TODO: deal with changing land mask
     f = loadmat(ua_draft_file)
     draft = np.transpose(f['b_forMITgcm'])
     mask = np.transpose(f['mask_forMITgcm'])
@@ -166,8 +175,6 @@ def convert_mit_output (options):
 # Arguments:
 # options: Options object
 # spinup: boolean indicating we're in the ocean-only spinup phase, so there is no Ua output to deal with
-# TODO: Move Ua output into new folder
-# TODO: If some output we expect isn't there, stop the coupling
 def gather_output (options, spinup):
 
     # Make a subdirectory named after the starting date of the simulation segment
@@ -195,11 +202,14 @@ def gather_output (options, spinup):
                 move_to_dir(fname, options.mit_run_dir, new_dir)
 
     if not spinup:
-        # TODO: Move Ua output into this folder
-
-        # Move coupling files into the subdirectory
-        move_to_dir(options.ua_melt_file, options.output_dir, new_dir)
-        move_to_dir(options.ua_draft_file, options.output_dir, new_dir
+        # Move Ua output into this folder
+        for fname in os.listdir(options.ua_output_dir):
+            move_to_dir(fname, options.ua_output_dir, new_dir)
+        # Make sure the draft file exists
+        if not os.path.isfile(new_dir+options.ua_draft_file):
+            print 'Error gathering output'
+            print 'Ua did not create the draft file '+ua_draft_file
+            sys.exit()
     
 
 

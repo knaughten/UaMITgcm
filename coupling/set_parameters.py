@@ -80,6 +80,8 @@ class Options:
         # Save the run directory derived from this
         self.mit_run_dir = self.mit_case_dir + 'run/'
         self.ua_exe_dir = real_dir(ua_exe_dir)
+        # Save the Ua output directory derived from this
+        self.ua_output_dir = self.ua_exe_dir + 'ResultsFiles/'
         self.output_dir = real_dir(output_dir)
         self.mitgcmutils_dir = real_dir(mitgcmutils_dir)
         if self.use_xmitgcm:
