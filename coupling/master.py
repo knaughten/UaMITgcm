@@ -1,7 +1,9 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
+from process_data import copy_grid, extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
 from coupling_utils import submit_job
+
+import os
 
 
 print 'Reading parameters'
@@ -17,6 +19,9 @@ if not initial and not spinup and not finished:
     print 'Building MITgcm grid'
     grid = Grid(options.mit_run_dir)
 
+    print 'Sending MITgcm grid to Ua'
+    copy_grid(options.mit_run_dir, options.output_dir)
+
     print 'Sending melt rates from MITgcm to Ua'
     extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, grid, options)
 
@@ -24,7 +29,7 @@ if not initial and not spinup and not finished:
     if not first_coupled:
 
         print 'Adjusting MITgcm topography'
-        adjust_mit_geom(options.output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
+        adjust_mit_geom(options.ua_output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
 
     print 'Setting new initial conditions for MITgcm'
     set_mit_ics(options.mit_run_dir, grid, options)

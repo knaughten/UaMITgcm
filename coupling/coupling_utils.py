@@ -133,6 +133,10 @@ def read_last_output (directory, file_head, var_names, timestep=None):
 
     # Read the most recent file
     data, its, meta = rdmds(directory+file_head, itrs=np.Inf, returnmeta=True)
+    if len(data)==0:
+        # Nothing was read, no such files exist
+        print 'Error (read_last_output): no such files ' + directory+file_head+'.*.data exist.'
+        sys.exit()
     print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
     # Make sure it agrees with any expected timestep number
     if timestep is not None and its != timestep:
