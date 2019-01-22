@@ -28,7 +28,7 @@ cp `find $ua_source/NewestVertexBisection/ -name "*.m"` $ua_build
 cp -r $ua_updates/* $ua_build
 
 # Create the executable
-$matlab_path/bin/mcc -m $ua_build/startUa2D.m -o Ua -d $ua_build
-# Copy just the executable (not the associated run script) to the current directory
-# TODO: copy to special Ua executable directory which also has necessary data files etc.
+$matlab_path/bin/mcc -m $ua_build/callUa.m -o Ua -d $ua_build
+# Copy just the executable (not the auto-generated run script as we have a custom one) to the current directory
 cp $ua_build/Ua .
+echo 'Now copy "Ua" the Ua executable directory on the server where you will run the model.'

@@ -26,8 +26,8 @@ if not initial and not spinup and not finished:
         print 'Adjusting MITgcm topography'
         adjust_mit_geom(options.output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
 
-        print 'Setting new initial conditions for MITgcm'
-        set_mit_ics(options.mit_run_dir, grid, options)
+    print 'Setting new initial conditions for MITgcm'
+    set_mit_ics(options.mit_run_dir, grid, options)
 
     
 # Is there any output we need to deal with?

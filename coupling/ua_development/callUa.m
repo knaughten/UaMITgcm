@@ -20,7 +20,6 @@ end
 % read from user input file (TO DO):
 UserVar.UaMITgcm.Experiment = 'MISOMIP_1r';
 
-UserVar.UaMITgcm.UaSourceDirectory = '/home/UNN/wchm8/Documents/Ua/UaMITgcm_Development/Ua_source/';
 UserVar.UaMITgcm.UaOutputDirectory = './ResultsFiles';
 UserVar.UaMITgcm.UaOutputFormat = 'matlab'; % options are 'matlab' or 'netcdf'
 
@@ -89,7 +88,8 @@ UserVar.UaMITgcm.MITgcmGridY = y;
 %%%%%%%%%%%%
 %% run Ua %%
 %%%%%%%%%%%%
-setup_Ua(UserVar.UaMITgcm.UaSourceDirectory);
+setenv('UaHomeDirectory','./')
+UaHomeDirectory=getenv('UaHomeDirectory'); addpath(genpath(UaHomeDirectory))
 Ua2D(UserVar,varargin{:})
 
 end

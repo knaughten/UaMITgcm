@@ -14,6 +14,7 @@
 MCR=$WORK/MCR_2017a/v92/
 
 module swap PrgEnv-intel PrgEnv-gnu
+cd $PBS_O_WORKDIR
 cd $UA_DIR
 
-./run_Ua.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
+./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
