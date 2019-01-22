@@ -1,3 +1,4 @@
+Setup MITgcm:
 Copy MISOMIP_999 directory to some new location
      eg cp -r MISOMIP_999 $WORK/mitgcm/cases/
 Edit work_dir and possibly mit_case_dir in config_options.py
@@ -7,3 +8,13 @@ python setup_mit_misomip.py
 cd <whatever>/MISOMIP_999/scripts
 ./compile.sh
 ./prepare_run.sh
+
+Setup Ua:
+Go onto machine where you will compile
+cd <whatever>/UaMITgcm/coupling
+Edit matlab_path, ua_build in compile_ua.sh
+./compile_ua.sh
+scp Ua <server where everything will run>:<Ua executable directory on that server>
+Go back onto that server
+cd <whatever>/UaMITgcm/example/MISOMIP
+cp MISOMIP_999-RestartFile.mat <Ua executable directory>
