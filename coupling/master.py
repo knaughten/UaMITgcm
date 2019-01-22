@@ -3,8 +3,6 @@ from mitgcm_python.grid import Grid
 from process_data import copy_grid, extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
 from coupling_utils import submit_job
 
-import os
-
 
 print 'Reading parameters'
 options = Options()

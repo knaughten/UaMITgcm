@@ -17,7 +17,7 @@ ua_option = 'compiled'
 
 # Whether to convert MITgcm binary output to NetCDF using xmitgcm
 # (Even if this is False, the MNC package in MITgcm is not supported.)
-use_xmitgcm = True
+use_xmitgcm = False
 
 # Format for Ua output
 # For now the only option is 'matlab', later 'netcdf' will be added
