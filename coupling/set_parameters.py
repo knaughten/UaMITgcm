@@ -81,7 +81,7 @@ class Options:
         self.mit_run_dir = self.mit_case_dir + 'run/'
         self.ua_exe_dir = real_dir(ua_exe_dir)
         self.output_dir = real_dir(output_dir)
-        self.mitgcmutils_dir = real_dir(mitgcm_utils_dir)
+        self.mitgcmutils_dir = real_dir(mitgcmutils_dir)
         if self.use_xmitgcm:
             self.xmitgcm_dir = real_dir(xmitgcm_dir)
         else:
@@ -280,7 +280,7 @@ def update_namelists (mit_dir, endTime, options, initial=False):
                 check = 'none'
             else:
                 check = 'all'
-            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, error=True, check=check, error=not initial)
+            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, check=check, error=not initial)
             
 # end function update_namelists
 
