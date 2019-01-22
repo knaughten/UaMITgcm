@@ -1,6 +1,8 @@
+Copy MISOMIP_999 directory to some new location
+     eg cp -r MISOMIP_999 $WORK/mitgcm/cases/
+Edit work_dir and possibly mit_case_dir in config_options.py
 cp config_options.py ../../coupling
-cp -r MISOMIP_999 <some_new_location>
-Edit input_dir in setup_mit_misomip.py to reflect this path
+Edit input_dir near the bottom of setup_mit_misomip.py
 python setup_mit_misomip.py
 cd <whatever>/MISOMIP_999/scripts
 ./compile.sh
