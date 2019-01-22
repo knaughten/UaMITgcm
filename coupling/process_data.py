@@ -205,11 +205,17 @@ def gather_output (options, spinup):
         # Move Ua output into this folder
         for fname in os.listdir(options.ua_output_dir):
             move_to_dir(fname, options.ua_output_dir, new_dir)
+        # Now copy the restart file from the main Ua directory
+        for fname in os.listdir(options.ua_exe_dir):
+            if fname.endswith('RestartFile.mat'):
+                copyfile(options.ua_exe_dir+fname, new_dir)
         # Make sure the draft file exists
         if not os.path.isfile(new_dir+options.ua_draft_file):
             print 'Error gathering output'
             print 'Ua did not create the draft file '+ua_draft_file
             sys.exit()
+            
+        
     
 
 
