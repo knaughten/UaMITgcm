@@ -1,0 +1,21 @@
+# open boundaries
+ &OBCS_PARM01
+ OB_Ieast=42*-1,
+
+ useOBCSprescribe=.TRUE.,
+ useOBCSsponge=.TRUE.,
+ useLinearSponge = .TRUE.,
+ OBEtFile='OBEt',
+ OBEsFile='OBEs',
+ OBEuFile='OBEu',
+ OBEvFile='OBEv',
+ &
+
+ &OBCS_PARM02
+ &
+
+ &OBCS_PARM03
+ spongeThickness = 5,
+ Urelaxobcsinner=43200,
+ Urelaxobcsbound=8640, 
+ &

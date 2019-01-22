@@ -1,0 +1,7 @@
+cp config_options.py ../../coupling
+cp -r MISOMIP_999 <some_new_location>
+Edit input_dir in setup_mit_misomip.py to reflect this path
+python setup_mit_misomip.py
+cd <whatever>/MISOMIP_999/scripts
+./compile.sh
+./prepare_run.sh

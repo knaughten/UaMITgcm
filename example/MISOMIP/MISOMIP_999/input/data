@@ -1,0 +1,101 @@
+# ====================
+# | Model parameters |
+# ====================
+#
+# Continuous equation parameters
+ &PARM01
+ Tref = 36*-1.,
+ Sref = 36*34.2,
+ viscAz=1.E-3,
+ viscAh=6.0,
+ diffKzT=5.E-5,
+ diffKhT=1.0,
+ diffKzS=5.E-5
+ diffKhS=1.0,
+ bottomDragQuadratic=2.5E-3,
+#
+ eosType='LINEAR',
+ rhoNil=1027.51,
+ tAlpha=3.733E-5,
+ sBeta =7.843E-4,
+ HeatCapacity_cp = 3974.0,
+ rhoConst=1028.,
+ gravity=9.81,
+ convertFW2Salt = -1,
+# 
+ selectCoriMap=0,
+ f0=-1.4087e-4,
+ beta=0.0,
+ no_slip_sides=.true.,
+ no_slip_bottom=.true.,
+ rigidLid=.FALSE.,
+ implicitFreeSurface=.TRUE.,
+ nonlinFreeSurf=4,
+ exactConserv=.TRUE.,
+ useCDScheme = .FALSE.,
+ nonHydrostatic=.FALSE.,
+ hFacInf=0.2,
+ hFacSup=2.0,
+ hFacMin=0.05,
+ staggerTimeStep = .TRUE.,
+ tempAdvScheme = 33,
+ saltAdvScheme = 33,
+ useSingleCPUio = .TRUE.,
+ readBinaryPrec=64,
+ implicitViscosity=.true.,
+ implicitDiffusion=.true.,
+ useCDScheme = .FALSE.,
+ &
+
+# Elliptic solver parameters
+ &PARM02
+ cg2dMaxIters=1000,
+ cg2dTargetResidual=1.E-13,
+ cg3dMaxIters=400,
+ cg3dTargetResidual=1.E-13,
+ &
+
+# Time stepping parameters
+ &PARM03
+ niter0=0,
+ deltaT=300.0,
+# 6-month simulation
+ endTime=15552000.,
+ abEps=0.1,
+ cAdjFreq = -1.,
+# monthly checkpoints
+ chkptFreq = 2592000.,
+# pickupSuff='ckptA',
+# 6-monthly permanent checkpoint
+ pchkptFreq = 15552000.,
+ nIter0=0,
+ dumpFreq=0.0,
+ taveFreq=0.0,
+ dumpInitAndLast=.true.,
+ monitorFreq=64800.,
+ monitorSelect=64800.,
+# for time dependent open boundary conditions, activate the following 3 lines:
+ periodicExternalForcing=.false.,
+ externForcingPeriod=0.,
+ externForcingCycle=0.,
+ &
+
+# Gridding parameters
+ &PARM04
+ usingCartesianGrid=.TRUE.,
+# usingSphericalPolarGrid=.TRUE.,
+ xgOrigin = 320000.,
+ ygOrigin = -2000.,
+ delX=240*2000,
+ delY=42*2000,
+ delZ=36*20.0,
+ &
+
+# Input datasets
+ &PARM05
+ bathyFile='bathymetry.shice',
+ hydrogThetaFile='lev_t.shice',
+ hydrogSaltFile='lev_s.shice',
+ checkIniTemp=.false.,
+ checkIniSalt=.false.,
+&

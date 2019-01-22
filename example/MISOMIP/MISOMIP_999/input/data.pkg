@@ -1,0 +1,10 @@
+# Packages
+ &PACKAGES
+ useDiagnostics = .TRUE., 
+ useShelfIce=.true.,
+ useMNC=.false.,
+ useOBCS=.true.,
+ useGMRedi=.false.,
+ useKPP   =.false.,
+ usePP81 = .false.,
+&

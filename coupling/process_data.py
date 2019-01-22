@@ -193,7 +193,7 @@ def gather_output (options, spinup):
             
     # Deal with MITgcm binary output files
     for fname in os.listdir(options.mit_run_dir):
-        if fname.startswith('state') and (fname.endswith('.data') or fname.endswith('.meta')):
+        if (fname.startswith('state') or fname.startswith('pickup')) and (fname.endswith('.data') or fname.endswith('.meta')):
             if options.use_xmitgcm:
                 # Delete binary files which were savely converted to NetCDF
                 os.remove(options.mit_run_dir+fname)
