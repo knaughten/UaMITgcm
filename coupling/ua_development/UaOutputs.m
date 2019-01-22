@@ -31,8 +31,8 @@ end
 
 if strcmp(UserVar.UaMITgcm.UaOutputFormat,'matlab')
     
-    FileName=sprintf('%s/%07i-Nodes%i-Ele%i-Tri%i-kH%i-%s.mat',...
-    UserVar.UaMITgcm.UaOutputDirectory,round(time*365.25),MUA.Nnodes,MUA.Nele,MUA.nod,1000*CtrlVar.kH,CtrlVar.Experiment);
+    FileName=sprintf(UserVar.UaMITgcm.UaOutputDirectory,'/',CtrlVar.Experiment,'_',...
+        UserVar.UaMITgcm.StartYear,UserVar.UaMITgcm.StartMonth,round(time*365.25));
     fprintf(' Saving data in %s \n',FileName)
     save(FileName,'UserVar','CtrlVar','MUA','time','s','b','S','B','h','ub','vb','C','dhdt','AGlen','m','n','rho','rhow','as','ab','GF');
     

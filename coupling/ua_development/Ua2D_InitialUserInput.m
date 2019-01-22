@@ -1,7 +1,6 @@
 function [UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar)
 
 %%
-
 CtrlVar.Experiment=UserVar.UaMITgcm.Experiment;   
 %% Types of run
 %
