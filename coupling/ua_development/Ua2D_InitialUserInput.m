@@ -46,7 +46,6 @@ CtrlVar.niph=6;
 CtrlVar.NameOfRestartFiletoWrite=[CtrlVar.Experiment,'-RestartFile.mat'];
 CtrlVar.NameOfRestartFiletoRead=CtrlVar.NameOfRestartFiletoWrite;
 
-
 %% adapt mesh
 CtrlVar.AdaptMesh=1;         %
 CtrlVar.InfoLevelAdaptiveMeshing=5;

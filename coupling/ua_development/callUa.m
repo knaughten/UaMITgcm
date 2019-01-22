@@ -1,3 +1,5 @@
+%%%%%%%%%%%
+%%%
 
 function callUa(UserVar,varargin)
 
@@ -75,8 +77,8 @@ UserVar.UaMITgcm.MITgcmMelt = meltrate(:);
 %% Read MITgcm grid and check if it’s lat/lon or Cartesian %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % read tracer gridpoints
-lon=rdmds('XC');
-lat=rdmds('YC');
+lon=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XC']);
+lat=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YC']);
 
 % check if grid is lat/lon and convert to cartesian if required
 if all(lon(:)>=-180) && all(lon(:)<=180) && all(lat(:)>=-90) && all(lat(:)<=90)
