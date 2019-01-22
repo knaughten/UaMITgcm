@@ -38,6 +38,7 @@ class BasicGrid:
         # Build vertical grid
         self.z_edges = np.arange(0, -(nz+1)*dz, -dz)
         self.z = 0.5*(self.z_edges[:-1] + self.z_edges[1:])
+        self.dz = np.zeros(self.z.size) + dz
         # Save grid dimensions
         self.nx = nx
         self.ny = ny
@@ -92,7 +93,7 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr, dig_option='draft')
 
     print 'Zapping ice shelf drafts which are too thin'
-    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=hFacMinDr)        
+    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=hFacMinDr)[0]        
 
     # Calculate hFacC and save to the grid for later
     grid.save_hfac(bathy, draft)

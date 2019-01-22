@@ -8,8 +8,8 @@ if [ -d "../run" ]; then
   cd ../run
   rm -rf *
 else
-  echo 'There is no run directory'
-  exit 1
+  echo 'Creating run directory'
+  mkdir ../run
 fi
 
 # Link everything from the input directory

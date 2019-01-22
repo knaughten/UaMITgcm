@@ -8,8 +8,8 @@ if [ -d "../build" ]; then
   cd ../build
   rm -rf *
 else
-  echo 'There is no build directory'
-  exit 1
+  echo 'Creating build directory'
+  mkdir ../build
 fi
 
 # Generate a Makefile
