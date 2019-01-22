@@ -6,12 +6,11 @@
 #PBS -r n
 ###############################################################
 # Run coupling script to exchange data between MITgcm and Ua.
-# Pass the argument -v MITUTILS=<path to MITgcmutils package>,XMITGCM=<path to xmitgcm package>
 ###############################################################
 
 # Get mitgcm_python in the path
 # Assumes this script was submitted from its own directory
 MITPY=$PBS_O_WORKDIR/../tools/
-export PYTHONPATH=$PYTHONPATH:$MITPY:$MITUTILS:$XMITGCM
+export PYTHONPATH=$PYTHONPATH:$MITPY
 python master.py &> coupler_stdout
 

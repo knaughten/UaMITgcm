@@ -7,8 +7,7 @@ import numpy as np
 from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
-# TODO: is this the best way to do it? Absolute path? .bashrc?
-sys.path.insert(0, '../../tools/')
+sys.path.append('../../tools/')
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz
 from mitgcm_python.make_domain import calc_hfac, do_digging, do_zapping

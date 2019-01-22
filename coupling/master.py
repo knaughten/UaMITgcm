@@ -62,7 +62,7 @@ if not finished:
         afterok.append(ua_id)
 
     print 'Submitting next coupler job to start after segment is finished'
-    submit_job('run_coupler.sh', input_var=['MITUTILS='+options.mitgcmutils_dir, 'XMITGCM='+options.xmitgcm_dir], afterok=afterok)
+    submit_job('run_coupler.sh', afterok=afterok)
     
 
 print 'Coupling successfully completed'

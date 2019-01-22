@@ -5,6 +5,7 @@
 ##############################################################
 
 import os
+import sys
 
 from config_options import *
 from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between
@@ -83,9 +84,12 @@ class Options:
         # Save the Ua output directory derived from this
         self.ua_output_dir = self.ua_exe_dir + 'ResultsFiles/'
         self.output_dir = real_dir(output_dir)
+        # Append python packages to path
         self.mitgcmutils_dir = real_dir(mitgcmutils_dir)
+        sys.path.append(self.mitgcmutils_dir)
         if self.use_xmitgcm:
             self.xmitgcm_dir = real_dir(xmitgcm_dir)
+            sys.path.append(self.xmitgcm_dir)
         else:
             self.xmitgcm_dir = ''
         self.budget_code = budget_code
