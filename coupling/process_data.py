@@ -104,17 +104,29 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 # Also set the new pressure load anomaly.
 
 # Arguments:
-# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and final state
+# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and dump of final state variables
 # grid: Grid object
 # options: Options object
 
 def set_mit_ics (mit_dir, grid, options):
 
-    # Read the final state of ocean variables
-    temp, salt, u, v = read_last_output(mit_dir, options.final_state_name, ['THETA', 'SALT', 'UVEL', 'VVEL'], timestep=options.last_timestep)
+    # Inner function to read the final dump of a given variable
+    def read_last_dump (var_name):
+        return read_last_output(mit_dir, var_name, None, timestep=options.last_timestep)
+    
+    # Read the final ocean state variables
+    temp = read_last_dump('T')
+    salt = read_last_dump('S')
+    u = read_last_dump('U')
+    v = read_last_dump('V')
     if options.use_seaice:
-        # Read the final state of sea ice variables
-        aice, hice, hsnow, uice, vice = read_last_output(mit_dir, options.seaice_final_state_name, ['SIarea', 'SIheff', 'SIhsnow', 'SIuice', 'SIvice'], timestep=options.last_timestep)
+        # Read the final sea ice state variables
+        # TODO: confirm names
+        aice = read_last_dump('SIarea')
+        hice = read_last_dump('SIheff')
+        hsnow = read_last_dump('SIhsnow')
+        uice = read_last_dump('SIuice')
+        vice = read_last_dump('SIvice')
     
     # Read the new ice shelf draft, and also the bathymetry
     draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
@@ -155,7 +167,7 @@ def set_mit_ics (mit_dir, grid, options):
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
 # Arguments:
 # options: Options object
-# TODO: check if this breaks with FinalState snapshots. Should we just convert output_names? Or convert output_names and final_state_name/seaice_final_state_name separately?
+# TODO: check if this breaks with dump files.
 def convert_mit_output (options):
 
     # Wrap import statement inside this function, so that xmitgcm isn't required to be installed unless needed

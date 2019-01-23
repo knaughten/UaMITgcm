@@ -182,16 +182,10 @@ pload_file = 'phi0surf.bin'
 ### (you can have SHIfwFlx on another output stream too if you want
 ### output at a different frequency for analysis)
 ismr_name = 'MITout_2D'
-### Contains THETA, SALT, UVEL, VVEL snapshot at end of simulation
-final_state_name = 'FinalState'
-### Contains SIarea, SIheff, SIhsnow, SIuice, SIvice snapshot
-### at end of simulation
-### (only matters if use_seaice = True)
-seaice_final_state_name = ''
 ### Any files you want to output at output_freq.
 ### Will probably include ismr_name.
-### Should not include any snapshots including the final state.
 output_names = ['MITout_2D', 'MITout_3D']
+
 ### Name for NetCDF files converted by xmitgcm
 ### Doesn't really matter what this is,
 ### as long as it won't overwrite anything in run/

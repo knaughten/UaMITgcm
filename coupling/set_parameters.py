@@ -176,11 +176,6 @@ class Options:
             self.ini_vice_file = ''
         self.pload_file = pload_file
         self.ismr_name = ismr_name
-        self.final_state_name = final_state_name
-        if self.use_seaice:
-            self.seaice_final_state_name = seaice_final_state_name
-        else:
-            self.seaice_final_state_name = ''
         self.output_names = check_value('output_names', output_names, type='list')
         self.mit_nc_name = mit_nc_name
         if not self.mit_nc_name.endswith('.nc'):
@@ -255,17 +250,6 @@ def update_namelists (mit_dir, endTime, options, initial=False):
     old_endTime = extract_first_int(line)
     # Update file if needed
     check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime', error=not initial)
-        
-    # Look for the frequency of the final state snapshot file in "data.diagnostics" namelist
-    final_state_freq, final_state_freq_line, final_state_index = get_diag_freq(options.final_state_name)
-    # Update if needed
-    check_and_change(final_state_freq, -endTime, final_state_freq_line, ' frequency('+str(final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.final_state_name, error=not initial)
-    if options.use_seaice:
-        # Sea ice final state snapshot might be a different file
-        seaice_final_state_freq, seaice_final_state_freq_line, seaice_final_state_index = get_diag_freq(options.seaice_final_state_name)
-        if seaice_final_state_index != final_state_index:
-            # Update if needed
-            check_and_change(seaice_final_state_freq, -endTime, seaice_final_state_freq_line, ' frequency('+str(seaice_final_state_index)+') = '+str(-endTime)+'.,\n', namelist_diag, 'diagnostic frequency of '+options.seaice_final_state_name, error=not initial)
 
     # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
     if len(options.output_names) > 0:

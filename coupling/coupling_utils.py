@@ -5,6 +5,7 @@
 import os
 import datetime
 import subprocess
+import numpy as np
 
 from MITgcmutils import rdmds
 
@@ -123,7 +124,7 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
             return num_days
 
 
-# Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D' or 'FinalState') and extract all the variables in the given list of names.
+# Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
 # If there is an expected value for the timestep number corresponding to this output, check that it agrees.
 def read_last_output (directory, file_head, var_names, timestep=None):
 
@@ -136,12 +137,19 @@ def read_last_output (directory, file_head, var_names, timestep=None):
     if len(data)==0:
         # Nothing was read, no such files exist
         print 'Error (read_last_output): no such files ' + directory+file_head+'.*.data exist.'
+        if var_names is None:
+            # This looks like a case of missing dump files
+            print 'Make sure that dumpInitAndLast=.true. in input/data.'
         sys.exit()
     print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
     # Make sure it agrees with any expected timestep number
     if timestep is not None and its != timestep:
         print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + timestep
         sys.exit()
+        
+    if var_names is None:
+        # There is just one variable here, return the whole array
+        return data
     # Extract one variable at a time and wrap them up in a list
     var_data = []
     for var in var_names:
