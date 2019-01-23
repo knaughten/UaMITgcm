@@ -84,14 +84,6 @@ class Options:
         # Save the Ua output directory derived from this
         self.ua_output_dir = self.ua_exe_dir + 'ResultsFiles/'
         self.output_dir = real_dir(output_dir)
-        # Append python packages to path
-        self.mitgcmutils_dir = real_dir(mitgcmutils_dir)
-        sys.path.append(self.mitgcmutils_dir)
-        if self.use_xmitgcm:
-            self.xmitgcm_dir = real_dir(xmitgcm_dir)
-            sys.path.append(self.xmitgcm_dir)
-        else:
-            self.xmitgcm_dir = ''
         self.budget_code = budget_code
 
         self.total_time = check_value('total_time', total_time, type='int')

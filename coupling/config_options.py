@@ -33,11 +33,6 @@ mit_case_dir = work_dir+'mitgcm/cases/'+expt_name+'/'
 ua_exe_dir = work_dir+'Ua_exe_'+expt_name+'/'
 ### Path to the directory to centrally gather output
 output_dir = work_dir+expt_name+'_output/'
-### Path to MITgcmutils python package (within MITgcm source code distribution)
-mitgcmutils_dir = work_dir+'mitgcm/MITgcm/utils/python/MITgcmutils'
-### Path to xmitgcm python package
-### Only matters if use_xmitgcm=True
-xmitgcm_dir = work_dir+'python/xmitgcm'
 
 ### Archer budget to charge jobs to
 budget_code = 'n02-NEL013770'

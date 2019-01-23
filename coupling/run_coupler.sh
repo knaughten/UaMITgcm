@@ -10,9 +10,14 @@
 
 cd $PBS_O_WORKDIR
 
-# Get mitgcm_python in the path
+# Get various python packages in the path
 # Assumes this script was submitted from its own directory
+# mitgcm_python
 MITPY=$PBS_O_WORKDIR/../tools/
-export PYTHONPATH=$PYTHONPATH:$MITPY
+# xmitgcm
+XMIT=$PBS_O_WORKDIR/../tools/xmitgcm/
+# MITgcmutils
+MITU=$PBS_O_WORKDIR/../MITgcm/utils/python/MITgcmutils/
+export PYTHONPATH=$PYTHONPATH:$MITPY:$XMIT:$MITU
 python master.py &> coupler_stdout
 
