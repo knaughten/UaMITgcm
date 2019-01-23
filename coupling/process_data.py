@@ -89,7 +89,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft')
 
     print 'Zapping ice shelf drafts which are too thin'
-    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr)
+    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr)[0]
     
     # Ice shelf draft could change in all three cases
     write_binary(draft, mit_dir+options.draftFile, prec=options.readBinaryPrec)

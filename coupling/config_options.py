@@ -41,7 +41,7 @@ budget_code = 'n02-NEL013770'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 24
+total_time = 6 #24
 ### Length of ocean spinup period (months)
 spinup_time = 1 #12
 ### Length of coupling timestep (months)
