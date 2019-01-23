@@ -8,6 +8,8 @@
 # Run coupling script to exchange data between MITgcm and Ua.
 ###############################################################
 
+cd $PBS_O_WORKDIR
+
 # Get mitgcm_python in the path
 # Assumes this script was submitted from its own directory
 MITPY=$PBS_O_WORKDIR/../tools/

@@ -1,0 +1,16 @@
+Reading parameters
+Checking calendar
+Advancing calendar by 1 months
+Setting output intervals
+Updating /work/n02/n02/kaight/MISOMIP_999_output/calendar
+Updating simulation length in namelists
+Building MITgcm grid
+Sending MITgcm grid to Ua
+Traceback (most recent call last):
+  File "master.py", line 21, in <module>
+    copy_grid(options.mit_run_dir, options.output_dir)
+  File "/fs2/n02/n02/kaight/python/UaMITgcm/coupling/process_data.py", line 22, in copy_grid
+    copyfile(mit_dir+'XC.data', out_dir)
+  File "/home/y07/y07/cse/anaconda/python2/lib/python2.7/shutil.py", line 83, in copyfile
+    with open(dst, 'wb') as fdst:
+IOError: [Errno 21] Is a directory: '/work/n02/n02/kaight/MISOMIP_999_output/'
