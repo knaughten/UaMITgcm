@@ -38,7 +38,7 @@ if strcmp(UserVar.UaMITgcm.UaOutputFormat,'matlab')
     
 elseif strcmp(UserVar.UaMITgcm.UaOutputFormat,'netcdf')
     
-    %% add here for netcdf output - use MISOMIP code
+    %% add here for netcdf output 
     
 else
     
