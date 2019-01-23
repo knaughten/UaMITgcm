@@ -48,21 +48,21 @@ if not initial:
 if not finished:
 
     print 'Submitting next MITgcm segment'
-    mit_id = submit_job('run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
+    mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
     afterok = [mit_id]
 
     # Do we also need to submit Ua job?
     if not spinup:
         print 'Submitting next Ua segment'
         if options.ua_option == 'compiled':
-            ua_id = submit_job('run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
+            ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
         elif options.ua_option == 'matlab':
             # TODO
             pass
         afterok.append(ua_id)
 
     print 'Submitting next coupler job to start after segment is finished'
-    submit_job('run_coupler.sh', afterok=afterok)
+    submit_job(options, 'run_coupler.sh', afterok=afterok)
     
 
 print 'Coupling successfully completed'

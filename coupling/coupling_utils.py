@@ -185,16 +185,17 @@ def move_to_dir (fname, old_dir, new_dir):
 def list_with_commas (A):
     s = ''
     for elm in A:
-        s += A + ','
+        s += elm + ','
     # Remove the last comma
     return s[:-1]    
 
 
 # Submit the given PBS script and return the PBS job ID.
 # Optional keyword arguments:
+# options: Options object
 # input_var: a list of variable definitions to pass with -v option, eg 'MIT_DIR=directory_path'
 # afterok: a list of PBS job IDs of previously submitted jobs. If it is defined, this job will stay on hold until the given jobs successfully complete.
-def submit_job (pbs_script, input_var=None, afterok=None):
+def submit_job (options, pbs_script, input_var=None, afterok=None):
 
     # Construct qsub call line by line.
     command = 'qsub'
@@ -213,4 +214,10 @@ def submit_job (pbs_script, input_var=None, afterok=None):
     # Call the command and capture the output
     pbs_id = subprocess.check_output(command, shell=True)
     # Now extract the digits from the PBS job ID and return as a string
-    return str(extract_first_int(pbs_id))
+    try:
+        return str(extract_first_int(pbs_id))
+    except(ValueError):
+        print 'Error (submit_job): job did not submit properly'
+        print 'Error message from qsub was:'
+        print pbs_id
+        sys.exit()

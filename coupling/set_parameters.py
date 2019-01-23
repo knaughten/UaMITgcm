@@ -224,7 +224,7 @@ def update_namelists (mit_dir, endTime, options, initial=False):
         freq_line = line_that_matters(namelist_diag, 'frequency('+str(index)+')')
         # Strip out the number after the equals sign
         freq = extract_first_int(freq_line[freq_line.index('=')+1:])
-        return freq_line, freq, index
+        return freq, freq_line, index
 
     # Inner function to throw an error or a warning if the existing simulation length is incorrect in a 360-day calendar (where every simulation segment should be the same length).
     def throw_error_warning (var_string, file_name, error=True):
@@ -252,7 +252,7 @@ def update_namelists (mit_dir, endTime, options, initial=False):
     # Look for endTime in "data" namelist
     endTime_line = line_that_matters(namelist, 'endTime')
     # Strip out the number
-    old_endTime = extract_first_int(line)
+    old_endTime = extract_first_int(endTime_line)
     # Update file if needed
     check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime', error=not initial)
         

@@ -22,12 +22,6 @@
  frequency(2) = 2592000.,
  filename(2)  = 'MITout_3D',
  fields(1,2)  = 'UVEL ','VVEL ','THETA','SALT ',
- 
-# output of final T and S
- frequency(3) = -15552000.,
- filename(3) = 'FinalState',
- fields(1,3) = 'THETA','SALT ',
-#
 &
 
 
