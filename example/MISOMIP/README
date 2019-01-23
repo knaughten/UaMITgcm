@@ -1,7 +1,7 @@
 Setup MITgcm:
 Copy MISOMIP_999 directory to some new location
      eg cp -r MISOMIP_999 $WORK/mitgcm/cases/
-Edit work_dir and possibly mit_case_dir in config_options.py
+Edit work_dir and possibly mit_case_dir in config_options.py; make sure that output_dir exists
 cp config_options.py ../../coupling
 Edit input_dir near the bottom of setup_mit_misomip.py
 python setup_mit_misomip.py
@@ -17,3 +17,6 @@ Edit matlab_path, ua_build in compile_ua.sh
 scp Ua <server where everything will run>:<Ua executable directory on that server>
 Go back onto that server
 cp <whatever>/UaMITgcm/example/MISOMIP/MISOMIP_999_Ua/MISOMIP_999-RestartFile.mat <Ua executable directory>
+
+cd <whatever>/UaMITgcm/coupling
+qsub -A $HECACC run_coupler.sh

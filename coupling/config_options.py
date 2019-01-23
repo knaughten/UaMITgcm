@@ -6,7 +6,7 @@
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'MISOMIP_999'
+expt_name = 'MISOMIP_1r' #'MISOMIP_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable

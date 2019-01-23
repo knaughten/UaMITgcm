@@ -150,7 +150,7 @@ def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file, obcs_salt
 
 ############## USER INPUT HERE #########################
 # Path to MITgcm input/ directory for the MISOMIP case
-input_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_999/input/'
+input_dir = '/work/n02/n02/kaight/mitgcm/cases/MISOMIP_1r/input/'
 
 print 'Building grid'
 grid = BasicGrid()
