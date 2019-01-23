@@ -9,8 +9,8 @@ import sys
 # Get mitgcm_python in the path
 sys.path.append('../../tools/')
 from mitgcm_python.file_io import write_binary
-from mitgcm_python.utils import z_to_xyz
-from mitgcm_python.make_domain import calc_hfac, do_digging, do_zapping
+from mitgcm_python.utils import z_to_xyz, calc_hfac
+from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.ics_obcs import calc_load_anomaly
 
 
