@@ -64,7 +64,7 @@
  abEps=0.1,
  cAdjFreq = -1.,
 # monthly checkpoints
- chkptFreq = 2592000.,
+# chkptFreq = 2592000.,
 # pickupSuff='ckptA',
 # 6-monthly permanent checkpoint
  pchkptFreq = 15552000.,

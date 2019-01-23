@@ -160,7 +160,7 @@ def set_mit_ics (mit_dir, grid, options):
         write_binary(vice, mit_dir+options.ini_vice_file, prec=options.readBinaryPrec)
 
     print 'Calculating pressure load anomaly'
-    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=pload_temp, constant_s=pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, Talpha=options.tAlpha, Sbeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
+    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=options.pload_temp, constant_s=options.pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
 
 
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
@@ -186,7 +186,8 @@ def convert_mit_output (options):
 # Arguments:
 # options: Options object
 # spinup: boolean indicating we're in the ocean-only spinup phase, so there is no Ua output to deal with
-def gather_output (options, spinup):
+# first_coupled: boolean indicating we're about to start the first coupled timestep, so there is still no Ua output to deal with
+def gather_output (options, spinup, first_coupled):
 
     # Make a subdirectory named after the starting date of the simulation segment
     new_dir = options.output_dir + options.last_start_date + '/'
@@ -204,7 +205,7 @@ def gather_output (options, spinup):
             
     # Deal with MITgcm binary output files
     for fname in os.listdir(options.mit_run_dir):
-        if (fname.startswith('state') or fname.startswith('pickup')) and (fname.endswith('.data') or fname.endswith('.meta')):
+        if fname.endswith('.data') or fname.endswith('.meta'):
             if options.use_xmitgcm:
                 # Delete binary files which were savely converted to NetCDF
                 os.remove(options.mit_run_dir+fname)
@@ -212,7 +213,7 @@ def gather_output (options, spinup):
                 # Move binary files to output directory
                 move_to_dir(fname, options.mit_run_dir, new_dir)
 
-    if not spinup:
+    if not spinup and not first_coupled:
         # Move Ua output into this folder
         for fname in os.listdir(options.ua_output_dir):
             move_to_dir(fname, options.ua_output_dir, new_dir)

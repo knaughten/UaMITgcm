@@ -43,7 +43,7 @@ if not initial:
         convert_mit_output(options)
 
     print 'Gathering output'
-    gather_output(options, spinup)
+    gather_output(options, spinup, first_coupled)
 
 
 # Do we need to submit more jobs?

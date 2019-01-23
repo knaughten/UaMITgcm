@@ -10,8 +10,8 @@ import sys
 
 from MITgcmutils import rdmds
 
-from mitgcm_python.make_domain import model_bdry, level_vars
-from mitgcm_python.utils import xy_to_xyz, z_to_xyz, is_leap_year
+from mitgcm_python.make_domain import level_vars
+from mitgcm_python.utils import xy_to_xyz, z_to_xyz, is_leap_year, model_bdry
 
 # Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
 def extract_first_int (string):
@@ -168,8 +168,8 @@ def read_last_output (directory, file_head, var_names, timestep=None):
 def find_open_cells (bathy, draft, grid, hFacMin, hFacMinDr):
 
     # Calculate the actual bathymetry and ice shelf draft seen by MITgcm, based on hFac constraints
-    bathy_model = model_bdry(bathy, grid.dz, grid.z_edges, option='bathy', hFacMin=hFacMin, hFacMinDr=hFacMinDr)
-    draft_model = model_bdry(draft, grid.dz, grid.z_edges, option='draft', hFacMin=hFacMin, hFacMinDr=hFacMinDr)
+    bathy_model = model_bdry('bathy', bathy, draft, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr)
+    draft_model = model_bdry('draft', bathy, draft, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr)
 
     # Find the depth of the last dry z-level edge above the draft
     edge_above_draft = level_vars(draft_model, grid.dz, grid.z_edges, include_edge='top')[1]
@@ -190,12 +190,12 @@ def move_to_dir (fname, old_dir, new_dir):
     os.rename(old_dir+fname, new_dir+fname)
 
 
-# Convert a list of strings to a single string with elements separated by commas.
-def list_with_commas (A):
+# Convert a list of strings to a single string with elements separated by the given separator character.
+def list_with_separator (A, sep):
     s = ''
     for elm in A:
-        s += elm + ','
-    # Remove the last comma
+        s += elm + sep
+    # Remove the last character
     return s[:-1]    
 
 
@@ -213,10 +213,10 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
     if input_var is not None:
         # Add variable definitions
         command += ' -v '
-        command += list_with_commas(input_var)
+        command += list_with_separator(input_var,',')
     if afterok is not None:
         command += ' -W depend=afterok:'
-        command += list_with_commas(afterok)
+        command += list_with_separator(afterok,':')
     # Specify script
     command += ' ' + pbs_script
 
