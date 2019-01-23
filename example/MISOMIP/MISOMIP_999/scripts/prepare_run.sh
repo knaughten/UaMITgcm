@@ -13,19 +13,8 @@ else
   cd ../run
 fi
 
-# Link everything from the input directory
-ln -s ../input/* .
-
-# Deep copy of files which will get updated during the simulation
-# and which you don't want to get overwritten in input/
-rm -f data
-cp -f ../input/data .
-rm -f data.diagnostics
-cp -f ../input/data.diagnostics .
-rm -f bathymetry.shice
-cp -f ../input/bathymetry.shice .
-rm -f shelfice_topo.bin
-cp -f ../input/shelfice_topo.bin
+# Copy everything from the input directory
+cp ../input/* .
 
 # Link executable
 ln -s ../build/mitgcmuv .
