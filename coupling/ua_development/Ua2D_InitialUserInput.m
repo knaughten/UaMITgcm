@@ -20,6 +20,17 @@ CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes;
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;
 CtrlVar.WriteRestartFile = 1;  
 
+%% parallel settings
+myCluster = parcluster('local') ;  
+myCluster.NumWorkers = 6;
+saveProfile(myCluster);
+
+% CtrlVar.Parallel.uvhAssembly.parfor.isOn=1;     % assembly over integration points done in parallel using parfor
+% CtrlVar.Parallel.uvhAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
+% CtrlVar.Parallel.uvhAssembly.spmd.nWorkers=[];  % If left empty, all workers available are used
+% CtrlVar.Parallel.uvAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
+% CtrlVar.Parallel.uvAssembly.spmd.nWorkers=[]; 
+
 %% Reading in mesh
 CtrlVar.ReadInitialMesh=0;    % if true then read FE mesh (i.e the MUA variable) directly from a .mat file
                               % unless the adaptive meshing option is used, no further meshing is done.
