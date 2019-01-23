@@ -30,9 +30,9 @@ work_dir = '/work/n02/n02/kaight/'
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
 mit_case_dir = work_dir+'mitgcm/cases/'+expt_name+'/'
 ### Path to the Ua directory containing executable
-ua_exe_dir = work_dir+'Ua_exe_'+expt_name+'/'
+ua_exe_dir = work_dir+'Ua_MITgcm_coupling/Ua_exe_'+expt_name+'/'
 ### Path to the directory to centrally gather output
-output_dir = work_dir+expt_name+'_output/'
+output_dir = work_dir+'Ua_MITgcm_coupling/'+expt_name+'_output/'
 
 ### Archer budget to charge jobs to
 budget_code = 'n02-NEL013770'
@@ -41,12 +41,12 @@ budget_code = 'n02-NEL013770'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 6 #24
+total_time = 24
 ### Length of ocean spinup period (months)
-spinup_time = 1 #12
+spinup_time = 12
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 1 #6
+couple_step = 6
 
 ### Calendar type. 3 options:
 ### 'standard': full calendar with leap years 

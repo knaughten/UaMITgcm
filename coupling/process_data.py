@@ -5,9 +5,9 @@
 import numpy as np
 from scipy.io import savemat, loadmat
 import os
-from shutil import copyfile
+import shutil
 
-from coupling_utils import read_last_output, find_open_cells, move_to_dir
+from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_to_dir
 
 from mitgcm_python.utils import convert_ismr
 from mitgcm_python.make_domain import do_digging, do_zapping
@@ -19,10 +19,10 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 # Copy the XC and YC grid files from one directory to another.
 # In practice, they will be copied from the MITgcm run directory to the central output directory, so that Ua can read them.
 def copy_grid (mit_dir, out_dir):
-    copyfile(mit_dir+'XC.data', out_dir+'XC.data')
-    copyfile(mit_dir+'XC.meta', out_dir+'XC.meta')
-    copyfile(mit_dir+'YC.data', out_dir+'YC.data')
-    copyfile(mit_dir+'YC.meta', out_dir+'YC.meta')
+    copy_to_dir('XC.data', mit_dir, out_dir)
+    copy_to_dir('XC.meta', mit_dir, out_dir)
+    copy_to_dir('YC.data', mit_dir, out_dir)
+    copy_to_dir('YC.meta', mit_dir, out_dir)
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
@@ -90,6 +90,10 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
     print 'Zapping ice shelf drafts which are too thin'
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr)[0]
+
+    # Make a copy of the original bathymetry and ice shelf draft
+    shutil.copyfile(mit_dir+options.draftFile, mit_dir+options.draftFile+'.tmp')
+    shutil.copyfile(mit_dir+options.bathyFile, mit_dir+options.bathyFile+'.tmp')
     
     # Ice shelf draft could change in all three cases
     write_binary(draft, mit_dir+options.draftFile, prec=options.readBinaryPrec)
@@ -213,6 +217,16 @@ def gather_output (options, spinup, first_coupled):
                 # Move binary files to output directory
                 move_to_dir(fname, options.mit_run_dir, new_dir)
 
+    # Move the bathymetry and ice shelf draft
+    if os.path.isfile(options.mit_run_dir+options.draftFile+'.tmp'):
+        # They were modified during this coupler step, so move the copies we made before modifying them
+        os.rename(options.mit_run_dir+options.draftFile+'.tmp', new_dir+options.draftFile)
+        os.rename(options.mit_run_dir+options.bathyFile+'.tmp', new_dir+options.bathyFile)
+    else:
+        # They were not modified, so just copy them
+        copy_to_dir(options.draftFile, options.mit_run_dir, new_dir)
+        copy_to_dir(options.bathyFile, options.mit_run_dir, new_dir)
+    
     if not spinup and not first_coupled:
         # Move Ua output into this folder
         for fname in os.listdir(options.ua_output_dir):
@@ -220,7 +234,7 @@ def gather_output (options, spinup, first_coupled):
         # Now copy the restart file from the main Ua directory
         for fname in os.listdir(options.ua_exe_dir):
             if fname.endswith('RestartFile.mat'):
-                copyfile(options.ua_exe_dir+fname, new_dir+fname)
+                copy_to_dir(fname, options.ua_exe_dir, new_dir)
         # Make sure the draft file exists
         if not os.path.isfile(new_dir+options.ua_draft_file):
             print 'Error gathering output'

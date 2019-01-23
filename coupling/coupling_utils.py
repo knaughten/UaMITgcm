@@ -7,6 +7,7 @@ import datetime
 import subprocess
 import numpy as np
 import sys
+import shutil
 
 from MITgcmutils import rdmds
 
@@ -188,6 +189,10 @@ def find_open_cells (bathy, draft, grid, hFacMin, hFacMinDr):
 # Move a file from one directory to another, without changing its name.
 def move_to_dir (fname, old_dir, new_dir):
     os.rename(old_dir+fname, new_dir+fname)
+
+# Copy a file from one directory to another, without changing its name.
+def copy_to_dir (fname, old_dir, new_dir):
+    shutil.copyfile(old_dir+fname, new_dir+fname)    
 
 
 # Convert a list of strings to a single string with elements separated by the given separator character.

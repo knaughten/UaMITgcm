@@ -14,14 +14,18 @@ else
 fi
 
 # Link everything from the input directory
-ln -s ../input/* . 
+ln -s ../input/* .
 
-# Deep copy of the master namelist (so it doesn't get overwritten in input/)
+# Deep copy of files which will get updated during the simulation
+# and which you don't want to get overwritten in input/
 rm -f data
 cp -f ../input/data .
-# Similarly for data.diagnostics
 rm -f data.diagnostics
 cp -f ../input/data.diagnostics .
+rm -f bathymetry.shice
+cp -f ../input/bathymetry.shice .
+rm -f shelfice_topo.bin
+cp -f ../input/shelfice_topo.bin
 
 # Link executable
 ln -s ../build/mitgcmuv .

@@ -16,4 +16,4 @@ Edit matlab_path, ua_build in compile_ua.sh
 ./compile_ua.sh
 scp Ua <server where everything will run>:<Ua executable directory on that server>
 Go back onto that server
-cp <whatever>/UaMITgcm/example/MISOMIP/MISOMIP_999-RestartFile.mat <Ua executable directory>
+cp <whatever>/UaMITgcm/example/MISOMIP/MISOMIP_999_Ua/MISOMIP_999-RestartFile.mat <Ua executable directory>

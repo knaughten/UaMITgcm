@@ -7,9 +7,12 @@ matlab_path=$HOME/matlab_2017a
 # Path to Ua build directory
 ua_build=$HOME/UaBuild
 
+# Path to Ua source directory
 ua_source=../UaSource
-# TODO: separate this folder into MISOMIP-specific updates (put into examples/MISOMIP, put this at the top so the user can easily change the path) and coupling-general updates (keep where they are)
-ua_updates=ua_development
+# Path to coupling-specific Ua files to overwrite
+ua_coupling_updates=ua_development
+# Path to configuration-specific Ua files to overwrite
+ua_case_updates=../example/MISOMIP/MISOMIP_999_Ua
 
 if [ -e $ua_build ]; then
     # Empty the directory
@@ -24,8 +27,9 @@ cp $ua_source/*.m $ua_build
 # Need to collapse a couple of subdirectories for more Matlab files
 cp `find $ua_source/UaUtilities/ -name "*.m"` $ua_build
 cp `find $ua_source/NewestVertexBisection/ -name "*.m"` $ua_build
-# Also copy everything from updates folder
-cp -r $ua_updates/* $ua_build
+# Also copy everything from updates folders
+cp -r $ua_coupling_updates/* $ua_build
+cp -r $ua_case_updates/* $ua_build
 
 # Create the executable
 $matlab_path/bin/mcc -m $ua_build/callUa.m -o Ua -d $ua_build
