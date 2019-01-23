@@ -31,4 +31,4 @@ cp -r $ua_updates/* $ua_build
 $matlab_path/bin/mcc -m $ua_build/callUa.m -o Ua -d $ua_build
 # Copy just the executable (not the auto-generated run script as we have a custom one) to the current directory
 cp $ua_build/Ua .
-echo 'Now copy "Ua" and "Ua_MCR.sh" the Ua executable directory on the server where you will run the model.'
+echo 'Now copy "Ua" to the Ua executable directory on the server where you will run the model.'
