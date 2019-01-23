@@ -6,6 +6,7 @@ import os
 import datetime
 import subprocess
 import numpy as np
+import sys
 
 from MITgcmutils import rdmds
 
@@ -143,8 +144,8 @@ def read_last_output (directory, file_head, var_names, timestep=None):
         sys.exit()
     print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
     # Make sure it agrees with any expected timestep number
-    if timestep is not None and its != timestep:
-        print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + timestep
+    if timestep is not None and its[0] != timestep:
+        print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + str(timestep)
         sys.exit()
         
     if var_names is None:
@@ -164,7 +165,7 @@ def read_last_output (directory, file_head, var_names, timestep=None):
 
 
 # Given 2D fields for bathymetry and ice shelf draft, and information about the vertical grid (which doesn't change over time, so Grid object from last segment is fine), figure out which cells in the 3D grid are (at least partially) open. Return a 3D boolean array.
-def find_open_cells (bathy, draft, grid, options, hFacMin, hFacMinDr):
+def find_open_cells (bathy, draft, grid, hFacMin, hFacMinDr):
 
     # Calculate the actual bathymetry and ice shelf draft seen by MITgcm, based on hFac constraints
     bathy_model = model_bdry(bathy, grid.dz, grid.z_edges, option='bathy', hFacMin=hFacMin, hFacMinDr=hFacMinDr)

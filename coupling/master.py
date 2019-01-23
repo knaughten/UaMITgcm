@@ -10,24 +10,26 @@ options = Options()
 print 'Checking calendar'
 initial, spinup, first_coupled, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
 
-
-# Do we need to do any coupling?
-if not initial and not spinup and not finished:
+# Do we need to do any processing for the next run?
+if not initial and not finished:
     
     print 'Building MITgcm grid'
     grid = Grid(options.mit_run_dir)
 
-    print 'Sending MITgcm grid to Ua'
-    copy_grid(options.mit_run_dir, options.output_dir)
+    # Do we need to do any coupling?
+    if not spinup:
 
-    print 'Sending melt rates from MITgcm to Ua'
-    extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, grid, options)
+        print 'Sending MITgcm grid to Ua'
+        copy_grid(options.mit_run_dir, options.output_dir)
 
-    # Do we need to change the ice shelf draft in MITgcm?
-    if not first_coupled:
+        print 'Sending melt rates from MITgcm to Ua'
+        extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, grid, options)
 
-        print 'Adjusting MITgcm topography'
-        adjust_mit_geom(options.ua_output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
+        # Do we need to change the ice shelf draft in MITgcm?
+        if not first_coupled:
+
+            print 'Adjusting MITgcm topography'
+            adjust_mit_geom(options.ua_output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
 
     print 'Setting new initial conditions for MITgcm'
     set_mit_ics(options.mit_run_dir, grid, options)

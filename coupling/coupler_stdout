@@ -6,11 +6,13 @@ Updating /work/n02/n02/kaight/MISOMIP_999_output/calendar
 Updating simulation length in namelists
 Building MITgcm grid
 Sending MITgcm grid to Ua
+Sending melt rates from MITgcm to Ua
+Read MITout_2D data from MITgcm timestep 8640
 Traceback (most recent call last):
-  File "master.py", line 21, in <module>
-    copy_grid(options.mit_run_dir, options.output_dir)
-  File "/fs2/n02/n02/kaight/python/UaMITgcm/coupling/process_data.py", line 22, in copy_grid
-    copyfile(mit_dir+'XC.data', out_dir)
-  File "/home/y07/y07/cse/anaconda/python2/lib/python2.7/shutil.py", line 83, in copyfile
-    with open(dst, 'wb') as fdst:
-IOError: [Errno 21] Is a directory: '/work/n02/n02/kaight/MISOMIP_999_output/'
+  File "master.py", line 24, in <module>
+    extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, grid, options)
+  File "/fs2/n02/n02/kaight/python/UaMITgcm/coupling/process_data.py", line 41, in extract_melt_rates
+    ismr = -1*convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
+  File "/fs2/n02/n02/kaight/python/UaMITgcm/coupling/coupling_utils.py", line 147, in read_last_output
+    print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + timestep
+TypeError: cannot concatenate 'str' and 'int' objects

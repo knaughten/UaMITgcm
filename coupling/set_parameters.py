@@ -196,7 +196,7 @@ class Options:
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).
     def save_last_calendar (self, start_date, ndays):
         self.last_start_date = start_date
-        self.last_timestep = ndays*sec_per_day
+        self.last_timestep = ndays*sec_per_day/self.deltaT
 
 # end class Options
 

@@ -19,10 +19,10 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 # Copy the XC and YC grid files from one directory to another.
 # In practice, they will be copied from the MITgcm run directory to the central output directory, so that Ua can read them.
 def copy_grid (mit_dir, out_dir):
-    copyfile(mit_dir+'XC.data', out_dir)
-    copyfile(mit_dir+'XC.meta', out_dir)
-    copyfile(mit_dir+'YC.data', out_dir)
-    copyfile(mit_dir+'YC.meta', out_dir)
+    copyfile(mit_dir+'XC.data', out_dir+'XC.data')
+    copyfile(mit_dir+'XC.meta', out_dir+'XC.meta')
+    copyfile(mit_dir+'YC.data', out_dir+'YC.data')
+    copyfile(mit_dir+'YC.meta', out_dir+'YC.meta')
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
@@ -145,19 +145,19 @@ def set_mit_ics (mit_dir, grid, options):
     salt_new = discard_and_fill(salt, [], newly_open, missing_val=0)
     
     # Write the new initial conditions, masked with 0s (important in case maskIniTemp and/or maskIniSalt are off)
-    write_binary(temp_new*mask_new, mit_dir+options.ini_temp_file, prec=readBinaryPrec)
-    write_binary(salt_new*mask_new, mit_dir+options.ini_salt_file, prec=readBinaryPrec)
+    write_binary(temp_new*mask_new, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
+    write_binary(salt_new*mask_new, mit_dir+options.ini_salt_file, prec=options.readBinaryPrec)
 
     # Write the initial conditions which haven't changed
     # No need to mask them, as velocity and sea ice variables are always masked when they're read in
-    write_binary(u, mit_dir+options.ini_u_file, prec=readBinaryPrec)
-    write_binary(v, mit_dir+options.ini_v_file, prec=readBinaryPrec)
+    write_binary(u, mit_dir+options.ini_u_file, prec=options.readBinaryPrec)
+    write_binary(v, mit_dir+options.ini_v_file, prec=options.readBinaryPrec)
     if options.use_seaice:
-        write_binary(aice, mit_dir+options.ini_area_file, prec=readBinaryPrec)
-        write_binary(hice, mit_dir+options.ini_heff_file, prec=readBinaryPrec)
-        write_binary(hsnow, mit_dir+options.ini_hsnow_file, prec=readBinaryPrec)
-        write_binary(uice, mit_dir+options.ini_uice_file, prec=readBinaryPrec)
-        write_binary(vice, mit_dir+options.ini_vice_file, prec=readBinaryPrec)
+        write_binary(aice, mit_dir+options.ini_area_file, prec=options.readBinaryPrec)
+        write_binary(hice, mit_dir+options.ini_heff_file, prec=options.readBinaryPrec)
+        write_binary(hsnow, mit_dir+options.ini_hsnow_file, prec=options.readBinaryPrec)
+        write_binary(uice, mit_dir+options.ini_uice_file, prec=options.readBinaryPrec)
+        write_binary(vice, mit_dir+options.ini_vice_file, prec=options.readBinaryPrec)
 
     print 'Calculating pressure load anomaly'
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=pload_temp, constant_s=pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, Talpha=options.tAlpha, Sbeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
@@ -219,7 +219,7 @@ def gather_output (options, spinup):
         # Now copy the restart file from the main Ua directory
         for fname in os.listdir(options.ua_exe_dir):
             if fname.endswith('RestartFile.mat'):
-                copyfile(options.ua_exe_dir+fname, new_dir)
+                copyfile(options.ua_exe_dir+fname, new_dir+fname)
         # Make sure the draft file exists
         if not os.path.isfile(new_dir+options.ua_draft_file):
             print 'Error gathering output'
