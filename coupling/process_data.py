@@ -121,12 +121,11 @@ def set_mit_ics (mit_dir, grid, options):
     v = read_last_dump('V')
     if options.use_seaice:
         # Read the final sea ice state variables
-        # TODO: confirm names
-        aice = read_last_dump('SIarea')
-        hice = read_last_dump('SIheff')
-        hsnow = read_last_dump('SIhsnow')
-        uice = read_last_dump('SIuice')
-        vice = read_last_dump('SIvice')
+        aice = read_last_dump('AREA')
+        hice = read_last_dump('HEFF')
+        hsnow = read_last_dump('HSNOW')
+        uice = read_last_dump('UICE')
+        vice = read_last_dump('VICE')
     
     # Read the new ice shelf draft, and also the bathymetry
     draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
