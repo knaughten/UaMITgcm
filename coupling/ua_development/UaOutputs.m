@@ -142,6 +142,6 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     B_forMITgcm(Ifloating(Ierr)) = b_forMITgcm(Ifloating(Ierr))-1;
     
     % save B, b and mask
-    save([UserVar.UaMITgcm.UaOutputDirectory,'/ua_draft_file.mat'],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
+    save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
          
 end
