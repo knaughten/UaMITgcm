@@ -219,7 +219,7 @@ def convert_mit_output (options):
     # Then move the original files to a temporary directory so they're hidden
     # at the end.
     # If dump=False, read whatever files are left.
-    def convert_files (ncname, dump=True, tstep=None):
+    def convert_files (nc_name, dump=True, tstep=None):
         if dump:
             if tstep is None:
                 print 'Error (convert_files): must define tstep'
