@@ -235,3 +235,42 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
         print 'Error message from qsub was:'
         print pbs_id
         sys.exit()
+
+        
+# Check if the given plain-text file contains the given string.
+def string_in_file (fname, string):
+
+    f = open(fname, 'r')
+    for line in f:
+        if string in line:
+            f.close()
+            return True
+    # If we're still here, the string's not in the file
+    f.close()
+    return False
+
+
+# Find all the prefixes for MDS dump files at the given timestep.
+# They are identified by their .meta file being a different format to
+# diagnostic files, specifically the fldList isn't there.
+def find_dump_prefixes (directory, tstep):
+
+    # Figure out the end of the filenames we care about
+    file_tail = '.' + str(tstep).zfill(10) + '.meta'
+    prefixes = []
+    for fname in os.listdir(directory):
+        if fname.endswith(file_tail):
+            if not string_in_file(fname, 'fldList'):
+                # Extract the prefix (everything before the first .)
+                prefixes.append(fname.split('.')[0])
+    return prefixes
+
+
+# Move the MDS files defined by "prefixes" and "tstep" into the given directory "tmpdir".
+def move_processed_files (directory, tmpdir, prefixes, tstep):
+
+    for fname in os.listdir(directory):
+        if (fname.endswith('.data') or fname.endswith('.meta')) and fname.split('.')[0] in prefixes and int(fname.split('.')[1])==tstep:
+            move_to_dir(fname, directory, tmpdir)
+                
+                

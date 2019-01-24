@@ -170,9 +170,18 @@ class Options:
         self.pload_file = pload_file
         self.ismr_name = ismr_name
         self.output_names = check_value('output_names', output_names, type='list')
-        self.mit_nc_name = mit_nc_name
-        if not self.mit_nc_name.endswith('.nc'):
-            throw_error('mit_nc_name must be a NetCDF file')
+        if self.use_xmitgcm:
+            self.mit_nc_name = mit_nc_name
+            if not self.mit_nc_name.endswith('.nc'):
+                throw_error('mit_nc_name must be a NetCDF file')
+            self.dump_start_nc_name = 'dump_start.nc'
+            self.dump_end_nc_name = 'dump_end.nc'
+            if mit_nc_name in [self.dump_start_nc_name, self.dump_end_nc_name]:
+                throw_error('mit_nc_name cannot be '+mit_nc_name)
+        else:
+            self.mit_nc_name = ''
+            self.dump_start_nc_name = ''
+            self.dump_end_nc_name = ''
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
 

@@ -7,7 +7,7 @@ from scipy.io import savemat, loadmat
 import os
 import shutil
 
-from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_to_dir
+from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files
 
 from mitgcm_python.utils import convert_ismr
 from mitgcm_python.make_domain import do_digging, do_zapping
@@ -201,7 +201,6 @@ def set_mit_ics (mit_dir, grid, options):
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
 # Arguments:
 # options: Options object
-# TODO: check if this breaks with dump files.
 def convert_mit_output (options):
 
     # Wrap import statement inside this function, so that xmitgcm isn't required to be installed unless needed
@@ -210,11 +209,49 @@ def convert_mit_output (options):
     # Get startDate in the right format for NetCDF
     ref_date = options.startDate[:4]+'-'+options.startDate[4:6]+'-'+options.startDate[6:8]+' 0:0:0'
 
-    # Read all the MDS files in run/
-    ds = open_mdsdataset(options.mit_run_dir, delta_t=options.deltaT, ref_date=ref_date)
+    # Make a temporary directory to save already-processed files
+    tmp_dir = options.mit_run_dir + 'tmp_mds/'
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
 
-    # Save to NetCDF file
-    ds.to_netcdf(options.mit_run_dir+options.mit_nc_name, unlimited_dims=['time'])
+    # Inner function to read MDS files and convert to NetCDF.
+    # If dump=True, only read dump files, and only from the given timestep.
+    # Then move the original files to a temporary directory so they're hidden
+    # at the end.
+    # If dump=False, read whatever files are left.
+    def convert_files (ncname, dump=True, tstep=None):
+        if dump:
+            if tstep is None:
+                print 'Error (convert_files): must define tstep'
+                sys.exit()
+            iters = [tstep]
+            prefixes = find_dump_prefixes(options.mit_run_dir, tstep)
+        else:
+            iters = None
+            prefixes = None
+        # Read all the files matching the criteria
+        ds = open_mdsdataset(options.mit_run_dir, iters=iters, prefix=prefixes, deltaT=options.deltaT, ref_date=ref_date)
+        # Save to NetCDF file
+        ds.to_netcdf(options.mit_run_dir+nc_name, unlimited_dims=['time'])
+        if dump:
+            # Move to temporary directory
+            move_processed_files(options.mit_run_dir, tmp_dir, prefixes, tstep)
+
+    # Process first dump
+    convert_files(options.dump_start_nc_name, tstep=0)
+    # Process last dump
+    convert_files(options.dump_end_nc_name, tstep=options.last_timestep)
+    # Process diagnostics, i.e. everything that's left
+    convert_files(options.mit_nc_name, dump=False)
+
+    # Move everything back out of the temporary directory
+    for fname in os.listdir(tmp_dir):
+        move_to_dir(fname, tmp_dir, options.mit_run_dir)
+    # Make sure we can safely delete it
+    if len(os.listdir(tmp_dir)) != 0:
+        print 'Error (convert_mit_output): '+tmp_dir+' is not empty'
+        sys.exit()
+    os.remove(tmp_dir)
 
 
 # Gather all output from MITgcm and Ua, moving it to a common subdirectory of options.output_dir.
@@ -227,16 +264,21 @@ def gather_output (options, spinup, first_coupled):
     # Make a subdirectory named after the starting date of the simulation segment
     new_dir = options.output_dir + options.last_start_date + '/'
     print 'Creating ' + new_dir
-    os.mkdir(new_dir)    
+    os.mkdir(new_dir)
+
+    # Inner function to check a file exists, and if so, move it to the new folder
+    def check_and_move (directory, fname):
+        if not os.path.isfile(directory+fname):
+            print 'Error gathering output'
+            print file_path + ' does not exist'
+            sys.exit()
+        move_to_dir(fname, directory, new_dir)
 
     if options.use_xmitgcm:
-        # Move the NetCDF file created by convert_mit_output into the new folder
-        # First check it actually exists
-        if not os.path.isfile(options.mit_run_dir+options.mit_nc_name):
-            print 'Error gathering output'
-            print 'xmitgcm conversion was unsuccessful'
-            sys.exit()
-        move_to_dir(options.mit_nc_name, options.mit_run_dir, new_dir)
+        # Move the NetCDF files created by convert_mit_output into the new folder
+        check_and_move(options.mit_run_dir, options.dump_start_nc_name)
+        check_and_move(options.mit_run_dir, options.dump_end_nc_name)
+        check_and_move(options.mit_run_dir, options.mit_nc_name)
             
     # Deal with MITgcm binary output files
     for fname in os.listdir(options.mit_run_dir):

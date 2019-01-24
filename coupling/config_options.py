@@ -190,6 +190,7 @@ output_names = ['MITout_2D', 'MITout_3D']
 ### Name for NetCDF files converted by xmitgcm
 ### Doesn't really matter what this is,
 ### as long as it won't overwrite anything in run/
+### and isn't 'dump_start.nc' or 'dump_end.nc'
 mit_nc_name = 'output.nc'
 
 ### Melt rate file read by Ua
