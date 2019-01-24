@@ -208,7 +208,7 @@ def convert_mit_output (options):
     from xmitgcm import open_mdsdataset
 
     # Get startDate in the right format for NetCDF
-    ref_date = startDate[:4]+'-'+startDate[4:6]+'-'+startDate[6:8]+' 0:0:0'
+    ref_date = options.startDate[:4]+'-'+options.startDate[4:6]+'-'+options.startDate[6:8]+' 0:0:0'
 
     # Read all the MDS files in run/
     ds = open_mdsdataset(options.mit_run_dir, delta_t=options.deltaT, ref_date=ref_date)
