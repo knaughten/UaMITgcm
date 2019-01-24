@@ -260,7 +260,7 @@ def find_dump_prefixes (directory, tstep):
     prefixes = []
     for fname in os.listdir(directory):
         if fname.endswith(file_tail):
-            if not string_in_file(fname, 'fldList'):
+            if not string_in_file(directory+fname, 'fldList'):
                 # Extract the prefix (everything before the first .)
                 prefixes.append(fname.split('.')[0])
     return prefixes
