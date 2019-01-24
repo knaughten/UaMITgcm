@@ -112,6 +112,7 @@ class Options:
             self.pload_salt = 0.
             
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
+        self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')
         self.deltaT = check_value('deltaT', deltaT, type='int')
         # Make sure ocean timestep evenly divides 1 day
         if sec_per_day % self.deltaT != 0:
@@ -363,6 +364,13 @@ def set_calendar (directory, mit_dir, options):
         for interval in output_intervals:
             f.write(str(interval) + '\n')
         f.close()
+
+        if options.use_cal_pkg:
+            print 'Updating start date for calendar package'
+            # Look for startDate_1 in "data.cal" namelist
+            namelist_cal = mit_dir + 'data.cal'
+            start_date_line = line_that_matters(namelist_cal, 'startDate_1')
+            replace_line(namelist_cal, start_date_line, ' startDate_1='+date_code_new+'01,\n')            
 
         print 'Updating simulation length in namelists'
         # Calculate simulation length in seconds
