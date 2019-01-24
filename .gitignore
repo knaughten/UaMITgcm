@@ -1,3 +1,4 @@
 *.pyc
 coupling/Ua
+coupling/coupler_stdout
 *.sh.o*
