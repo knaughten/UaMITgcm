@@ -17,7 +17,7 @@ ua_option = 'compiled'
 
 # Whether to convert MITgcm binary output to NetCDF using xmitgcm
 # (Even if this is False, the MNC package in MITgcm is not supported.)
-use_xmitgcm = False
+use_xmitgcm = True
 
 # Format for Ua output
 # For now the only option is 'matlab', later 'netcdf' will be added
@@ -190,6 +190,7 @@ output_names = ['MITout_2D', 'MITout_3D']
 ### Name for NetCDF files converted by xmitgcm
 ### Doesn't really matter what this is,
 ### as long as it won't overwrite anything in run/
+### and isn't 'dump_start.nc' or 'dump_end.nc'
 mit_nc_name = 'output.nc'
 
 ### Melt rate file read by Ua
