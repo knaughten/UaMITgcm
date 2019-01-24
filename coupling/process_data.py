@@ -251,7 +251,7 @@ def convert_mit_output (options):
     if len(os.listdir(tmp_dir)) != 0:
         print 'Error (convert_mit_output): '+tmp_dir+' is not empty'
         sys.exit()
-    os.remove(tmp_dir)
+    os.rmdir(tmp_dir)
 
 
 # Gather all output from MITgcm and Ua, moving it to a common subdirectory of options.output_dir.
