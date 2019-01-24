@@ -1,6 +1,6 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import copy_grid, extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
+from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
 from coupling_utils import submit_job
 
 
@@ -9,6 +9,11 @@ options = Options()
 
 print 'Checking calendar'
 initial, spinup, first_coupled, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
+
+if initial:
+    print 'Creating dummy initial conditions files where needed'
+    zero_ini_files(options)
+    
 
 # Do we need to do any processing for the next run?
 if not initial and not finished:

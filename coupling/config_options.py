@@ -145,12 +145,15 @@ ini_temp_file = 'lev_t.shice'
 ### Salinity (match hydrogSaltFile in input/data)
 ini_salt_file = 'lev_s.shice'
 ### Zonal velocity (match uVelInitFile in input/data)
+### This is assumed not to exist at the beginning,
+### it will be created with all zeros.
 ini_u_file = 'u_init.bin'
 ### Meridional velocity (match vVelInitFile in input/data)
 ini_v_file = 'v_init.bin'
 
 ### Sea ice initial conditions files read by MITgcm
-### (only matters if use_seaice=True):
+### (only matters if use_seaice=True)
+### They will be created if they don't exist.
 ###
 ### Sea ice area (match AreaFile in input/data.seaice)
 ini_area_file = ''
@@ -159,6 +162,7 @@ ini_heff_file = ''
 ### Snow thickness (match HsnowFile in input/data.seaice)
 ini_hsnow_file = ''
 ### Sea ice zonal velocity (match uIceFile in input/data.seaice)
+### This will be 
 ini_uice_file = ''
 ### Sea ice meridional velocity (match vIceFile in input/data.seaice)
 ini_vice_file = ''

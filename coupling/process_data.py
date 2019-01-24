@@ -11,10 +11,41 @@ from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_
 
 from mitgcm_python.utils import convert_ismr
 from mitgcm_python.make_domain import do_digging, do_zapping
-from mitgcm_python.file_io import read_binary, write_binary
+from mitgcm_python.file_io import read_binary, write_binary, set_dtype
 from mitgcm_python.interpolation import discard_and_fill
 from mitgcm_python.ics_obcs import calc_load_anomaly
 
+
+# Create dummy initial conditions files for the files which might not exist
+# because their variables initialise with all zeros.
+def zero_ini_files (options):
+
+    # Set data type string to read from binary
+    dtype = set_dtype(options.readBinaryPrec, 'big')
+
+    # Inner function to create a file if it doesn't exist, with data of the same size as the given array
+    def check_create_zero_file (fname, base_array):
+        file_path = options.mit_run_dir+fname
+        if not os.path.isfile(file_path):
+            data = base_array*0
+            write_binary(data, file_path, prec=options.readBinaryPrec)
+    
+    # Start with 3D ocean variables (u and v)
+    # Read the initial temperature file so we have the right size
+    temp = np.fromfile(options.mit_run_dir+options.ini_temp_file, dtype=dtype)
+    check_create_zero_file(options.ini_u_file, temp)
+    check_create_zero_file(options.ini_v_file, temp)
+
+    if options.use_seaice:
+        # 2D Sea ice variables (area, heff, hsnow, uice, vice)
+        # Read the initial pload file so we have the right size
+        pload = np.fromfile(options.mit_run_dir+options.pload_file, dtype=dtype)
+        check_create_zero_file(options.ini_area_file, pload)
+        check_create_zero_file(options.ini_heff_file, pload)
+        check_create_zero_file(options.ini_hsnow_file, pload)
+        check_create_zero_file(options.ini_uice_file, pload)
+        check_create_zero_file(options.ini_vice_file, pload)    
+    
 
 # Copy the XC and YC grid files from one directory to another.
 # In practice, they will be copied from the MITgcm run directory to the central output directory, so that Ua can read them.
