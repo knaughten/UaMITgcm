@@ -90,6 +90,8 @@ pload_salt = 34.2
 
 ### Does your configuration of MITgcm include sea ice?
 use_seaice = False
+### Does your configuration of MITgcm use the calendar package?
+use_cal_pkg = False
 
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
