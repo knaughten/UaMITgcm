@@ -5,8 +5,8 @@
  useOBCSprescribe=.TRUE.,
  useOBCSsponge=.TRUE.,
  useLinearSponge = .TRUE.,
- OBEtFile='OBEt',
- OBEsFile='OBEs',
+ OBEtFile='OBEt_cold',
+ OBEsFile='OBEs_cold',
  OBEuFile='OBEu',
  OBEvFile='OBEv',
  &

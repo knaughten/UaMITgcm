@@ -103,43 +103,60 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
 
 
 # Returns temperature and salinity profiles, varying with depth, to be used for initial and boundary conditions.
-# This is the MISOMIP "warm" case.
-def ts_profile (z):
+# Pass option='warm' or 'cold'.
+def ts_profile(z, option='warm'):
+
+    if option not in ['warm', 'cold']:
+        print 'Error (ts_profile): invalid option ' + option
+        sys.exit()
 
     T0 = -1.9
-    Tbot = 1.
+    if option == 'warm':
+        Tbot = 1.
+    elif option == 'cold':
+        Tbot = -1.9
     S0 = 33.8
-    Sbot = 34.7
+    if option == 'warm':
+        Sbot = 34.7
+    elif option == 'cold':
+        Sbot = 34.55
     zdeep = -720.
 
     t_profile = T0 + (Tbot-T0)*z/zdeep
     s_profile = S0 + (Sbot-S0)*z/zdeep
 
-    return t_profile, s_profile
+    return t_profile, s_profile    
 
 
-# Creates OBCS for the eastern boundary, and initial conditions for temperature and salinity, using the T/S profiles above. Also calculates the pressure load anomaly.
-def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file, obcs_salt_file, obcs_u_file, obcs_v_file, pload_file, prec=64):
+# Creates OBCS for the eastern boundary (both warm and cold), and initial conditions for temperature and salinity (cold), using the T/S profiles above. Also calculates the pressure load anomaly.
+def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file_cold, obcs_salt_file_cold, obcs_temp_file_warm, obcs_salt_file_warm, obcs_u_file, obcs_v_file, pload_file, prec=64):
 
-    t_profile, s_profile = ts_profile(grid.z)
+    t_profile_cold, s_profile_cold = ts_profile(grid.z, option='cold')
+    t_profile_warm, s_profile_warm = ts_profile(grid.z, option='warm')
 
     # Tile to cover the whole domain
-    temp = z_to_xyz(t_profile, [nx, ny])
-    salt = z_to_xyz(s_profile, [nx, ny])
+    temp_cold = z_to_xyz(t_profile_cold, [nx, ny])
+    salt_cold = z_to_xyz(s_profile_cold, [nx, ny])
+    temp_warm = z_to_xyz(t_profile_warm, [nx, ny])
+    salt_warm = z_to_xyz(s_profile_warm, [nx, ny])
 
     # Extract boundary conditions
-    temp_e = temp[:,:,-1]
-    salt_e = salt[:,:,-1]
+    temp_e_cold = temp_cold[:,:,-1]
+    salt_e_cold = salt_cold[:,:,-1]
+    temp_e_warm = temp_warm[:,:,-1]
+    salt_e_warm = salt_warm[:,:,-1]
     # Zero velocity
     u_e = np.zeros([nz,ny])
     v_e = np.zeros([nz,ny])
 
     # Write the files
     # No need to mask out the land because MITgcm will do that for us
-    write_binary(temp, ini_temp_file, prec=prec)
-    write_binary(salt, ini_salt_file, prec=prec)
-    write_binary(temp_e, obcs_temp_file, prec=prec)
-    write_binary(salt_e, obcs_salt_file, prec=prec)
+    write_binary(temp_cold, ini_temp_file, prec=prec)
+    write_binary(salt_cold, ini_salt_file, prec=prec)
+    write_binary(temp_e_cold, obcs_temp_file_cold, prec=prec)
+    write_binary(salt_e_cold, obcs_salt_file_cold, prec=prec)
+    write_binary(temp_e_warm, obcs_temp_file_warm, prec=prec)
+    write_binary(salt_e_warm, obcs_salt_file_warm, prec=prec)
     write_binary(u_e, obcs_u_file, prec=prec)
     write_binary(v_e, obcs_v_file, prec=prec)
 
@@ -159,7 +176,7 @@ print 'Creating topography'
 make_topo(grid, 'MISOMIP_999_Ua/DataForMIT.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64)
 
 print 'Creating initial and boundary conditions'
-make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEt', input_dir+'OBEs', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
+make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEt_cold', input_dir+'OBEs_cold', input_dir+'OBEt_warm', input_dir+'OBEs_warm', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
 
 
 
