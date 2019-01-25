@@ -207,7 +207,7 @@ def convert_mit_output (options):
     from xmitgcm import open_mdsdataset
 
     # Get startDate in the right format for NetCDF
-    ref_date = options.startDate[:4]+'-'+options.startDate[4:6]+'-'+options.startDate[6:8]+' 0:0:0'
+    ref_date = options.last_start_date[:4]+'-'+options.last_start_date[4:6]+'-01 0:0:0'
 
     # Make a temporary directory to save already-processed files
     tmp_dir = options.mit_run_dir + 'tmp_mds/'
@@ -227,7 +227,7 @@ def convert_mit_output (options):
             iters = [tstep]
             prefixes = find_dump_prefixes(options.mit_run_dir, tstep)
         else:
-            iters = None
+            iters = 'all'
             prefixes = None
         # Read all the files matching the criteria
         ds = open_mdsdataset(options.mit_run_dir, iters=iters, prefix=prefixes, delta_t=options.deltaT, ref_date=ref_date)
