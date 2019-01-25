@@ -16,7 +16,7 @@ if initial:
     
 
 # Do we need to do any processing for the next run?
-if not initial and not finished:
+if not initial and not restart:
     
     print 'Building MITgcm grid'
     grid = Grid(options.mit_run_dir)
