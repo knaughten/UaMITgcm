@@ -31,8 +31,9 @@ end
 
 if strcmp(UserVar.UaMITgcm.UaOutputFormat,'matlab')
     
+
     FileName=sprintf([UserVar.UaMITgcm.UaOutputDirectory,'/',CtrlVar.Experiment,'_',...
-        UserVar.UaMITgcm.StartYear,UserVar.UaMITgcm.StartMonth,num2str(round(time*365.25))]);
+        UserVar.UaMITgcm.StartYear,'_',UserVar.UaMITgcm.StartMonth,'_',num2str(round(time*365.25))]);
     fprintf(' Saving data in %s \n',FileName);
     save(FileName,'UserVar','CtrlVar','MUA','time','s','b','S','B','h','ub','vb','C','dhdt','AGlen','m','n','rho','rhow','as','ab','GF');
     
