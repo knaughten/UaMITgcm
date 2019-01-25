@@ -297,6 +297,7 @@ def set_calendar (directory, mit_dir, options):
     if restart:
         # Remove it
         os.remove(finifile)
+        print 'This is a restart from a previously-finished simulation that was extended'
 
     # Get the start year and month for the whole simulation
     ini_year = int(options.startDate[:4])
