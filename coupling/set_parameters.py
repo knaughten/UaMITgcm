@@ -145,6 +145,7 @@ class Options:
         self.startDate = startDate            
 
         self.calendar_file = calendar_file
+        self.finished_file = finished_file
         self.bathyFile = bathyFile
         if self.digging == 'bathy':
             self.bathyFileOrig = bathyFileOrig
@@ -278,8 +279,9 @@ def update_namelists (mit_dir, endTime, options, initial=False):
 
 
 # Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir).
-# Return four booleans:
+# Return five booleans:
 # initial: indicates whether the next segment is the very first segment
+# restart: indicates whether the previous segment was the very end of a run which finished successfully
 # spinup: indicates whether the next segment is part of the ocean-only spinup period
 # first_coupled: indicates whether this is the first coupled timestep
 # finished: indicates whether the entire simulation is finished, so no more segments need to run.
@@ -288,6 +290,13 @@ def set_calendar (directory, mit_dir, options):
     # Figure out if this the very first segment, based on whether the calendar file already exists
     calfile = directory + options.calendar_file    
     initial = not os.path.isfile(calfile)
+
+    # Figure out if this is restarting from a previously-finished segment, based on whether the finished-file already exists
+    finifile = directory + options.finished_file
+    restart = os.path.isfile(finifile)
+    if restart:
+        # Remove it
+        os.remove(finifile)
 
     # Get the start year and month for the whole simulation
     ini_year = int(options.startDate[:4])
@@ -336,6 +345,8 @@ def set_calendar (directory, mit_dir, options):
     finished = new_year==end_year and new_month==end_month
     if finished:
         print 'Simulation has finished'
+        # Create the finished file
+        open(finifile, 'a').close()
     else:
         print 'Setting output intervals'
         # Get the date at the beginning of the simulation after next
@@ -387,7 +398,7 @@ def set_calendar (directory, mit_dir, options):
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
         update_namelists(mit_dir, endTime, options, initial=initial)
 
-    return initial, spinup, first_coupled, finished
+    return initial, restart, spinup, first_coupled, finished
 
         
 

@@ -8,7 +8,7 @@ print 'Reading parameters'
 options = Options()
 
 print 'Checking calendar'
-initial, spinup, first_coupled, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
+initial, restart, spinup, first_coupled, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
 
 if initial:
     print 'Creating dummy initial conditions files where needed'
@@ -41,7 +41,7 @@ if not initial and not finished:
 
     
 # Is there any output we need to deal with?
-if not initial:
+if not initial and not restart:
     
     if options.use_xmitgcm:
         print 'Converting MITgcm binary output to NetCDF'

@@ -127,6 +127,9 @@ startDate = '19790101'
 ### (this will be created for you during the first segment):
 calendar_file = 'calendar'
 
+### Name of file that is created when simulation successfully finishes
+finished_file = 'finished'
+
 ### Bathymetry file read by MITgcm. Should match the value in input/data.
 bathyFile = 'bathymetry.shice'
 ### Original bathymetry file before digging,
