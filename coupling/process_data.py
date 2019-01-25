@@ -266,13 +266,17 @@ def gather_output (options, spinup, first_coupled):
     print 'Creating ' + new_dir
     os.mkdir(new_dir)
 
-    # Inner function to check a file exists, and if so, move it to the new folder
+    # Make a subdirectory for MITgcm
+    new_mit_dir = new_dir + 'MITgcm/'
+    os.mkdir(new_mit_dir)
+
+    # Inner function to check a file exists, and if so, move it to the new MITgcm output folder
     def check_and_move (directory, fname):
         if not os.path.isfile(directory+fname):
             print 'Error gathering output'
             print file_path + ' does not exist'
             sys.exit()
-        move_to_dir(fname, directory, new_dir)
+        move_to_dir(fname, directory, new_mit_dir)
 
     if options.use_xmitgcm:
         # Move the NetCDF files created by convert_mit_output into the new folder
@@ -288,28 +292,31 @@ def gather_output (options, spinup, first_coupled):
                 os.remove(options.mit_run_dir+fname)
             else:
                 # Move binary files to output directory
-                move_to_dir(fname, options.mit_run_dir, new_dir)
+                move_to_dir(fname, options.mit_run_dir, new_mit_dir)
 
     # Move the bathymetry and ice shelf draft
     if os.path.isfile(options.mit_run_dir+options.draftFile+'.tmp'):
         # They were modified during this coupler step, so move the copies we made before modifying them
-        os.rename(options.mit_run_dir+options.draftFile+'.tmp', new_dir+options.draftFile)
-        os.rename(options.mit_run_dir+options.bathyFile+'.tmp', new_dir+options.bathyFile)
+        os.rename(options.mit_run_dir+options.draftFile+'.tmp', new_mit_dir+options.draftFile)
+        os.rename(options.mit_run_dir+options.bathyFile+'.tmp', new_mit_dir+options.bathyFile)
     else:
         # They were not modified, so just copy them
-        copy_to_dir(options.draftFile, options.mit_run_dir, new_dir)
-        copy_to_dir(options.bathyFile, options.mit_run_dir, new_dir)
+        copy_to_dir(options.draftFile, options.mit_run_dir, new_mit_dir)
+        copy_to_dir(options.bathyFile, options.mit_run_dir, new_mit_dir)
     
     if not spinup and not first_coupled:
+        # Make a subdirectory for Ua
+        new_ua_dir = new_dir + 'Ua/'
+        os.mkdir(new_ua_dir)
         # Move Ua output into this folder
         for fname in os.listdir(options.ua_output_dir):
-            move_to_dir(fname, options.ua_output_dir, new_dir)
+            move_to_dir(fname, options.ua_output_dir, new_ua_dir)
         # Now copy the restart file from the main Ua directory
         for fname in os.listdir(options.ua_exe_dir):
             if fname.endswith('RestartFile.mat'):
-                copy_to_dir(fname, options.ua_exe_dir, new_dir)
+                copy_to_dir(fname, options.ua_exe_dir, new_ua_dir)
         # Make sure the draft file exists
-        if not os.path.isfile(new_dir+options.ua_draft_file):
+        if not os.path.isfile(new_ua_dir+options.ua_draft_file):
             print 'Error gathering output'
             print 'Ua did not create the draft file '+ua_draft_file
             sys.exit()
