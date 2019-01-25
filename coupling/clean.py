@@ -28,7 +28,7 @@ for fname in os.listdir(options.ua_exe_dir):
         # Save the name of the restart file
         restart_name = fname
     # Delete everything except the Ua directory
-    if fname is not 'Ua':
+    if fname != 'Ua':
         path = options.ua_exe_dir+fname
         if os.path.isfile(path):
             os.remove(path)
