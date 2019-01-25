@@ -1,3 +1,4 @@
+import sys
 import shutil
 import os
 import subprocess
@@ -10,7 +11,7 @@ while True:
     if out == 'yes':
         break
     if out == 'no':
-        return
+        sys.exit()
     out = raw_input('Please answer yes or no. ').strip()
 
 # Read simulation options so we have directories
