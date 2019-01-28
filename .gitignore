@@ -1,4 +1,5 @@
 *.pyc
+*.sh.o*
 example/MISOMIP_999/Ua
 example/MISOMIP_999/coupler_stdout
 example/MISOMIP_999/jobs.log
@@ -10,4 +11,4 @@ example/MISOMIP_999/mitgcm_run/input/*.bin
 example/MISOMIP_999/ua_run/Ua
 example/MISOMIP_999/ua_run/options_for_ua
 example/MISOMIP_999/output
-*.sh.o*
+example/MISOMIP_1r
