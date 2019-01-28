@@ -26,7 +26,7 @@ MITPY=$REPO_DIR/tools
 XMIT=$REPO_DIR/tools/xmitgcm
 # MITgcmutils
 MITU=$MIT_SOURCE/utils/python/MITgcmutils
-export PYTHONPATH=$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
+export PYTHONPATH=$PBS_O_WORKDIR:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
 python $COUPLEPY/master.py &> coupler_stdout
 
