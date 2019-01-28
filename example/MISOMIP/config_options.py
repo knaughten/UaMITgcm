@@ -6,7 +6,7 @@
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'MISOMIP_999'
+expt_name = 'MISOMIP_1r' #'MISOMIP_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
@@ -35,7 +35,7 @@ ua_exe_dir = work_dir+'Ua_MITgcm_coupling/Ua_exe_'+expt_name+'/'
 output_dir = work_dir+'Ua_MITgcm_coupling/'+expt_name+'_output/'
 
 ### Archer budget to charge jobs to
-budget_code = 'n02-NEL013770'
+budget_code = 'n02-FISSA'
 
 
 ###### 2. Coupling options ######
@@ -43,7 +43,7 @@ budget_code = 'n02-NEL013770'
 ### Total length of simulation (months)
 total_time = 24
 ### Length of ocean spinup period (months)
-spinup_time = 12
+spinup_time = 24
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 6
@@ -126,6 +126,9 @@ startDate = '19790101'
 ### Name of plain-text file to keep track of calendar info
 ### (this will be created for you during the first segment):
 calendar_file = 'calendar'
+
+### Name of file that is created when simulation successfully finishes
+finished_file = 'finished'
 
 ### Bathymetry file read by MITgcm. Should match the value in input/data.
 bathyFile = 'bathymetry.shice'

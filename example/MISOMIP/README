@@ -1,22 +1,30 @@
+Clone this repository to Compile-Machine (where you will compile Ua) and Run-Machine (where you will run everything).
+
+Set some variables specific to your filesystem:
+For Compile-Machine:
+compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD
+For Run-Machine:
+MISOMIP_999/scripts/compile.sh: MIT_SOURCE
+run_coupler.sh: REPO_DIR
+config_options.py: mit_case_dir, ua_exe_dir, output_dir (note depend on work_dir)
+setup_mit_misomip.py: input_dir (near bottom; this should agree with mit_case_dir/input)
+
+Go to Run-Machine.
+
 Setup MITgcm:
-Copy MISOMIP_999 directory to some new location
+Copy MISOMIP_999 directory to mit_case_dir as specified in config_options.py
      eg cp -r MISOMIP_999 $WORK/mitgcm/cases/
-Edit work_dir and possibly mit_case_dir in config_options.py; make sure that output_dir exists
-cp config_options.py ../../coupling
-Edit input_dir near the bottom of setup_mit_misomip.py
 python setup_mit_misomip.py
-cd <whatever>/MISOMIP_999/scripts
+cd to where you copied this folder, then cd to scripts/
 ./compile.sh
 ./prepare_run.sh
 
 Setup Ua:
-Go onto machine where you will compile
-cd <whatever>/UaMITgcm/coupling
-Edit matlab_path, ua_build in compile_ua.sh
+Go to Compile-Machine.
 ./compile_ua.sh
-scp Ua <server where everything will run>:<Ua executable directory on that server>
-Go back onto that server
-cp <whatever>/UaMITgcm/example/MISOMIP/MISOMIP_999_Ua/MISOMIP_999-RestartFile.mat <Ua executable directory>
+scp Ua <Run-Machine>:<ua_exe_dir as specified in config_options.py>
+Go back to Run-Machine.
+cp MISOMIP_999_Ua/MISOMIP_999-Restartfile.mat <ua_exe_dir>
 
-cd <whatever>/UaMITgcm/coupling
+Run the model:
 qsub -A $HECACC run_coupler.sh

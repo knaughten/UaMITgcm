@@ -1,4 +1,4 @@
 *.pyc
-coupling/Ua
-coupling/coupler_stdout
+example/MISOMIP/Ua
+example/MISOMIP/coupler_stdout
 *.sh.o*

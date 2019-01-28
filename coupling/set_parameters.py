@@ -84,6 +84,9 @@ class Options:
         # Save the Ua output directory derived from this
         self.ua_output_dir = self.ua_exe_dir + 'ResultsFiles/'
         self.output_dir = real_dir(output_dir)
+        # Create it, if needed
+        if not os.path.isdir(self.output_dir):
+            os.mkdir(self.output_dir)
         self.budget_code = budget_code
 
         self.total_time = check_value('total_time', total_time, type='int')

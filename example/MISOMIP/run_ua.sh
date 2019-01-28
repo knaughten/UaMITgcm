@@ -10,6 +10,7 @@
 # and -A <Archer budget>
 ####################################################################
 
+# USER VARIABLE
 # Path to Matlab Compiler Runtime installation
 MCR=$WORK/MCR_2017a/v92/
 
