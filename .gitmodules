@@ -1,5 +1,5 @@
 [submodule "MITgcm"]
-	path = MITgcm
+	path = MITgcm_67g
 	url = https://github.com/MITgcm/MITgcm.git
 [submodule "tools/mitgcm_python"]
 	path = tools/mitgcm_python
@@ -8,5 +8,5 @@
 	path = tools/xmitgcm
 	url = https://github.com/xgcm/xmitgcm.git
 [submodule "UaSource"]
-	path = UaSource
+	path = UaSource_22Nov2018
 	url = https://github.com/GHilmarG/UaSource.git
