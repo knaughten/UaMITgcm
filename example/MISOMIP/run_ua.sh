@@ -22,6 +22,11 @@ cp Ua_MCR.sh $UA_DIR
 cd $UA_DIR
 
 ./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
+OUT=$?
 
 cd $PBS_O_WORKDIR
-echo 'Ua ends '`date` >> jobs.log
+if [ $OUT == 0 ]; then
+    echo 'Ua ends '`date` >> jobs.log
+else
+    echo 'Error in Ua '`date` >> jobs.log
+fi

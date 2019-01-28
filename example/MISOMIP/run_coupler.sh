@@ -30,6 +30,11 @@ MITU=$MIT_SOURCE/utils/python/MITgcmutils
 export PYTHONPATH=$PBS_O_WORKDIR:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
 python $COUPLEPY/master.py &> coupler_stdout
+OUT=$?
 
-echo 'Coupler ends '`date` >> jobs.log
+if [ $OUT == 0 ]; then
+    echo 'Coupler ends '`date` >> jobs.log
+else
+    echo 'Error in coupler '`date` >> jobs.log
+fi
 

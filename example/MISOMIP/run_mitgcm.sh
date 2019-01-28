@@ -20,6 +20,11 @@ export TMPDIR=/work/n02/n02/`whoami`/SCRATCH
 export OMP_NUM_THREADS=1
 
 aprun -n 24 -N 24 ./mitgcmuv
+OUT=$?
 
 cd $PBS_O_WORKDIR
-echo 'MITgcm ends '`date` >> jobs.log
+if [ $OUT == 0 ]; then
+    echo 'MITgcm ends '`date` >> jobs.log
+else
+    echo 'Error in MITgcm '`date` >> jobs.log
+fi
