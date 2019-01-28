@@ -15,6 +15,7 @@ REPO_DIR=$WORK/Ua_MITgcm_coupling/UaMITgcm
 MIT_SOURCE=$REPO_DIR/MITgcm
 
 cd $PBS_O_WORKDIR
+echo 'Coupler starts '`date` >> jobs.log
 
 # Get various python files/packages in the path
 # coupling scripts
@@ -28,4 +29,6 @@ MITU=$MIT_SOURCE/utils/python/MITgcmutils
 export PYTHONPATH=$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
 python master.py &> coupler_stdout
+
+echo 'Coupler ends '`date` >> jobs.log
 

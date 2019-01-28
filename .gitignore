@@ -1,4 +1,5 @@
 *.pyc
 example/MISOMIP/Ua
 example/MISOMIP/coupler_stdout
+example/MISOMIP/jobs.log
 *.sh.o*
