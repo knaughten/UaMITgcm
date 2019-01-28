@@ -6,7 +6,7 @@ wget http://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R20
 If you want another version for a different machine, they're all available here https://uk.mathworks.com/products/compiler/matlab-runtime.html. 
 Follow instructions here to unzip and install; https://uk.mathworks.com/help/compiler/install-the-matlab-runtime.html On Archer, make sure you install to a folder in /work rather than /home.
 
-Set some variables specific to your filesystem (all within this example/MISOMIP directory):
+Set some variables specific to your filesystem (all within this example/MISOMIP_999 directory):
 For Compile-Machine:
 compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD
 For Run-Machine:
@@ -26,7 +26,7 @@ cd ../../
 Setup Ua:
 Go to Compile-Machine.
 ./compile_ua.sh
-scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP/ua_run/
+scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP_999/ua_run/
 
 Run the model:
 Go back to Run-Machine.
