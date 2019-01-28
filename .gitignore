@@ -10,5 +10,9 @@ example/MISOMIP_999/mitgcm_run/input/OBE*
 example/MISOMIP_999/mitgcm_run/input/*.bin
 example/MISOMIP_999/ua_run/Ua
 example/MISOMIP_999/ua_run/options_for_ua
+example/MISOMIP_999/ua_run/matlab*.out
+example/MISOMIP_999/ua_run/*RunInfo.txt
+example/MISOMIP_999/ua_run/ResultsFiles
+example/MISOMIP_999/ua_run/*.mat
 example/MISOMIP_999/output
 example/MISOMIP_1r
