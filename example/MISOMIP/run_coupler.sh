@@ -28,7 +28,7 @@ XMIT=$REPO_DIR/tools/xmitgcm
 MITU=$MIT_SOURCE/utils/python/MITgcmutils
 export PYTHONPATH=$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
-python master.py &> coupler_stdout
+python $COUPLEPY/master.py &> coupler_stdout
 
 echo 'Coupler ends '`date` >> jobs.log
 
