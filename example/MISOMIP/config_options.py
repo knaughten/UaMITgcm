@@ -6,7 +6,7 @@
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'MISOMIP_1r' #'MISOMIP_999'
+expt_name = 'MISOMIP_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
@@ -25,14 +25,14 @@ ua_output_format = 'matlab'
 
 # Optional base directory to simplify definition of directories below
 # This variable won't be read by the coupler, so you don't have to use it.
-work_dir = '/work/n02/n02/kaight/'
+work_dir = '/work/n02/n02/kaight/Ua_MITgcm_coupling/UaMITgcm/examples/MISOMIP_999/'
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
-mit_case_dir = work_dir+'mitgcm/cases/'+expt_name+'/'
+mit_case_dir = work_dir+'mitgcm_run/'
 ### Path to the Ua directory containing executable
-ua_exe_dir = work_dir+'Ua_MITgcm_coupling/Ua_exe_'+expt_name+'/'
+ua_exe_dir = work_dir+'ua_run/'
 ### Path to the directory to centrally gather output
-output_dir = work_dir+'Ua_MITgcm_coupling/'+expt_name+'_output/'
+output_dir = work_dir+'output/'
 
 ### Archer budget to charge jobs to
 budget_code = 'n02-FISSA'

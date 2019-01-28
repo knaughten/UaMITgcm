@@ -10,28 +10,25 @@ Set some variables specific to your filesystem (all within this example/MISOMIP 
 For Compile-Machine:
 compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD
 For Run-Machine:
-MISOMIP_999/scripts/compile.sh: MIT_SOURCE
+mitgcm_run/scripts/compile.sh: MIT_SOURCE, BUILD_OPTIONS
 run_coupler.sh: REPO_DIR
 run_ua.sh: MCR
-config_options.py: mit_case_dir, ua_exe_dir, output_dir (note depend on work_dir), budget_code
+config_options.py: work_dir, budget_code
 setup_mit_misomip.py: input_dir (near bottom; this should agree with mit_case_dir/input)
 
-Go to Run-Machine.
-
 Setup MITgcm:
-Copy MISOMIP_999 directory to mit_case_dir as specified in config_options.py
-     eg cp -r MISOMIP_999 $WORK/mitgcm/cases/
+Go to Run-Machine.
 python setup_mit_misomip.py
-cd to where you copied this folder, then cd to scripts/
+cd mitgcm_run/scripts
 ./compile.sh
 ./prepare_run.sh
+cd ../../
 
 Setup Ua:
 Go to Compile-Machine.
 ./compile_ua.sh
-scp Ua <Run-Machine>:<ua_exe_dir as specified in config_options.py>
-Go back to Run-Machine.
-cp MISOMIP_999_Ua/MISOMIP_999-Restartfile.mat <ua_exe_dir>
+scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP/ua_run/
 
 Run the model:
+Go back to Run-Machine.
 qsub -A <budget code> run_coupler.sh

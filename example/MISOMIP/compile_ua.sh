@@ -9,7 +9,7 @@ REPO_DIR=$HOME/UaMITgcm
 # Path to Ua build directory (will be created if it doesn't exist)
 UA_BUILD=$HOME/UaBuild
 # Path to configuration-specific Ua files to overwrite
-UA_CASE_UPDATES=$PWD/MISOMIP_999_Ua
+UA_CASE_UPDATES=$PWD/ua_custom
 # Path to Ua source directory (default use the one inside UaMITgcm)
 UA_SOURCE=$REPO_DIR/UaSource
 # Path to coupling-specific Ua files to overwrite
