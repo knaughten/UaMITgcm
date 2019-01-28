@@ -11,7 +11,7 @@ ORIG_DIR=$PWD
 # If unset, assume we're already in it
 SCRIPT_DIR=$1
 if [ -z "$SCRIPT_DIR" ]; then
-    SCRIPT_DIR=ORIG_DIR
+    SCRIPT_DIR=$ORIG_DIR
 fi
 
 cd $SCRIPT_DIR
