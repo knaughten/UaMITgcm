@@ -27,9 +27,7 @@ Setup Ua:
 Go to Compile-Machine.
 ./compile_ua.sh
 scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP_999/ua_run/
-Go back to Run-Machine.
-cp MISOMIP_999-RestartFile.mat ua_run/
-(note this will get overwritten during simulations.)
 
 Run the model:
+Go back to Run-Machine.
 qsub -A <budget code> run_coupler.sh
