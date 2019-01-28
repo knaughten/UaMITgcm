@@ -272,5 +272,10 @@ def move_processed_files (directory, tmpdir, prefixes, tstep):
     for fname in os.listdir(directory):
         if (fname.endswith('.data') or fname.endswith('.meta')) and fname.split('.')[0] in prefixes and int(fname.split('.')[1])==tstep:
             move_to_dir(fname, directory, tmpdir)
+
+
+# Make a temporary copy of the given file with the suffix .tmp
+def make_tmp_copy (file_path):
+    shutil.copyfile(file_path, file_path+'.tmp')
                 
                 

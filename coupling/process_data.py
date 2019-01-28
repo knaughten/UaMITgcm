@@ -7,7 +7,7 @@ from scipy.io import savemat, loadmat
 import os
 import shutil
 
-from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files
+from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy
 
 from mitgcm_python.utils import convert_ismr
 from mitgcm_python.make_domain import do_digging, do_zapping
@@ -73,6 +73,10 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
     # Put it in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
     ismr_points = np.ravel(np.transpose(ismr))[:,None].astype('float64')
 
+    if os.path.isfile(ua_out_file):
+        # Make a backup copy of the old file
+        make_tmp_copy(ua_out_file)
+
     # Write to Matlab file for Ua, as long 1D array
     print 'Writing ' + ua_out_file
     savemat(ua_out_file, {'meltrate':ismr_points})  
@@ -123,7 +127,8 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr)[0]
 
     # Make a copy of the original bathymetry and ice shelf draft
-    shutil.copyfile(mit_dir+options.draftFile, mit_dir+options.draftFile+'.tmp')
+    make_tmp_copy(mit_dir+options.draftFile)
+    make_tmp_copy(mit_dir+options.bathyFile)
     shutil.copyfile(mit_dir+options.bathyFile, mit_dir+options.bathyFile+'.tmp')
     
     # Ice shelf draft could change in all three cases
@@ -178,6 +183,13 @@ def set_mit_ics (mit_dir, grid, options):
     temp_new = discard_and_fill(temp, [], newly_open, missing_val=0)
     print 'Extrapolating salinity into newly opened cells'
     salt_new = discard_and_fill(salt, [], newly_open, missing_val=0)
+
+    # Make backup copies of old initial conditions files before we overwrite them
+    files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
+    if options.use_seaice:
+        files_to_copy += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
+    for fname in files_to_copy:
+        make_tmp_copy(mit_dir+fname)
     
     # Write the new initial conditions, masked with 0s (important in case maskIniTemp and/or maskIniSalt are off)
     write_binary(temp_new*mask_new, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
@@ -270,7 +282,7 @@ def gather_output (options, spinup, first_coupled):
     new_mit_dir = new_dir + 'MITgcm/'
     os.mkdir(new_mit_dir)
 
-    # Inner function to check a file exists, and if so, move it to the new MITgcm output folder
+    # Inner function to check a file exists, and if so, move it to the new MITgcm output folder. This is just called for xmitgcm output files.
     def check_and_move (directory, fname):
         if not os.path.isfile(directory+fname):
             print 'Error gathering output'
@@ -294,15 +306,23 @@ def gather_output (options, spinup, first_coupled):
                 # Move binary files to output directory
                 move_to_dir(fname, options.mit_run_dir, new_mit_dir)
 
-    # Move the bathymetry and ice shelf draft
-    if os.path.isfile(options.mit_run_dir+options.draftFile+'.tmp'):
-        # They were modified during this coupler step, so move the copies we made before modifying them
-        os.rename(options.mit_run_dir+options.draftFile+'.tmp', new_mit_dir+options.draftFile)
-        os.rename(options.mit_run_dir+options.bathyFile+'.tmp', new_mit_dir+options.bathyFile)
-    else:
-        # They were not modified, so just copy them
-        copy_to_dir(options.draftFile, options.mit_run_dir, new_mit_dir)
-        copy_to_dir(options.bathyFile, options.mit_run_dir, new_mit_dir)
+    # Inner function to copy topography/ICs/pload files which are modified every coupling timestep, and for which temporary copies are made prior to modification.
+    def copy_tmp_file (fname, source_dir, target_dir):
+        # First check if it was modified this timestep
+        if os.path.isfile(source_dir+fname+'.tmp'):
+            # Move the temporary copies
+            os.rename(source_dir+fname+'.tmp', target_dir+fname)
+        else:
+            # They were not modified, so copy them
+            copy_to_dir(fname, source_dir, target_dir)
+
+    # List of such files to copy from MITgcm run directory
+    mit_file_names = [options.draftFile, options.bathyFile, options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
+    if options.use_seaice:
+        mit_file_names += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
+    # Now copy them
+    for fname in mit_file_names:
+        copy_tmp_file(fname, options.mit_run_dir, new_mit_dir)
     
     if not spinup and not first_coupled:
         # Make a subdirectory for Ua
@@ -315,6 +335,8 @@ def gather_output (options, spinup, first_coupled):
         for fname in os.listdir(options.ua_exe_dir):
             if fname.endswith('RestartFile.mat'):
                 copy_to_dir(fname, options.ua_exe_dir, new_ua_dir)
+        # Also copy melt file from MITgcm
+        copy_tmp_file(options.ua_melt_file, options.output_dir, new_ua_dir)
         # Make sure the draft file exists
         if not os.path.isfile(new_ua_dir+options.ua_draft_file):
             print 'Error gathering output'
