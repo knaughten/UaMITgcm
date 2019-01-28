@@ -10,7 +10,7 @@
 
 # USER VARIABLES
 # Path to UaMITgcm repository
-REPO_DIR=$WORK/Ua_MITgcm_coupling/UaMITgcm
+REPO_DIR=$WORK/UaMITgcm
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
 MIT_SOURCE=$REPO_DIR/MITgcm
 

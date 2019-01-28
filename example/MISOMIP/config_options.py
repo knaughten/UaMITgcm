@@ -25,7 +25,7 @@ ua_output_format = 'matlab'
 
 # Optional base directory to simplify definition of directories below
 # This variable won't be read by the coupler, so you don't have to use it.
-work_dir = '/work/n02/n02/kaight/Ua_MITgcm_coupling/UaMITgcm/examples/MISOMIP_999/'
+work_dir = '/work/n02/n02/kaight/UaMITgcm/examples/MISOMIP_999/'
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
 mit_case_dir = work_dir+'mitgcm_run/'
