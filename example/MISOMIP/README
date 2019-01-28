@@ -1,4 +1,4 @@
-Clone this repository to Compile-Machine (where you will compile Ua) and Run-Machine (where you will run everything).
+Clone the UaMITgcm repository to Compile-Machine (where you will compile Ua) and Run-Machine (where you will run everything). Make sure to use git clone --recursive instead of just git clone, so you get the submodules.
 
 Install Matlab Runtime on Run-Machine:
 Assuming you're using Archer, you will need version 2017a:
@@ -6,14 +6,14 @@ wget http://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R20
 If you want another version for a different machine, they're all available here https://uk.mathworks.com/products/compiler/matlab-runtime.html. 
 Follow instructions here to unzip and install; https://uk.mathworks.com/help/compiler/install-the-matlab-runtime.html On Archer, make sure you install to a folder in /work rather than /home.
 
-Set some variables specific to your filesystem:
+Set some variables specific to your filesystem (all within this example/MISOMIP directory):
 For Compile-Machine:
 compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD
 For Run-Machine:
 MISOMIP_999/scripts/compile.sh: MIT_SOURCE
 run_coupler.sh: REPO_DIR
 run_ua.sh: MCR
-config_options.py: mit_case_dir, ua_exe_dir, output_dir (note depend on work_dir)
+config_options.py: mit_case_dir, ua_exe_dir, output_dir (note depend on work_dir), budget_code
 setup_mit_misomip.py: input_dir (near bottom; this should agree with mit_case_dir/input)
 
 Go to Run-Machine.
@@ -34,4 +34,4 @@ Go back to Run-Machine.
 cp MISOMIP_999_Ua/MISOMIP_999-Restartfile.mat <ua_exe_dir>
 
 Run the model:
-qsub -A $HECACC run_coupler.sh
+qsub -A <budget code> run_coupler.sh
