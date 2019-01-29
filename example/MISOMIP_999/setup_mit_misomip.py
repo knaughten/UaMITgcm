@@ -59,7 +59,7 @@ class BasicGrid:
 
 
 # Calculate the topography and write to binary files.
-def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='none', bathy_orig_file=None):
+def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='none'):
 
     # Read bathymetry and initial ice shelf draft from Ua
     # (end of MISMIP experiment)
@@ -80,11 +80,6 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
     if dig_option == 'none':
         print 'Not doing digging as per user request'
     elif dig_option == 'bathy':
-        print 'Saving original bathymetry'
-        if bathy_orig_file is None:
-            print "Error (make_topo): must set bathy_orig_file if dig_option='bathy'"
-            sys.exit()
-        write_binary(bathy, bathy_orig_file, prec=prec)
         print 'Digging bathymetry which is too shallow'
         bathy = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr, dig_option='bathy')
     elif dig_option == 'draft':

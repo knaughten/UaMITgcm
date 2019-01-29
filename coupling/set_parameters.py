@@ -150,10 +150,6 @@ class Options:
         self.calendar_file = calendar_file
         self.finished_file = finished_file
         self.bathyFile = bathyFile
-        if self.digging == 'bathy':
-            self.bathyFileOrig = bathyFileOrig
-        else:
-            self.bathyFileOrig = ''
         self.draftFile = draftFile
         self.ini_temp_file = ini_temp_file
         self.ini_salt_file = ini_salt_file

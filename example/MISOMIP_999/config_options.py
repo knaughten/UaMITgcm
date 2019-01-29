@@ -132,13 +132,6 @@ finished_file = 'finished'
 
 ### Bathymetry file read by MITgcm. Should match the value in input/data.
 bathyFile = 'bathymetry.shice'
-### Original bathymetry file before digging,
-### written out during domain generation
-### (see save_pre_digging option in remove_grid_problems function,
-### file make_domain.py, repository mitgcm_python)
-### Only matters if digging='bathy'
-bathyFileOrig = ''
-
 ### Ice shelf draft file read by MITgcm.
 ### Should match SHELFICEtopoFile in input/data.shelfice.
 draftFile = 'shelfice_topo.bin'

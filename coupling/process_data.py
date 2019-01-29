@@ -98,21 +98,14 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
 
 def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
-    # Read the ice shelf draft and mask from Ua
+    # Read the bathymetry, ice shelf draft and mask from Ua
     f = loadmat(ua_draft_file)
+    bathy = np.transpose(f['B_forMITgcm'])
     draft = np.transpose(f['b_forMITgcm'])
     mask = np.transpose(f['mask_forMITgcm'])
-    # Mask grounded ice out of ice shelf draft
+    # Mask grounded ice out of both fields
+    bathy[mask==0] = 0
     draft[mask==0] = 0
-
-    # Read MITgcm bathymetry file
-    if options.digging == 'bathy':
-        # Read original (pre-digging) bathymetry, so that digging is reversible
-        bathyFile_read = options.bathyFileOrig
-    else:
-        # Read bathymetry from last segment
-        bathyFile_read = options.bathyFile    
-    bathy = read_binary(mit_dir+bathyFile_read, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
 
     if options.digging == 'none':
         print 'Not doing digging as per user request'
@@ -131,11 +124,9 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     make_tmp_copy(mit_dir+options.bathyFile)
     shutil.copyfile(mit_dir+options.bathyFile, mit_dir+options.bathyFile+'.tmp')
     
-    # Ice shelf draft could change in all three cases
+    # Write to file
     write_binary(draft, mit_dir+options.draftFile, prec=options.readBinaryPrec)
-    if options.digging == 'bathy':
-        # Bathymetry can only change in one case
-        write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
+    write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
 
 
 # Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment.
