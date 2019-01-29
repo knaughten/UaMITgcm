@@ -28,8 +28,8 @@ for fname in os.listdir(options.ua_exe_dir):
     if fname.endswith('RestartFile.mat'):
         # Save the name of the restart file
         restart_name = fname
-    # Delete everything except the Ua directory
-    if fname != 'Ua':
+    # Delete everything except the Ua executable and run script
+    if fname not in ['Ua', 'Ua_MCR.sh']:
         path = options.ua_exe_dir+fname
         if os.path.isfile(path):
             os.remove(path)
