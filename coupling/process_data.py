@@ -108,7 +108,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     draft[mask==0] = 0
 
     if options.misomip_wall:
-        # Build a wall at the north and south
+        print 'Building walls in MISOMIP domain'
         bathy[0,:] = 0
         draft[0,:] = 0
         bathy[-1,:] = 0
