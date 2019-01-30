@@ -47,3 +47,8 @@ shutil.copyfile(orig_restart, options.ua_exe_dir+restart_name)
 # Now call the prepare_run.sh script to reset the MITgcm run directory
 # Pass the path to scripts/ as an argument, because prepare_run.sh is called from outside its own directory
 subprocess.check_output([options.mit_case_dir+'scripts/prepare_run.sh', options.mit_case_dir+'scripts/'])
+
+# Delete some log files if they exist
+for fname in os.listdir('./'):
+    if fname in ['coupler_stdout', 'jobs.log'] or (fname.startswith('run_') and '.sh.o' in fname):
+        os.remove(fname)
