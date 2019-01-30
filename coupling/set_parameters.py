@@ -104,7 +104,7 @@ class Options:
         if self.calendar_type=='noleap' and self.output_freq=='monthly':
             throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
-        self.x_is_lon = check_value('x_is_lon', x_is_lon, type='bool')
+        self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
         if self.pload_option == 'constant':
             self.pload_temp = check_value('pload_temp', pload_temp, type='float')

@@ -107,6 +107,13 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     bathy[mask==0] = 0
     draft[mask==0] = 0
 
+    if options.misomip_wall:
+        # Build a wall at the north and south
+        bathy[0,:] = 0
+        draft[0,:] = 0
+        bathy[-1,:] = 0
+        draft[-1,:] = 0
+
     if options.digging == 'none':
         print 'Not doing digging as per user request'
     elif options.digging == 'bathy':
@@ -122,7 +129,6 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     # Make a copy of the original bathymetry and ice shelf draft
     make_tmp_copy(mit_dir+options.draftFile)
     make_tmp_copy(mit_dir+options.bathyFile)
-    shutil.copyfile(mit_dir+options.bathyFile, mit_dir+options.bathyFile+'.tmp')
     
     # Write to file
     write_binary(draft, mit_dir+options.draftFile, prec=options.readBinaryPrec)

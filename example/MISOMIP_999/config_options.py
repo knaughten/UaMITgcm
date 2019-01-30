@@ -68,8 +68,8 @@ output_freq = 'monthly'
 ### 'draft': dig ice shelf drafts which are too deep
 digging = 'none'
 
-### Does the x-coordinate of your domain refer to longitude?
-x_is_lon = False
+# Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
+misomip_wall = True
 
 ### How should we calculate the pressure load anomaly of the ice shelf draft?
 ### This involves making an assumption about the properties of the water
