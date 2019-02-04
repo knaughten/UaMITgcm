@@ -70,16 +70,14 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
     # melting is negative as per Ua convention.
     # Make sure it's from the last timestep of the previous simulation.
     ismr = -1*convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
-    # Put it in exactly the format that Ua wants: long 1D arrays with an empty second dimension, and double precision
-    ismr_points = np.ravel(np.transpose(ismr))[:,None].astype('float64')
 
     if os.path.isfile(ua_out_file):
         # Make a backup copy of the old file
         make_tmp_copy(ua_out_file)
 
-    # Write to Matlab file for Ua, as long 1D array
+    # Write to Matlab file for Ua, as a long 1D array
     print 'Writing ' + ua_out_file
-    savemat(ua_out_file, {'meltrate':ismr_points})  
+    savemat(ua_out_file, {'meltrate':ismr.ravel()})
 
 
 # Given the updated ice shelf draft from Ua, adjust the draft and/or bathymetry so that MITgcm is happy. In order to have fully connected adjacent water columns, they must overlap by at least two wet cells.
