@@ -128,7 +128,12 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
 
 # Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
 # If there is an expected value for the timestep number corresponding to this output, check that it agrees.
-def read_last_output (directory, file_head, var_names, timestep=None):
+def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
+
+    # Dimensions (2D or 3D) of variables in pickup file
+    # These files are structured differently so a 2D/3D key is necessary.
+    pickup_vars_3d = ['Uvel', 'Vvel', 'Theta', 'Salt', 'GuNm1', 'GvNm1', 'PhiHyd']
+    pickup_vars_2d = ['EtaN', 'dEtaHdt', 'EtaH']
 
     # Check if var_names is a string rather than a list
     if isinstance(var_names, str):
@@ -152,12 +157,38 @@ def read_last_output (directory, file_head, var_names, timestep=None):
     if var_names is None:
         # There is just one variable here, return the whole array
         return data
+
+    if file_head == 'pickup':
+        # Pickup files do not have an extra dimension for the different variables.
+        # Instead this is collapsed into the depth dimension.
+        # Unpick the resulting large 3D array into the different variables.
+        if nz is None:
+            print 'Error (read_last_output): must define nz for pickup files'
+            sys.exit()
+        data_unpick = []
+        for var in meta['fldlist']:
+            if var in pickup_vars_3d:
+                # Select the first nz records
+                data_unpick.append(data[:nz,:])
+                data = data[nz:,:]
+            elif var in pickup_vars_2d:
+                # Select the first 1 record
+                data_unpick.append(data[0,:])
+                data = data[1:,:]
+            else:
+                print 'Error (read_last_output): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.'
+                sys.exit()
+        data = data_unpick            
+
     # Extract one variable at a time and wrap them up in a list
     var_data = []
     for var in var_names:
         # Figure out which index contains this variable
         i = meta['fldlist'].index(var)
-        var_data.append(data[i,:])
+        if file_head == 'pickup':
+            var_data.append(data[i])
+        else:
+            var_data.append(data[i,:])
     # Check for single variable
     if len(var_data) == 1:
         return var_data[0]

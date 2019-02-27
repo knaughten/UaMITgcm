@@ -48,6 +48,23 @@ spinup_time = 6
 ### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 6
 
+### Restart type for MITgcm. 2 options:
+### 'zero': MITgcm will start from time 0 every coupling segment.
+###         Initial conditions for temperature, salinity, u, v,
+###         and sea ice variables will be calculated based on the dump
+###         at the end of the last segment.
+###         Other variables, such as sea surface height and
+###         dynamics tendencies, will be set to zero.
+###         With this option, you need to set dumpInitAndLast=.true.
+###         in the input/data namelist.
+### 'pickup': MITgcm will restart from the pickup file it writes
+###           at the frequency given by pchkptFreq in input/data.
+###           (This frequency will be set to the coupling timestep
+###           by the code, if it's not already correct.)
+###           If there are no changes in the ice shelf draft,
+###           this represents a perfect restart with no loss of information.
+restart_type = 'zero'
+
 ### Calendar type. 3 options:
 ### 'standard': full calendar with leap years 
 ### 'noleap': every year is 365 days
@@ -143,6 +160,7 @@ ini_temp_file = 'lev_t.shice'
 ### Salinity (match hydrogSaltFile in input/data)
 ini_salt_file = 'lev_s.shice'
 ### Zonal velocity (match uVelInitFile in input/data)
+### Only needed for restart_type='zero'.
 ### This is assumed not to exist at the beginning,
 ### it will be created with all zeros.
 ini_u_file = 'u_init.bin'
@@ -151,7 +169,7 @@ ini_v_file = 'v_init.bin'
 
 ### Sea ice initial conditions files read by MITgcm
 ### (only matters if use_seaice=True)
-### They will be created if they don't exist.
+### They will be created if they don't exist and restart_type='zero'.
 ###
 ### Sea ice area (match AreaFile in input/data.seaice)
 ini_area_file = ''

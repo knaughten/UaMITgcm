@@ -99,6 +99,7 @@ class Options:
             throw_error('couple_step must evenly divide total_time')
         if self.spinup_time % self.couple_step != 0:
             throw_error('couple_step must evenly divide spinup_time')
+        self.restart_type = check_value('restart_type', restart_type, legal=['zero', 'pickup'])
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
         if self.calendar_type=='noleap' and self.output_freq=='monthly':
@@ -199,13 +200,14 @@ class Options:
     def save_last_calendar (self, start_date, ndays):
         self.last_start_date = start_date
         self.last_timestep = ndays*sec_per_day/self.deltaT
+        
 
 # end class Options
 
 
-# Update the "data" and "data.diagnostics" namelists to reflect the length of the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
+# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to update niter0 and check that endTime (for the entire simulation) is correct. For restart_type 'zero', we need to update endTime for the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
-def update_namelists (mit_dir, endTime, options, initial=False):
+def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False):
 
     # Set file paths
     namelist = mit_dir + 'data'
@@ -223,8 +225,8 @@ def update_namelists (mit_dir, endTime, options, initial=False):
         freq = extract_first_int(freq_line[freq_line.index('=')+1:])
         return freq, freq_line, index
 
-    # Inner function to throw an error or a warning if the existing simulation length is incorrect in a 360-day calendar (where every simulation segment should be the same length).
-    def throw_error_warning (var_string, file_name, error=True):
+    # Inner function to throw an error or a warning if the value of a namelist variable is not what we expect (eg in a 360-day calendar where every simulation segment should be the same length).
+    def throw_error_warning (var_string, file_name, error=False):
         if error:
             message = 'Error: '
         else:
@@ -237,7 +239,7 @@ def update_namelists (mit_dir, endTime, options, initial=False):
     # Inner function to check if a variable needs to be updated, and then update the file if needed.
     # In some cases we don't think the variable should need to be changed; if so, throw an error (if error=True) or a warning (if error=False).
     # Control which situations this error/warning is thrown with the keyword argument "check": check='360' throws an error/warning if it's a 360-day calendar and the variable needs to be changed; check='all' throws an error/warning if the variable needs to be changed, regardless of the calendar; check='none' will never throw errors or warnings.
-    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=True, check='360'):
+    def check_and_change (old_var, new_var, old_line, new_line, file_name, var_string, error=False, check='360'):
         if old_var != new_var:
             if check=='all' or (check=='360' and options.calendar_type == '360-day'):
                 throw_error_warning(var_string, file_name, error=error)
@@ -246,12 +248,30 @@ def update_namelists (mit_dir, endTime, options, initial=False):
 
     # Now the work starts
 
+    # Update niter0 (for pickup-restarts)
+    if options.restart_type == 'pickup':
+        # No need to do error checking as we expect it to change every segment.
+        niter0_line = line_that_matters(namelist, 'niter0')
+        replace_line(namelist, niter0_line, ' niter0='+str(options.last_timestep)+',\n')
+
+    # Update endTime
+    # First figure out what endTime should be
+    if options.restart_type == 'zero':
+        # Just the length of this segment
+        endTime = segment_length
+        # This should only change between segments if it's not a 360-day calendar
+        check = '360'
+    elif option.restart_type == 'pickup':
+        # Length of the whole simulation
+        endTime = simulation_length
+        # This should never change between segments
+        check = 'all'
     # Look for endTime in "data" namelist
     endTime_line = line_that_matters(namelist, 'endTime')
     # Strip out the number
     old_endTime = extract_first_int(endTime_line)
     # Update file if needed
-    check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime', error=not initial)
+    check_and_change(old_endTime, endTime, endTime_line, ' endTime='+str(endTime)+',\n', namelist, 'endTime', check=check)
 
     # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
     if len(options.output_names) > 0:
@@ -263,7 +283,7 @@ def update_namelists (mit_dir, endTime, options, initial=False):
         elif options.output_freq == 'daily':
             freq = sec_per_day
         elif options.output_freq == 'end':
-            freq = endTime
+            freq = segment_length
 
         # Loop over diagnostic filetypes
         for fname in options.output_names:
@@ -272,7 +292,7 @@ def update_namelists (mit_dir, endTime, options, initial=False):
                 check = 'none'
             else:
                 check = 'all'
-            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, check=check, error=not initial)
+            check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, check=check)
             
 # end function update_namelists
 
@@ -342,7 +362,7 @@ def set_calendar (directory, mit_dir, options):
     # Figure out if the simulation is finished
     # Find the year and month after the simulation ends
     end_year, end_month = add_months(ini_year, ini_month, options.total_time)
-    finished = new_year==end_year and new_month==end_month
+    finished = new_year==end_year and new_month==end_month    
     if finished:
         print 'Simulation has finished'
         # Create the finished file
@@ -393,10 +413,12 @@ def set_calendar (directory, mit_dir, options):
             replace_line(namelist_cal, start_date_line, ' startDate_1='+date_code_new+'01,\n')            
 
         print 'Updating simulation length in namelists'
+        # Calculate segment length in seconds
+        segment_length = ndays_new*sec_per_day
         # Calculate simulation length in seconds
-        endTime = ndays_new*sec_per_day
-        # Update/check endTime for next MITgcm segment, and diagnostic frequencies
-        update_namelists(mit_dir, endTime, options, initial=initial)
+        simulation_length = days_between(ini_year, ini_month, end_year, end_month, options.calendar_type)*sec_per_day
+        # Update/check endTime and/or niter0 for next MITgcm segment, and diagnostic frequencies
+        update_namelists(mit_dir, segment_length, simulation_length, options, initial=initial)
 
     return initial, restart, spinup, first_coupled, finished
 

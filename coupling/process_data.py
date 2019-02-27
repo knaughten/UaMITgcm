@@ -18,6 +18,7 @@ from mitgcm_python.ics_obcs import calc_load_anomaly
 
 # Create dummy initial conditions files for the files which might not exist
 # because their variables initialise with all zeros.
+# Only called if options.restart_type='zero'.
 def zero_ini_files (options):
 
     # Set data type string to read from binary
@@ -133,7 +134,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
 
 
-# Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment.
+# Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment. Only called if options.restart_type='zero'.
 # Any cells which have opened up since the last segment (due to Ua's simulated ice shelf draft changes + MITgcm's adjustments eg digging) will have temperature and salinity set to the average of their nearest neighbours, and velocity to zero.
 # Sea ice (if active) will also set to zero area, thickness, snow depth, and velocity in the event of a retreat of the ice shelf front.
 # Also set the new pressure load anomaly.
@@ -203,6 +204,24 @@ def set_mit_ics (mit_dir, grid, options):
 
     print 'Calculating pressure load anomaly'
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=options.pload_temp, constant_s=options.pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
+
+
+def adjust_mit_pickup (mit_dir, grid, options):
+
+    print 'Reading last pickup file'
+    temp, salt, phihyd, etan, etah, u, v, gunm1, gvnm1, detahdt = read_last_output(mit_dir, 'pickup', ['Theta', 'Salt', 'PhiHyd', 'EtaN', 'EtaH', 'Uvel', 'Vvel', 'GuNm1', 'GvNm1', 'dEtaHdt'], timestep=options.last_timestep, nz=grid.nz)
+
+    # Make sure there are no ptracers in this simulation
+    for fname in os.listdir(mit_dir):
+        if fname.startswith('pickup_ptracers'):
+            print 'Error (adjust_mit_pickup): this run uses the ptracers package. You will need to customise the code to decide what you want to do with the ptracers at each restart.'
+            sys.exit()
+
+            
+    # Process each variable (need at least two auxiliary functions for this)
+    # Adjust Uvel, Vvel to preserve transport (make this an option which can also be called by set_mit_ics)
+    # Rewrite pickup file - how to do this in the right order? Need file name and variable order, can we get this from read_last_output?
+    # Recalculate pload as before (need to write out temp and salt tmp files)
 
 
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
@@ -294,12 +313,16 @@ def gather_output (options, spinup, first_coupled):
     # Deal with MITgcm binary output files
     for fname in os.listdir(options.mit_run_dir):
         if fname.endswith('.data') or fname.endswith('.meta'):
-            if options.use_xmitgcm:
-                # Delete binary files which were savely converted to NetCDF
-                os.remove(options.mit_run_dir+fname)
-            else:
-                # Move binary files to output directory
+            if fname.startswith('pickup'):
+                # Save pickup files
                 move_to_dir(fname, options.mit_run_dir, new_mit_dir)
+            else:
+                if options.use_xmitgcm:
+                    # Delete binary files which were savely converted to NetCDF
+                    os.remove(options.mit_run_dir+fname)
+                else:
+                    # Move binary files to output directory
+                    move_to_dir(fname, options.mit_run_dir, new_mit_dir)
 
     # Inner function to copy topography/ICs/pload files which are modified every coupling timestep, and for which temporary copies are made prior to modification.
     def copy_tmp_file (fname, source_dir, target_dir):

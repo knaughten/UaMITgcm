@@ -10,7 +10,7 @@ options = Options()
 print 'Checking calendar'
 initial, restart, spinup, first_coupled, finished = set_calendar(options.output_dir, options.mit_run_dir, options)
 
-if initial:
+if initial and options.restart_type=='zero':
     print 'Creating dummy initial conditions files where needed'
     zero_ini_files(options)
     
@@ -36,8 +36,15 @@ if not initial and not restart:
             print 'Adjusting MITgcm topography'
             adjust_mit_geom(options.ua_output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
 
-    print 'Setting new initial conditions for MITgcm'
-    set_mit_ics(options.mit_run_dir, grid, options)
+    if options.restart_type=='zero':
+        
+        print 'Setting new initial conditions for MITgcm'
+        set_mit_ics(options.mit_run_dir, grid, options)
+        
+    elif options.restart_type=='pickup':
+        
+        print 'Adjusting MITgcm pickup file'
+        adjust_mit_pickup(options.mit_run_dir, grid, options)
 
     
 # Is there any output we need to deal with?
