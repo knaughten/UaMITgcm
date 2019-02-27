@@ -175,9 +175,9 @@ def set_mit_ics (mit_dir, grid, options):
     newly_open = open_next*(grid.hfac==0)
 
     print 'Extrapolating temperature into newly opened cells'
-    temp_new = discard_and_fill(temp, [], newly_open, missing_val=0)
+    temp_new = discard_and_fill(temp, [], newly_open, missing_val=0, preference='vertical')
     print 'Extrapolating salinity into newly opened cells'
-    salt_new = discard_and_fill(salt, [], newly_open, missing_val=0)
+    salt_new = discard_and_fill(salt, [], newly_open, missing_val=0, preference='vertical')
 
     # Make backup copies of old initial conditions files before we overwrite them
     files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
