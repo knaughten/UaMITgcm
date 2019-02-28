@@ -36,11 +36,13 @@ def zero_ini_files (options):
     temp = np.fromfile(options.mit_run_dir+options.ini_temp_file, dtype=dtype)
     check_create_zero_file(options.ini_u_file, temp)
     check_create_zero_file(options.ini_v_file, temp)
+    # 2D ocean variables (eta)
+    # Read the initial pload file so we have the right size
+    pload = np.fromfile(options.mit_run_dir+options.pload_file, dtype=dtype)
+    check_create_zero_file(options.ini_eta_file, pload)
 
     if options.use_seaice:
         # 2D Sea ice variables (area, heff, hsnow, uice, vice)
-        # Read the initial pload file so we have the right size
-        pload = np.fromfile(options.mit_run_dir+options.pload_file, dtype=dtype)
         check_create_zero_file(options.ini_area_file, pload)
         check_create_zero_file(options.ini_heff_file, pload)
         check_create_zero_file(options.ini_hsnow_file, pload)
@@ -160,6 +162,7 @@ def adjust_mit_state (mit_dir, grid, options):
         salt = read_last_dump('S')
         u = read_last_dump('U')
         v = read_last_dump('V')
+        eta = read_last_dump('Eta')
         if options.use_seaice:
             # Read the final sea ice state variables
             aice = read_last_dump('AREA')
@@ -214,6 +217,9 @@ def adjust_mit_state (mit_dir, grid, options):
         extrapolate_into_new('total hydrostatic potential', phihyd)
         extrapolate_into_new('free surface (N)', etan, is_2d=True)
         extrapolate_into_new('free surface (H)', etah, is_2d=True)
+    else:
+        # Free surface is just one variable
+        eta = extrapolate_into_new('free surface', eta)
     # Any remaining variables (velocity etc) want newly opened cells to be set to zero. This is done implicitly as the mask was already zero.
 
     # Inner function to adjust velocity (u or v) to preserve barotropic transport after coupling. Pass correct dh and hfac depending on the direction: for u pass dy_w and hFacW, for v pass dx_s and hFacS.
@@ -263,15 +269,15 @@ def adjust_mit_state (mit_dir, grid, options):
     if options.restart_type == 'zero':
         
         # Make backup copies of old initial conditions files before we overwrite them
-        files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
+        files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file, options.pload_file]
         if options.use_seaice:
             files_to_copy += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
         for fname in files_to_copy:
             make_tmp_copy(mit_dir+fname)
 
         # Write the new initial conditions
-        fields = [temp, salt, u, v]
-        files = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file]
+        fields = [temp, salt, u, v, eta]
+        files = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file]
         if options.use_seaice:
             fields += [aice, hice, hsnow, uice, vice]
             files += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
@@ -402,7 +408,7 @@ def gather_output (options, spinup, first_coupled):
     # List of such files to copy from MITgcm run directory
     mit_file_names = [options.draftFile, options.bathyFile, options.pload_file]
     if options.restart_type == 'zero':
-        mit_file_names += [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file]
+        mit_file_names += [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file]
     if options.use_seaice:
         mit_file_names += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
     # Now copy them

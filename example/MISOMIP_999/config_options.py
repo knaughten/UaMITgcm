@@ -173,6 +173,8 @@ ini_salt_file = 'lev_s.shice'
 ini_u_file = 'u_init.bin'
 ### Meridional velocity (match vVelInitFile in input/data)
 ini_v_file = 'v_init.bin'
+### Free surface (match pSurfInitFile in input/data)
+ini_eta_file = 'eta_init.bin'
 
 ### Sea ice initial conditions files read by MITgcm
 ### (only matters if use_seaice=True)

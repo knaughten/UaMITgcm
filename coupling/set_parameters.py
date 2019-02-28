@@ -161,6 +161,7 @@ class Options:
         self.ini_salt_file = ini_salt_file
         self.ini_u_file = ini_u_file
         self.ini_v_file = ini_v_file
+        self.ini_eta_file = ini_eta_file
         if self.use_seaice:
             self.ini_area_file = ini_area_file
             self.ini_heff_file = ini_heff_file
