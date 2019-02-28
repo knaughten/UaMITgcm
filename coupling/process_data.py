@@ -200,10 +200,10 @@ def adjust_mit_state (mit_dir, grid, options):
     mask_new = (hFacC_new!=0).astype(int)
     mask_new_u = (hFacW_new!=0).astype(int)
     mask_new_v = (hFacS_new!=0).astype(int)
-    # Find all the cells which are newly open
+    # Find all the (t-grid) cells which are newly open
     newly_open = (hFacC_new!=0)*(grid.hfac==0)
 
-    # Inner function to extrapolate a field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D.
+    # Inner function to extrapolate a t-grid field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D.
     def extrapolate_into_new (var_string, data, is_2d=False)
         print 'Extrapolating ' + var_string + ' into newly opened cells'
         use_3d = not is_2d
@@ -226,15 +226,15 @@ def adjust_mit_state (mit_dir, grid, options):
     def adjust_vel (vel, dh, hfac_old, hfac_new):
         # Make things 3D
         dh = xy_to_xyz(dh, grid)
-        dz = xy_to_xyz(grid.dz, grid)
+        dz = z_to_xyz(grid.dz, grid)
         # Calculate transport before and after
         transport_old = np.sum(vel*dh*dz*hfac_old, axis=0)
         transport_new = np.sum(vel*dh*dz*hfac_new, axis=0)
         # Calculate correction; careful in land mask
         u_star = np.zeros(transport_old.shape)
         denom = np.sum(dh*dz*hfac_new, axis=0)
-        u_star[denom!=0] = (transport0-transport1)/denom
-        u_star[denom==0] = 0
+        index = denom!=0
+        u_star[index] = (transport_old[index]-transport_new[index])/denom[index]
         # Apply the correction everywhere
         vel += xy_to_xyz(u_star, grid)
         # Now apply the mask
