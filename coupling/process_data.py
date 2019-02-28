@@ -7,9 +7,9 @@ from scipy.io import savemat, loadmat
 import os
 import shutil
 
-from coupling_utils import read_last_output, find_open_cells, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy
+from coupling_utils import read_last_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy
 
-from mitgcm_python.utils import convert_ismr
+from mitgcm_python.utils import convert_ismr, calc_hfac
 from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.file_io import read_binary, write_binary, set_dtype
 from mitgcm_python.interpolation import discard_and_fill
@@ -134,6 +134,31 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
 
 
+# Figure out which cells have newly opened since the last segment. Helper function called by set_mit_ics and adjust_mit_pickup.
+def find_newly_open_cells (mit_dir, options, grid):
+
+    # Read the new ice shelf draft, and also the bathymetry
+    draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+    # Calculate the new hFacC
+    hfac_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
+    # Find all the cells which are newly open
+    newly_open = (hfac_new!=0)*(grid.hfac==0)
+    # Also get the new 3D mask
+    mask_new = (hfac_new!=0).astype(int)
+    return newly_open, hfac_new, mask_new
+
+
+# Extrapolate a field into its newly opened cells, and mask the closed cells with zeros. Helper function called by set_mit_ics and adjust_mit_pickup. Can be 3D (default) or 2D.
+def extrapolate_into_new (data, newly_open, mask_new, dims=3):
+
+    if dims not in [2, 3]:
+        print 'Error (extrapolate_into_new): Must be either a 2D or 3D field.'
+        sys.exit()
+    use_3d = dims==3
+    return discard_and_fill(data, [], newly_open, missing_val=0, use_3d=use_3d, preference='vertical')*mask_new
+
+
 # Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment. Only called if options.restart_type='zero'.
 # Any cells which have opened up since the last segment (due to Ua's simulated ice shelf draft changes + MITgcm's adjustments eg digging) will have temperature and salinity set to the average of their nearest neighbours, and velocity to zero.
 # Sea ice (if active) will also set to zero area, thickness, snow depth, and velocity in the event of a retreat of the ice shelf front.
@@ -162,23 +187,14 @@ def set_mit_ics (mit_dir, grid, options):
         hsnow = read_last_dump('HSNOW')
         uice = read_last_dump('UICE')
         vice = read_last_dump('VICE')
-    
-    # Read the new ice shelf draft, and also the bathymetry
-    draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
-    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
 
     print 'Selecting newly opened cells'
-    # Figure out which cells will be (at least partially) open in the next segment
-    open_next = find_open_cells(bathy, draft, grid, options.hFacMin, options.hFacMinDr)
-    # Also save this as a mask with 1s and 0s
-    mask_new = open_next.astype(int)
-    # Now select the open cells which weren't already open in the last segment
-    newly_open = open_next*(grid.hfac==0)
+    newly_open, hfac_new, mask_new = find_newly_open_cells(mit_dir, options,  grid)
 
     print 'Extrapolating temperature into newly opened cells'
-    temp_new = discard_and_fill(temp, [], newly_open, missing_val=0, preference='vertical')
+    temp_new = extrapolate_into_new(temp, newly_open, mask_new)
     print 'Extrapolating salinity into newly opened cells'
-    salt_new = discard_and_fill(salt, [], newly_open, missing_val=0, preference='vertical')
+    salt_new = extrapolate_into_new(salt, newly_open, mask_new)
 
     # Make backup copies of old initial conditions files before we overwrite them
     files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
@@ -187,9 +203,9 @@ def set_mit_ics (mit_dir, grid, options):
     for fname in files_to_copy:
         make_tmp_copy(mit_dir+fname)
     
-    # Write the new initial conditions, masked with 0s (important in case maskIniTemp and/or maskIniSalt are off)
-    write_binary(temp_new*mask_new, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
-    write_binary(salt_new*mask_new, mit_dir+options.ini_salt_file, prec=options.readBinaryPrec)
+    # Write the new initial conditions
+    write_binary(temp_new, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
+    write_binary(salt_new, mit_dir+options.ini_salt_file, prec=options.readBinaryPrec)
 
     # Write the initial conditions which haven't changed
     # No need to mask them, as velocity and sea ice variables are always masked when they're read in
@@ -203,7 +219,7 @@ def set_mit_ics (mit_dir, grid, options):
         write_binary(vice, mit_dir+options.ini_vice_file, prec=options.readBinaryPrec)
 
     print 'Calculating pressure load anomaly'
-    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, constant_t=options.pload_temp, constant_s=options.pload_salt, ini_temp_file=mit_dir+options.ini_temp_file, ini_salt_file=mit_dir+options.ini_salt_file, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, prec=options.readBinaryPrec)
+    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp_new, ini_salt=salt_new, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hfac_new, prec=options.readBinaryPrec)
 
 
 def adjust_mit_pickup (mit_dir, grid, options):
@@ -221,7 +237,7 @@ def adjust_mit_pickup (mit_dir, grid, options):
     # Process each variable (need at least two auxiliary functions for this)
     # Adjust Uvel, Vvel to preserve transport (make this an option which can also be called by set_mit_ics)
     # Rewrite pickup file - how to do this in the right order? Need file name and variable order, can we get this from read_last_output?
-    # Recalculate pload as before (need to write out temp and salt tmp files)
+    # Recalculate pload as before (need to edit calc_load_anomaly so it can just accept T/S fields instead of needing to read from files)
 
 
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.

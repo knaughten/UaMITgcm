@@ -12,7 +12,7 @@ import shutil
 from MITgcmutils import rdmds
 
 from mitgcm_python.make_domain import level_vars
-from mitgcm_python.utils import xy_to_xyz, z_to_xyz, is_leap_year, model_bdry
+from mitgcm_python.utils import xy_to_xyz, z_to_xyz, is_leap_year, calc_hfac
 
 # Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
 def extract_first_int (string):
@@ -194,27 +194,6 @@ def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
         return var_data[0]
     else:
         return var_data
-
-
-# Given 2D fields for bathymetry and ice shelf draft, and information about the vertical grid (which doesn't change over time, so Grid object from last segment is fine), figure out which cells in the 3D grid are (at least partially) open. Return a 3D boolean array.
-def find_open_cells (bathy, draft, grid, hFacMin, hFacMinDr):
-
-    # Calculate the actual bathymetry and ice shelf draft seen by MITgcm, based on hFac constraints
-    bathy_model = model_bdry('bathy', bathy, draft, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr)
-    draft_model = model_bdry('draft', bathy, draft, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr)
-
-    # Find the depth of the last dry z-level edge above the draft
-    edge_above_draft = level_vars(draft_model, grid.dz, grid.z_edges, include_edge='top')[1]
-    # Find the depth of the first dry z-level edge below the bathymetry
-    edge_below_bathy = level_vars(bathy_model, grid.dz, grid.z_edges, include_edge='bottom')[2]
-
-    # Tile everything to be 3D
-    edge_above_draft = xy_to_xyz(edge_above_draft, grid)
-    edge_below_bathy = xy_to_xyz(edge_below_bathy, grid)
-    z_3d = z_to_xyz(grid.z, grid)
-    
-    # Identify all z-centres between the two edges, and remove any cells with bathymetry 0. This is equivalent to ceil(hFacC). 
-    return (z_3d <= edge_above_draft)*(z_3d >= edge_below_bathy)*(bathy_model < 0)
 
 
 # Move a file from one directory to another, without changing its name.
