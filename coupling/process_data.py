@@ -135,18 +135,25 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 
 
 # Figure out which cells have newly opened since the last segment. Helper function called by set_mit_ics and adjust_mit_pickup.
-def find_newly_open_cells (mit_dir, options, grid):
+def find_newly_open_cells (mit_dir, options, grid, return_all_hfac=False):
 
     # Read the new ice shelf draft, and also the bathymetry
     draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
     bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
     # Calculate the new hFacC
     hfac_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
+    if return_all_hfac:
+        # Also calculate hFacW and hFacS
+        hfac_w_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='u')
+        hfac_s_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='v')
     # Find all the cells which are newly open
     newly_open = (hfac_new!=0)*(grid.hfac==0)
     # Also get the new 3D mask
     mask_new = (hfac_new!=0).astype(int)
-    return newly_open, hfac_new, mask_new
+    if return_all_hfac:
+        return newly_open, mask_new, hfac_new, hfac_w_new, hfac_s_new
+    else:
+        return newly_open, mask_new, hfac_new
 
 
 # Extrapolate a field into its newly opened cells, and mask the closed cells with zeros. Helper function called by set_mit_ics and adjust_mit_pickup. Can be 3D (default) or 2D.
@@ -191,7 +198,7 @@ def set_mit_ics (mit_dir, grid, options):
         vice = read_last_dump('VICE')
 
     print 'Selecting newly opened cells'
-    newly_open, hfac_new, mask_new = find_newly_open_cells(mit_dir, options,  grid)
+    newly_open, mask_new, hfac_new = find_newly_open_cells(mit_dir, options,  grid)
 
     # Extrapolate T and S into newly opened cells
     temp = extrapolate_into_new('temperature', temp, newly_open, mask_new)
@@ -235,7 +242,7 @@ def adjust_mit_pickup (mit_dir, grid, options):
             sys.exit()
 
     print 'Selecting newly opened cells'
-    newly_open, hfac_new, mask_new = find_newly_open_cells(mit_dir, options, grid)
+    newly_open, mask_new, hfac_new, hfac_w_new, hfac_s_new = find_newly_open_cells(mit_dir, options, grid, return_all_hfac=True)
 
     # Extrapolate tracers and free surface into newly opened cells
     var_names = ['temperature', 'salinity', 'total hydrostatic potential', 'free surface (N)', 'free surface (H)']
