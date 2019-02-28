@@ -150,7 +150,9 @@ def find_newly_open_cells (mit_dir, options, grid):
 
 
 # Extrapolate a field into its newly opened cells, and mask the closed cells with zeros. Helper function called by set_mit_ics and adjust_mit_pickup. Can be 3D (default) or 2D.
-def extrapolate_into_new (data, newly_open, mask_new, dims=3):
+def extrapolate_into_new (var_string, data, newly_open, mask_new, dims=3):
+
+    print 'Extrapolating ' + var_string + ' into newly opened cells'
 
     if dims not in [2, 3]:
         print 'Error (extrapolate_into_new): Must be either a 2D or 3D field.'
@@ -191,10 +193,9 @@ def set_mit_ics (mit_dir, grid, options):
     print 'Selecting newly opened cells'
     newly_open, hfac_new, mask_new = find_newly_open_cells(mit_dir, options,  grid)
 
-    print 'Extrapolating temperature into newly opened cells'
-    temp_new = extrapolate_into_new(temp, newly_open, mask_new)
-    print 'Extrapolating salinity into newly opened cells'
-    salt_new = extrapolate_into_new(salt, newly_open, mask_new)
+    # Extrapolate T and S into newly opened cells
+    temp = extrapolate_into_new('temperature', temp, newly_open, mask_new)
+    salt = extrapolate_into_new('salinity', salt, newly_open, mask_new)
 
     # Make backup copies of old initial conditions files before we overwrite them
     files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
@@ -204,8 +205,8 @@ def set_mit_ics (mit_dir, grid, options):
         make_tmp_copy(mit_dir+fname)
     
     # Write the new initial conditions
-    write_binary(temp_new, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
-    write_binary(salt_new, mit_dir+options.ini_salt_file, prec=options.readBinaryPrec)
+    write_binary(temp, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
+    write_binary(salt, mit_dir+options.ini_salt_file, prec=options.readBinaryPrec)
 
     # Write the initial conditions which haven't changed
     # No need to mask them, as velocity and sea ice variables are always masked when they're read in
@@ -219,7 +220,7 @@ def set_mit_ics (mit_dir, grid, options):
         write_binary(vice, mit_dir+options.ini_vice_file, prec=options.readBinaryPrec)
 
     print 'Calculating pressure load anomaly'
-    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp_new, ini_salt=salt_new, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hfac_new, prec=options.readBinaryPrec)
+    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hfac_new, prec=options.readBinaryPrec)
 
 
 def adjust_mit_pickup (mit_dir, grid, options):
@@ -233,11 +234,21 @@ def adjust_mit_pickup (mit_dir, grid, options):
             print 'Error (adjust_mit_pickup): this run uses the ptracers package. You will need to customise the code to decide what you want to do with the ptracers at each restart.'
             sys.exit()
 
-            
-    # Process each variable (need at least two auxiliary functions for this)
+    print 'Selecting newly opened cells'
+    newly_open, hfac_new, mask_new = find_newly_open_cells(mit_dir, options, grid)
+
+    # Extrapolate tracers and free surface into newly opened cells
+    var_names = ['temperature', 'salinity', 'total hydrostatic potential', 'free surface (N)', 'free surface (H)']
+    fields = [temp, salt, phihyd, etan, etah]
+    dims = [3, 3, 3, 2, 2]
+    for i in range(len(fields)):
+        extrapolate_into_new(var_names[i], fields[i], newly_open, mask_new, dims=dims[i])
+
+    # For u, v, gunm1, gvnm1, and detahdt, newly opened cells are implicitly set to zero (mask was already zero!)    
+    
     # Adjust Uvel, Vvel to preserve transport (make this an option which can also be called by set_mit_ics)
     # Rewrite pickup file - how to do this in the right order? Need file name and variable order, can we get this from read_last_output?
-    # Recalculate pload as before (need to edit calc_load_anomaly so it can just accept T/S fields instead of needing to read from files)
+    # Recalculate pload as before
 
 
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
