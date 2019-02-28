@@ -85,6 +85,10 @@ output_freq = 'monthly'
 ### 'draft': dig ice shelf drafts which are too deep
 digging = 'none'
 
+### Should we adjust velocities at each coupling timestep to preserve
+### barotropic transport?
+adjust_vel = False
+
 ### Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
 misomip_wall = True
 
@@ -128,6 +132,9 @@ tAlpha = 3.733e-5
 sBeta = 7.843e-4
 Tref = -1.
 Sref = 34.2
+### Number of vertical sea ice layers; match SEAICE_multDim in data.seaice.
+### Only maters if use_seaice=True.
+seaice_nz = 7
 
 ### Starting date of simulation
 ### Should match startDate_1 in data.cal

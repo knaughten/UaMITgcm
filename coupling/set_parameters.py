@@ -105,6 +105,7 @@ class Options:
         if self.calendar_type=='noleap' and self.output_freq=='monthly':
             throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
+        self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
         if self.pload_option == 'constant':
@@ -138,6 +139,10 @@ class Options:
             self.sBeta = 0.
             self.Tref = 0.
             self.Sref = 0.
+        if self.use_seaice:
+            self.seaice_nz = check_value('seaice_nz', seaice_nz, type='int')
+        else:
+            self.seaice_nz = 0
         # Make sure the start date is in the right format
         problem = len(startDate) != 8
         try:

@@ -1,6 +1,6 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, set_mit_ics, convert_mit_output, gather_output
+from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output
 from coupling_utils import submit_job
 
 
@@ -37,14 +37,10 @@ if not initial and not restart:
             adjust_mit_geom(options.ua_output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
 
     if options.restart_type=='zero':
-        
-        print 'Setting new initial conditions for MITgcm'
-        set_mit_ics(options.mit_run_dir, grid, options)
-        
-    elif options.restart_type=='pickup':
-        
+        print 'Setting new initial conditions for MITgcm'        
+    elif options.restart_type=='pickup':        
         print 'Adjusting MITgcm pickup file'
-        adjust_mit_pickup(options.mit_run_dir, grid, options)
+    adjust_mit_state(mit_dir, grid, options)
 
     
 # Is there any output we need to deal with?

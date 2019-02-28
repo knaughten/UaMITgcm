@@ -7,9 +7,9 @@ from scipy.io import savemat, loadmat
 import os
 import shutil
 
-from coupling_utils import read_last_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy
+from coupling_utils import read_last_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup
 
-from mitgcm_python.utils import convert_ismr, calc_hfac
+from mitgcm_python.utils import convert_ismr, calc_hfac, xy_to_xyz, z_to_xyz
 from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.file_io import read_binary, write_binary, set_dtype
 from mitgcm_python.interpolation import discard_and_fill
@@ -134,42 +134,9 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     write_binary(bathy, mit_dir+options.bathyFile, prec=options.readBinaryPrec)
 
 
-# Figure out which cells have newly opened since the last segment. Helper function called by set_mit_ics and adjust_mit_pickup.
-def find_newly_open_cells (mit_dir, options, grid, return_all_hfac=False):
-
-    # Read the new ice shelf draft, and also the bathymetry
-    draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
-    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
-    # Calculate the new hFacC
-    hfac_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
-    if return_all_hfac:
-        # Also calculate hFacW and hFacS
-        hfac_w_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='u')
-        hfac_s_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='v')
-    # Find all the cells which are newly open
-    newly_open = (hfac_new!=0)*(grid.hfac==0)
-    # Also get the new 3D mask
-    mask_new = (hfac_new!=0).astype(int)
-    if return_all_hfac:
-        return newly_open, mask_new, hfac_new, hfac_w_new, hfac_s_new
-    else:
-        return newly_open, mask_new, hfac_new
-
-
-# Extrapolate a field into its newly opened cells, and mask the closed cells with zeros. Helper function called by set_mit_ics and adjust_mit_pickup. Can be 3D (default) or 2D.
-def extrapolate_into_new (var_string, data, newly_open, mask_new, dims=3):
-
-    print 'Extrapolating ' + var_string + ' into newly opened cells'
-
-    if dims not in [2, 3]:
-        print 'Error (extrapolate_into_new): Must be either a 2D or 3D field.'
-        sys.exit()
-    use_3d = dims==3
-    return discard_and_fill(data, [], newly_open, missing_val=0, use_3d=use_3d, preference='vertical')*mask_new
-
-
-# Read MITgcm's state variables from the end of the last segment, and adjust them to create initial conditions for the next segment. Only called if options.restart_type='zero'.
+# Read MITgcm's state variables from the end of the last segment (from the final dump files if restart_type='zero', and from the last pickup if restart_type='pickup'), and adjust them to create initial conditions for the next segment.
 # Any cells which have opened up since the last segment (due to Ua's simulated ice shelf draft changes + MITgcm's adjustments eg digging) will have temperature and salinity set to the average of their nearest neighbours, and velocity to zero.
+# If options.adjust_vel=True, u and v will be adjusted to preserve the barotropic transport.
 # Sea ice (if active) will also set to zero area, thickness, snow depth, and velocity in the event of a retreat of the ice shelf front.
 # Also set the new pressure load anomaly.
 
@@ -178,84 +145,148 @@ def extrapolate_into_new (var_string, data, newly_open, mask_new, dims=3):
 # grid: Grid object
 # options: Options object
 
-def set_mit_ics (mit_dir, grid, options):
+def adjust_mit_state (mit_dir, grid, options):
 
-    # Inner function to read the final dump of a given variable
-    def read_last_dump (var_name):
-        return read_last_output(mit_dir, var_name, None, timestep=options.last_timestep)
-    
-    # Read the final ocean state variables
-    temp = read_last_dump('T')
-    salt = read_last_dump('S')
-    u = read_last_dump('U')
-    v = read_last_dump('V')
-    if options.use_seaice:
-        # Read the final sea ice state variables
-        aice = read_last_dump('AREA')
-        hice = read_last_dump('HEFF')
-        hsnow = read_last_dump('HSNOW')
-        uice = read_last_dump('UICE')
-        vice = read_last_dump('VICE')
+    # Read the final state from the last segment (dump or pickup)
+    if options.restart_type == 'zero':
+        print 'Reading last dump files'
+
+        # Inner function to read the final dump of a given variable
+        def read_last_dump (var_name):
+            return read_last_output(mit_dir, var_name, None, timestep=options.last_timestep)
+
+        # Read the final ocean state variables
+        temp = read_last_dump('T')
+        salt = read_last_dump('S')
+        u = read_last_dump('U')
+        v = read_last_dump('V')
+        if options.use_seaice:
+            # Read the final sea ice state variables
+            aice = read_last_dump('AREA')
+            hice = read_last_dump('HEFF')
+            hsnow = read_last_dump('HSNOW')
+            uice = read_last_dump('UICE')
+            vice = read_last_dump('VICE')
+
+    elif options.restart_type == 'pickup':
+        print 'Reading last pickup file'
+
+        var_names = ['Theta', 'Salt', 'PhiHyd', 'EtaN', 'EtaH', 'Uvel', 'Vvel', 'GuNm1', 'GvNm1', 'dEtaHdt']
+        temp, salt, phihyd, etan, etah, u, v, gunm1, gvnm1, detahdt = read_last_output(mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
+
+        if options.use_seaice:
+            # Read the sea ice pickup too
+            var_names_seaice = ['siTICES', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE', 'siSigm1', 'siSigm2', 'siSigm12']
+            temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = read_last_output(mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
+
+        # Make sure there are no ptracers in this simulation
+        for fname in os.listdir(mit_dir):
+            if fname.startswith('pickup_ptracers'):
+                print 'Error (adjust_mit_pickup): this run uses the ptracers package. You will need to customise the code to decide what you want to do with the ptracers at each restart.'
+                sys.exit()
 
     print 'Selecting newly opened cells'
-    newly_open, mask_new, hfac_new = find_newly_open_cells(mit_dir, options,  grid)
+    # Read the new ice shelf draft, and also the bathymetry
+    draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+    bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+    # Calculate the new hFacC, hFacW, and hFacS
+    hFacC_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
+    hFacW_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='u')
+    hFacS_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='v')
+    # Also get the new 3D masks
+    mask_new = (hFacC_new!=0).astype(int)
+    mask_new_u = (hFacW_new!=0).astype(int)
+    mask_new_v = (hFacS_new!=0).astype(int)
+    # Find all the cells which are newly open
+    newly_open = (hFacC_new!=0)*(grid.hfac==0)
+
+    # Inner function to extrapolate a field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D.
+    def extrapolate_into_new (var_string, data, is_2d=False)
+        print 'Extrapolating ' + var_string + ' into newly opened cells'
+        use_3d = not is_2d
+        return discard_and_fill(data, [], newly_open, missing_val=0, use_3d=use_3d, preference='vertical')*mask_new
 
     # Extrapolate T and S into newly opened cells
-    temp = extrapolate_into_new('temperature', temp, newly_open, mask_new)
-    salt = extrapolate_into_new('salinity', salt, newly_open, mask_new)
+    temp = extrapolate_into_new('temperature', temp)
+    salt = extrapolate_into_new('salinity', salt)
+    if options.restart_type == 'pickup':
+        # Extrapolate a few more variables
+        extrapolate_into_new('total hydrostatic potential', phihyd)
+        extrapolate_into_new('free surface (N)', etan, is_2d=True)
+        extrapolate_into_new('free surface (H)', etah, is_2d=True)
+    # Any remaining variables (velocity etc) want newly opened cells to be set to zero. This is done implicitly as the mask was already zero.
 
-    # Make backup copies of old initial conditions files before we overwrite them
-    files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
-    if options.use_seaice:
-        files_to_copy += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
-    for fname in files_to_copy:
-        make_tmp_copy(mit_dir+fname)
-    
-    # Write the new initial conditions
-    write_binary(temp, mit_dir+options.ini_temp_file, prec=options.readBinaryPrec)
-    write_binary(salt, mit_dir+options.ini_salt_file, prec=options.readBinaryPrec)
+    # Inner function to adjust velocity (u or v) to preserve barotropic transport after coupling. Pass correct dh and hfac depending on the direction: for u pass dy_w and hFacW, for v pass dx_s and hFacS.
+    def adjust_vel (vel, dh, hfac_old, hfac_new):
+        # Make things 3D
+        dh = xy_to_xyz(dh, grid)
+        dz = xy_to_xyz(grid.dz, grid)
+        # Calculate transport before and after
+        transport_old = np.sum(vel*dh*dz*hfac_old, axis=0)
+        transport_new = np.sum(vel*dh*dz*hfac_new, axis=0)
+        # Calculate correction; careful in land mask
+        u_star = np.zeros(transport_old.shape)
+        denom = np.sum(dh*dz*hfac_new, axis=0)
+        u_star[denom!=0] = (transport0-transport1)/denom
+        u_star[denom==0] = 0
+        # Apply the correction everywhere
+        vel += xy_to_xyz(u_star, grid)
+        # Now apply the mask
+        vel[hfac_new==0] = 0
+        return vel
 
-    # Write the initial conditions which haven't changed
-    # No need to mask them, as velocity and sea ice variables are always masked when they're read in
-    write_binary(u, mit_dir+options.ini_u_file, prec=options.readBinaryPrec)
-    write_binary(v, mit_dir+options.ini_v_file, prec=options.readBinaryPrec)
+    if options.adjust_vel:
+        print 'Adjusting velocities to preserve barotropic transport'
+        u = adjust_vel(u, grid.dy_w, grid.hfac_w, hFacW_new)
+        v = adjust_vel(v, grid.dx_s, grid.hfac_s, hFacS_new)
+
+    # Apply the new masks to any remaining variables, to make sure that any newly closed cells are masked.
+    u *= mask_new_u
+    v *= mask_new_v
     if options.use_seaice:
-        write_binary(aice, mit_dir+options.ini_area_file, prec=options.readBinaryPrec)
-        write_binary(hice, mit_dir+options.ini_heff_file, prec=options.readBinaryPrec)
-        write_binary(hsnow, mit_dir+options.ini_hsnow_file, prec=options.readBinaryPrec)
-        write_binary(uice, mit_dir+options.ini_uice_file, prec=options.readBinaryPrec)
-        write_binary(vice, mit_dir+options.ini_vice_file, prec=options.readBinaryPrec)
+        aice *= mask_new[0,:]
+        hice *= mask_new[0,:]
+        hsnow *= mask_new[0,:]
+        uice *= mask_new_u[0,:]
+        vice *= mask_new_v[0,:]
+    if options.restart_type == 'pickup':
+        gunm1 *= mask_new_u
+        gvnm1 *= mask_new_v
+        detahdt *= mask_new[0,:]
+        if options.use_seaice:
+            temp_ice *= xy_to_xyz(mask_new[0,:], [grid.nx, grid.ny, options.seaice_nz])
+            sigm1_ice *= mask_new[0,:]
+            sigm2_ice *= mask_new[0,:]
+            sigm12_ice *= mask_new[0,:]
+
+    # Write the new state
+    if options.restart_type == 'zero':
+        
+        # Make backup copies of old initial conditions files before we overwrite them
+        files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
+        if options.use_seaice:
+            files_to_copy += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
+        for fname in files_to_copy:
+            make_tmp_copy(mit_dir+fname)
+
+        # Write the new initial conditions
+        fields = [temp, salt, u, v]
+        files = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file]
+        if options.use_seaice:
+            fields += [aice, hice, hsnow, uice, vice]
+            files += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
+        for i in range(len(fields)):
+            write_binary(fields[i], mit_dir+files[i], prec=options.readBinaryPrec)
+            
+    elif options.restart_type == 'pickup':
+
+        # Overwrite pickup file
+        overwrite_pickup(mit_dir, 'pickup', options.last_timestep, [temp, salt, phihyd, etan, etah, u, v, gunm1, gvnm1, detahdt], var_names, grid.nz)
+        if options.use_seaice:
+            overwrite_pickup(mit_dir, 'pickup_seaice', options.last_timestep, [temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice], var_names_seaice, options.seaice_nz)
 
     print 'Calculating pressure load anomaly'
-    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hfac_new, prec=options.readBinaryPrec)
-
-
-def adjust_mit_pickup (mit_dir, grid, options):
-
-    print 'Reading last pickup file'
-    temp, salt, phihyd, etan, etah, u, v, gunm1, gvnm1, detahdt = read_last_output(mit_dir, 'pickup', ['Theta', 'Salt', 'PhiHyd', 'EtaN', 'EtaH', 'Uvel', 'Vvel', 'GuNm1', 'GvNm1', 'dEtaHdt'], timestep=options.last_timestep, nz=grid.nz)
-
-    # Make sure there are no ptracers in this simulation
-    for fname in os.listdir(mit_dir):
-        if fname.startswith('pickup_ptracers'):
-            print 'Error (adjust_mit_pickup): this run uses the ptracers package. You will need to customise the code to decide what you want to do with the ptracers at each restart.'
-            sys.exit()
-
-    print 'Selecting newly opened cells'
-    newly_open, mask_new, hfac_new, hfac_w_new, hfac_s_new = find_newly_open_cells(mit_dir, options, grid, return_all_hfac=True)
-
-    # Extrapolate tracers and free surface into newly opened cells
-    var_names = ['temperature', 'salinity', 'total hydrostatic potential', 'free surface (N)', 'free surface (H)']
-    fields = [temp, salt, phihyd, etan, etah]
-    dims = [3, 3, 3, 2, 2]
-    for i in range(len(fields)):
-        extrapolate_into_new(var_names[i], fields[i], newly_open, mask_new, dims=dims[i])
-
-    # For u, v, gunm1, gvnm1, and detahdt, newly opened cells are implicitly set to zero (mask was already zero!)    
-    
-    # Adjust Uvel, Vvel to preserve transport (make this an option which can also be called by set_mit_ics)
-    # Rewrite pickup file - how to do this in the right order? Need file name and variable order, can we get this from read_last_output?
-    # Recalculate pload as before
+    calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hFacC_new, prec=options.readBinaryPrec)
 
 
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
@@ -369,7 +400,9 @@ def gather_output (options, spinup, first_coupled):
             copy_to_dir(fname, source_dir, target_dir)
 
     # List of such files to copy from MITgcm run directory
-    mit_file_names = [options.draftFile, options.bathyFile, options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.pload_file]
+    mit_file_names = [options.draftFile, options.bathyFile, options.pload_file]
+    if options.restart_type == 'zero':
+        mit_file_names += [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file]
     if options.use_seaice:
         mit_file_names += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
     # Now copy them

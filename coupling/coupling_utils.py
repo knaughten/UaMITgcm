@@ -13,6 +13,13 @@ from MITgcmutils import rdmds
 
 from mitgcm_python.make_domain import level_vars
 from mitgcm_python.utils import xy_to_xyz, z_to_xyz, is_leap_year, calc_hfac
+from mitgcm_python.file_io import write_binary
+
+# Global variables
+# Dimensions (2D or 3D) of variables in pickup file
+# These files are structured differently so a 2D/3D key is necessary.
+pickup_vars_3d = ['Uvel', 'Vvel', 'Theta', 'Salt', 'GuNm1', 'GvNm1', 'PhiHyd', 'siTICES']
+pickup_vars_2d = ['EtaN', 'dEtaHdt', 'EtaH', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE', 'siSigm1', 'siSigm2', 'siSigm12']
 
 # Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
 def extract_first_int (string):
@@ -128,12 +135,8 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
 
 # Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
 # If there is an expected value for the timestep number corresponding to this output, check that it agrees.
+# For pickups, you must pass nz, which is the number of vertical layers in the model (for normal pickups) OR the number of sea ice vertical layers (for sea ice pickups).
 def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
-
-    # Dimensions (2D or 3D) of variables in pickup file
-    # These files are structured differently so a 2D/3D key is necessary.
-    pickup_vars_3d = ['Uvel', 'Vvel', 'Theta', 'Salt', 'GuNm1', 'GvNm1', 'PhiHyd']
-    pickup_vars_2d = ['EtaN', 'dEtaHdt', 'EtaH']
 
     # Check if var_names is a string rather than a list
     if isinstance(var_names, str):
@@ -194,6 +197,47 @@ def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
         return var_data[0]
     else:
         return var_data
+
+
+def overwrite_pickup (directory, file_head, timestep, fields, var_names, nz):
+
+    # Read the existing file
+    data, its, meta = rdmds(directory+file_head, itrs=[timestep], returnmeta=True)
+    if len(data)==0:
+        # Nothing was read; no such files exist
+        print 'Error (overwrite_pickup): file not found.'
+        sys.exit()
+
+    # Loop over the variables in order and overwrite them along the depth dimension.
+    posn = 0
+    for var in meta['fldlist']:
+        # Find the index of this variable in the input variable list
+        try:
+            i = var_names.index(var)
+        except(ValueError):
+            print 'Error (overwrite_pickup): variable ' + var + ' is not in input var_names'
+            sys.exit()
+        if var in pickup_vars_3d:
+            # Overwrite nz depth records
+            data[posn:posn+nz,:] = fields[i]
+            posn += nz
+        elif var in pickup_vars_2d:
+            data[posn,:] = fields[i]
+            posn += 1
+        else:
+            print 'Error (overwrite_pickup): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.'
+            sys.exit()
+    if posn != data.shape[0]:
+        print "Error (overwrite_pickup): didn't overwrite the entire pickup; something is wrong."
+        sys.exit()
+
+    # Now overwrite the file
+    file_path = directory + file_head + '.' + str(timestep).zfill(10) + '.data'
+    if not os.path.isfile(file_path):
+        print 'Error (overwrite_pickup): incorrect pickup file path.'
+        sys.exit()
+    prec = int(meta['dataprec'][0][-2:])
+    write_binary(data, file_path, prec=prec)
 
 
 # Move a file from one directory to another, without changing its name.
