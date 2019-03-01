@@ -40,7 +40,7 @@ if not initial and not restart:
         print 'Setting new initial conditions for MITgcm'        
     elif options.restart_type=='pickup':        
         print 'Adjusting MITgcm pickup file'
-    adjust_mit_state(mit_dir, grid, options)
+    adjust_mit_state(options.mit_run_dir, grid, options)
 
     
 # Is there any output we need to deal with?
