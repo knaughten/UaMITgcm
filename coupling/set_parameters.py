@@ -214,7 +214,7 @@ class Options:
 # end class Options
 
 
-# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to update niter0 and check that endTime (for the entire simulation) is correct. For restart_type 'zero', we need to update endTime for the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
+# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we just need to check that endTime (for the entire simulation) is correct, as niter0 was updated in adjust_mit_state. For restart_type 'zero', we need to update endTime for the next simulation segment. This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
 def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False):
 
@@ -256,12 +256,6 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
             replace_line(file_name, old_line, new_line)
 
     # Now the work starts
-
-    # Update niter0 (for pickup-restarts)
-    if options.restart_type == 'pickup':
-        # No need to do error checking as we expect it to change every segment.
-        niter0_line = line_that_matters(namelist, 'niter0')
-        replace_line(namelist, niter0_line, ' niter0='+str(options.last_timestep)+',\n')
 
     # Update endTime
     # First figure out what endTime should be
@@ -426,7 +420,7 @@ def set_calendar (directory, mit_dir, options):
         segment_length = ndays_new*sec_per_day
         # Calculate simulation length in seconds
         simulation_length = days_between(ini_year, ini_month, end_year, end_month, options.calendar_type)*sec_per_day
-        # Update/check endTime and/or niter0 for next MITgcm segment, and diagnostic frequencies
+        # Update/check endTime for next MITgcm segment, and diagnostic frequencies
         update_namelists(mit_dir, segment_length, simulation_length, options, initial=initial)
 
     return initial, restart, spinup, first_coupled, finished
