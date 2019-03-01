@@ -192,6 +192,9 @@ class Options:
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
 
+        # Initialise last timestep (0; will be updated if not an initial segment)
+        self.last_timestep = 0
+
         # Now write the variables Ua needs in a plain text file.
         f = open(self.ua_exe_dir+'options_for_ua', 'w')
         f.write(self.expt_name+'\n')
@@ -267,7 +270,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
         endTime = segment_length
         # This should only change between segments if it's not a 360-day calendar
         check = '360'
-    elif option.restart_type == 'pickup':
+    elif options.restart_type == 'pickup':
         # Length of the whole simulation
         endTime = simulation_length
         # This should never change between segments
@@ -418,7 +421,7 @@ def set_calendar (directory, mit_dir, options):
             start_date_line = line_that_matters(namelist_cal, 'startDate_1')
             replace_line(namelist_cal, start_date_line, ' startDate_1='+date_code_new+'01,\n')            
 
-        print 'Updating simulation length in namelists'
+        print 'Updating namelists'
         # Calculate segment length in seconds
         segment_length = ndays_new*sec_per_day
         # Calculate simulation length in seconds
