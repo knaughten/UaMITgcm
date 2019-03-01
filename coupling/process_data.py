@@ -174,13 +174,21 @@ def adjust_mit_state (mit_dir, grid, options):
     elif options.restart_type == 'pickup':
         print 'Reading last pickup file'
 
-        var_names = ['Theta', 'Salt', 'PhiHyd', 'EtaN', 'EtaH', 'Uvel', 'Vvel', 'GuNm1', 'GvNm1', 'dEtaHdt']
-        temp, salt, phihyd, etan, etah, u, v, gunm1, gvnm1, detahdt = read_last_output(mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
+        var_names = ['Theta', 'Salt', 'EtaN', 'EtaH', 'Uvel', 'Vvel', 'GuNm1', 'GvNm1', 'dEtaHdt']
+        if options.eosType != 'LINEAR':
+            # Also need PhiHyd
+            var_names += ['PhiHyd']
+        fields = read_last_output(mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
+        if options.eosType == 'LINEAR':
+            [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt] = fields
+        else:
+            [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt, phihyd] = fields
 
         if options.use_seaice:
             # Read the sea ice pickup too
             var_names_seaice = ['siTICES', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE', 'siSigm1', 'siSigm2', 'siSigm12']
-            temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = read_last_output(mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
+            fields_seaice = read_last_output(mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
+            temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = fields_seaice
 
         # Make sure there are no ptracers in this simulation
         for fname in os.listdir(mit_dir):
@@ -214,7 +222,8 @@ def adjust_mit_state (mit_dir, grid, options):
     salt = extrapolate_into_new('salinity', salt)
     if options.restart_type == 'pickup':
         # Extrapolate a few more variables
-        extrapolate_into_new('total hydrostatic potential', phihyd)
+        if options.eosType != 'LINEAR':
+            extrapolate_into_new('total hydrostatic potential', phihyd)
         extrapolate_into_new('free surface (N)', etan, is_2d=True)
         extrapolate_into_new('free surface (H)', etah, is_2d=True)
     else:
@@ -287,9 +296,9 @@ def adjust_mit_state (mit_dir, grid, options):
     elif options.restart_type == 'pickup':
 
         # Overwrite pickup file
-        overwrite_pickup(mit_dir, 'pickup', options.last_timestep, [temp, salt, phihyd, etan, etah, u, v, gunm1, gvnm1, detahdt], var_names, grid.nz)
+        overwrite_pickup(mit_dir, 'pickup', options.last_timestep, fields, var_names, grid.nz)
         if options.use_seaice:
-            overwrite_pickup(mit_dir, 'pickup_seaice', options.last_timestep, [temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice], var_names_seaice, options.seaice_nz)
+            overwrite_pickup(mit_dir, 'pickup_seaice', options.last_timestep, fields_seaice, var_names_seaice, options.seaice_nz)
 
     print 'Calculating pressure load anomaly'
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hFacC_new, prec=options.readBinaryPrec)
@@ -386,7 +395,12 @@ def gather_output (options, spinup, first_coupled):
         if fname.endswith('.data') or fname.endswith('.meta'):
             if fname.startswith('pickup'):
                 # Save pickup files
-                move_to_dir(fname, options.mit_run_dir, new_mit_dir)
+                if options.restart_type == 'zero':
+                    # Move them
+                    move_to_dir(fname, options.mit_run_dir, new_mit_dir)
+                elif options.restart_type == 'pickup':
+                    # Copy them, because the run directory still needs them
+                    copy_to_dir(fname, options.mit_run_dir, new_mit_dir)
             else:
                 if options.use_xmitgcm:
                     # Delete binary files which were savely converted to NetCDF

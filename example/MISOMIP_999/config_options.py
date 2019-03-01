@@ -133,7 +133,7 @@ sBeta = 7.843e-4
 Tref = -1.
 Sref = 34.2
 ### Number of vertical sea ice layers; match SEAICE_multDim in data.seaice.
-### Only maters if use_seaice=True.
+### Only matters if use_seaice=True.
 seaice_nz = 7
 
 ### Starting date of simulation
