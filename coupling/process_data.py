@@ -395,12 +395,11 @@ def gather_output (options, spinup, first_coupled):
         if fname.endswith('.data') or fname.endswith('.meta'):
             if fname.startswith('pickup'):
                 # Save pickup files
-                if options.restart_type == 'zero':
-                    # Move them
+                if options.restart_type == 'pickup' and str(options.last_timestep) in fname:
+                    # The run directory still needs these files, so don't do anything
+                    pass
+                else:
                     move_to_dir(fname, options.mit_run_dir, new_mit_dir)
-                elif options.restart_type == 'pickup':
-                    # Copy them, because the run directory still needs them
-                    copy_to_dir(fname, options.mit_run_dir, new_mit_dir)
             else:
                 if options.use_xmitgcm:
                     # Delete binary files which were savely converted to NetCDF
