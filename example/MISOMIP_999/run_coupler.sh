@@ -29,7 +29,7 @@ MITU=$MIT_SOURCE/utils/python/MITgcmutils
 # Note, also need PBS_O_WORKDIR in path so it sees config_options.py
 export PYTHONPATH=$PBS_O_WORKDIR:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
-echo '*****'`date`'*****' >> coupler_stdout
+echo $'\n''*****'`date`'*****' >> coupler_stdout
 
 python $COUPLEPY/master.py >> coupler_stdout 2>&1
 OUT=$?
