@@ -214,7 +214,7 @@ class Options:
 # end class Options
 
 
-# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to check/update endTime (length of the entire simulation) and pchkptFreq (length of the next simulation segment). For restart_type 'zero', we need to check/update endTime (length of the next simulation segment). This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
+# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to check/update endTime (length of the simulation up until the end of the next segment) and pchkptFreq (length of the next segment). For restart_type 'zero', we need to check/update endTime (length of the next segment). This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
 def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False):
 
@@ -265,10 +265,10 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
         # This should only change between segments if it's not a 360-day calendar
         check = '360'
     elif options.restart_type == 'pickup':
-        # Length of the whole simulation
+        # Length of the simulation up until the end of this segment
         endTime = simulation_length
-        # This should never change between segments
-        check = 'all'
+        # This will always change
+        check = 'none'
     # Look for endTime in "data" namelist
     endTime_line = line_that_matters(namelist, 'endTime')
     # Strip out the number
@@ -425,8 +425,8 @@ def set_calendar (directory, mit_dir, options):
         print 'Updating namelists'
         # Calculate segment length in seconds
         segment_length = ndays_new*sec_per_day
-        # Calculate simulation length in seconds
-        simulation_length = days_between(ini_year, ini_month, end_year, end_month, options.calendar_type)*sec_per_day
+        # Calculate simulation length (up to the end of the next segment) in seconds
+        simulation_length = days_between(ini_year, ini_month, newer_year, newer_month, options.calendar_type)*sec_per_day
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
         update_namelists(mit_dir, segment_length, simulation_length, options, initial=initial)
 
