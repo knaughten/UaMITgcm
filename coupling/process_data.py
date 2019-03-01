@@ -204,7 +204,7 @@ def adjust_mit_state (mit_dir, grid, options):
     newly_open = (hFacC_new!=0)*(grid.hfac==0)
 
     # Inner function to extrapolate a t-grid field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D.
-    def extrapolate_into_new (var_string, data, is_2d=False)
+    def extrapolate_into_new (var_string, data, is_2d=False):
         print 'Extrapolating ' + var_string + ' into newly opened cells'
         use_3d = not is_2d
         return discard_and_fill(data, [], newly_open, missing_val=0, use_3d=use_3d, preference='vertical')*mask_new

@@ -15,4 +15,4 @@ example/MISOMIP_999/ua_run/*RunInfo.txt
 example/MISOMIP_999/ua_run/ResultsFiles
 example/MISOMIP_999/ua_run/*.mat
 example/MISOMIP_999/output
-example/MISOMIP_1r
+example/MISOMIP_1r*
