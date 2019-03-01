@@ -219,7 +219,7 @@ def adjust_mit_state (mit_dir, grid, options):
         extrapolate_into_new('free surface (H)', etah, is_2d=True)
     else:
         # Free surface is just one variable
-        eta = extrapolate_into_new('free surface', eta)
+        eta = extrapolate_into_new('free surface', eta, is_2d=True)
     # Any remaining variables (velocity etc) want newly opened cells to be set to zero. This is done implicitly as the mask was already zero.
 
     # Inner function to adjust velocity (u or v) to preserve barotropic transport after coupling. Pass correct dh and hfac depending on the direction: for u pass dy_w and hFacW, for v pass dx_s and hFacS.
