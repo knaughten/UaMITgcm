@@ -347,7 +347,12 @@ def set_calendar (directory, mit_dir, options):
         f.close()
 
         # Save that info to the Options object
-        options.save_last_calendar(date_code, ndays)
+        if options.restart_type == 'zero':
+            # Last timestep will be based on number of days in the segment
+            options.save_last_calendar(date_code, ndays)
+        elif options.restart_type == 'pickup':
+            # Last timestep will be based on number of days in the simulation so far
+            options.save_last_calendar(date_code, days_between(ini_year, ini_month, new_year, new_month, options.calendar_type))
 
         # Parse the date code
         old_year = int(date_code[:4])
