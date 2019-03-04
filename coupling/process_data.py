@@ -332,7 +332,7 @@ def convert_mit_output (options):
 
     # Move all the pickups to that directory, otherwise they mess up xmitgcm
     for fname in os.listdir(options.mit_run_dir):
-        if fname.startswith('pickup') and (fname.ends.with('.data') or fname.endswith('.meta')):
+        if fname.startswith('pickup') and (fname.endswith('.data') or fname.endswith('.meta')):
             move_to_dir(fname, options.mit_run_dir, tmp_dir)
 
     # Inner function to read MDS files and convert to NetCDF.
