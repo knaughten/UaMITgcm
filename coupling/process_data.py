@@ -330,6 +330,11 @@ def convert_mit_output (options):
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
 
+    # Move all the pickups to that directory, otherwise they mess up xmitgcm
+    for fname in os.listdir(options.mit_run_dir):
+        if fname.startswith('pickup') and (fname.ends.with('.data') or fname.endswith('.meta')):
+            move_to_dir(fname, options.mit_run_dir, tmp_dir)
+
     # Inner function to read MDS files and convert to NetCDF.
     # If dump=True, only read dump files, and only from the given timestep.
     # Then move the original files to a temporary directory so they're hidden
