@@ -318,7 +318,12 @@ def convert_mit_output (options):
     from xmitgcm import open_mdsdataset
 
     # Get startDate in the right format for NetCDF
-    ref_date = options.last_start_date[:4]+'-'+options.last_start_date[4:6]+'-01 0:0:0'
+    if options.restart_type == 'zero':
+        # Beginning of the segment
+        ref_date = options.last_start_date[:4]+'-'+options.last_start_date[4:6]+'-01 0:0:0'
+    elif options.restart_type == 'pickup':
+        # Beginning of the entire simulation
+        ref_date = options.startDate[:4]+'-'+options.startDate[4:6]+'-01 0:0:0'
 
     # Make a temporary directory to save already-processed files
     tmp_dir = options.mit_run_dir + 'tmp_mds/'
