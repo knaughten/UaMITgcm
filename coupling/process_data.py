@@ -349,7 +349,7 @@ def convert_mit_output (options):
             move_processed_files(options.mit_run_dir, tmp_dir, prefixes, tstep)
 
     # Process first dump
-    convert_files(options.dump_start_nc_name, tstep=0)
+    convert_files(options.dump_start_nc_name, tstep=options.first_timestep)
     # Process last dump
     convert_files(options.dump_end_nc_name, tstep=options.last_timestep)
     # Process diagnostics, i.e. everything that's left

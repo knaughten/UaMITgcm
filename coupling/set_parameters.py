@@ -192,7 +192,8 @@ class Options:
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
 
-        # Initialise last timestep (0; will be updated if not an initial segment)
+        # Initialise first and last timesteps to 0 (will be updated later if needed)
+        self.first_timestep = 0
         self.last_timestep = 0
 
         # Now write the variables Ua needs in a plain text file.
@@ -206,9 +207,10 @@ class Options:
 
 
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).
-    def save_last_calendar (self, start_date, ndays):
+    def save_last_calendar (self, start_date, ndays_old, ndays_new):
         self.last_start_date = start_date
-        self.last_timestep = ndays*sec_per_day/self.deltaT
+        self.first_timestep = ndays_old*sec_per_day/self.deltaT
+        self.last_timestep = ndays_new*sec_per_day/self.deltaT
         
 
 # end class Options
@@ -346,14 +348,6 @@ def set_calendar (directory, mit_dir, options):
         ndays = int(f.readline())
         f.close()
 
-        # Save that info to the Options object
-        if options.restart_type == 'zero':
-            # Last timestep will be based on number of days in the segment
-            options.save_last_calendar(date_code, ndays)
-        elif options.restart_type == 'pickup':
-            # Last timestep will be based on number of days in the simulation so far
-            options.save_last_calendar(date_code, days_between(ini_year, ini_month, new_year, new_month, options.calendar_type))
-
         # Parse the date code
         old_year = int(date_code[:4])
         old_month = int(date_code[4:])
@@ -363,6 +357,14 @@ def set_calendar (directory, mit_dir, options):
         if ndays != days_between(old_year, old_month, new_year, new_month, options.calendar_type):
             print 'Error (set_calendar): number of days in last simulation does not agree with couple_step and/or calendar_type.'
             sys.exit()
+
+        # Save the last timestep and date code to the Options object
+        if options.restart_type == 'zero':
+            # First timestep is 0, and last timestep will be based on number of days in the segment
+            options.save_last_calendar(date_code, 0, ndays)
+        elif options.restart_type == 'pickup':
+            # First and last timestep will be based on number of days in the simulation since the very beginning
+            options.save_last_calendar(date_code, days_between(ini_year, ini_month, old_year, old_month, options.calendar_type), days_between(ini_year, ini_month, new_year, new_month, options.calendar_type))
 
     # Figure out if we're in the ocean-only spinup period
     # Find the year and month when coupling begins
