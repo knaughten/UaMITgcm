@@ -211,11 +211,17 @@ def adjust_mit_state (mit_dir, grid, options):
     # Find all the (t-grid) cells which are newly open
     newly_open = (hFacC_new!=0)*(grid.hfac==0)
 
-    # Inner function to extrapolate a t-grid field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D.
+    # Inner function to extrapolate a t-grid field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D (i.e. surface).
     def extrapolate_into_new (var_string, data, is_2d=False):
         print 'Extrapolating ' + var_string + ' into newly opened cells'
         use_3d = not is_2d
-        return discard_and_fill(data, [], newly_open, missing_val=0, use_3d=use_3d, preference='vertical')*mask_new
+        if use_3d:
+            discard = grid.hfac==0
+            fill = newly_open
+        else:
+            discard = grid.hfac[0,:]==0
+            fill = newly_open[0,:]
+        return discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical')*mask_new
 
     # Extrapolate T and S into newly opened cells
     temp = extrapolate_into_new('temperature', temp)
