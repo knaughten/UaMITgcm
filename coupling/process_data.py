@@ -223,7 +223,11 @@ def adjust_mit_state (mit_dir, grid, options):
             discard = grid.hfac[0,:]==0
             fill = newly_open[0,:]
             mask = mask_new[0,:]
-        return discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical')*mask
+        data_filled = discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical', missing_val=-9999)*mask
+        if np.count_nonzero(data_filled==-9999):
+            print 'Error (extrapolate_into_new): something went wrong with the masking.'
+            sys.exit()
+        return data_filled
 
     # Extrapolate T and S into newly opened cells
     temp = extrapolate_into_new('temperature', temp)
