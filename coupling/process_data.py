@@ -218,10 +218,12 @@ def adjust_mit_state (mit_dir, grid, options):
         if use_3d:
             discard = grid.hfac==0
             fill = newly_open
+            mask = mask_new
         else:
             discard = grid.hfac[0,:]==0
             fill = newly_open[0,:]
-        return discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical')*mask_new
+            mask = mask_new[0,:]
+        return discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical')*mask
 
     # Extrapolate T and S into newly opened cells
     temp = extrapolate_into_new('temperature', temp)
