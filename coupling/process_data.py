@@ -224,7 +224,7 @@ def adjust_mit_state (mit_dir, grid, options):
             fill = newly_open[0,:]
             mask = mask_new[0,:]
         data_filled = discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical', missing_val=-9999)*mask
-        if np.count_nonzero(data_filled==-9999):
+        if np.count_nonzero(data_filled==-9999) != 0:
             print 'Error (extrapolate_into_new): something went wrong with the masking.'
             sys.exit()
         return data_filled
@@ -235,9 +235,9 @@ def adjust_mit_state (mit_dir, grid, options):
     if options.restart_type == 'pickup':
         # Extrapolate a few more variables
         if options.eosType != 'LINEAR':
-            extrapolate_into_new('total hydrostatic potential', phihyd)
-        extrapolate_into_new('free surface (N)', etan, is_2d=True)
-        extrapolate_into_new('free surface (H)', etah, is_2d=True)
+            phihyd = extrapolate_into_new('total hydrostatic potential', phihyd)
+        etan = extrapolate_into_new('free surface (N)', etan, is_2d=True)
+        etah = extrapolate_into_new('free surface (H)', etah, is_2d=True)
     else:
         # Free surface is just one variable
         eta = extrapolate_into_new('free surface', eta, is_2d=True)
@@ -306,6 +306,12 @@ def adjust_mit_state (mit_dir, grid, options):
             write_binary(fields[i], mit_dir+files[i], prec=options.readBinaryPrec)
             
     elif options.restart_type == 'pickup':
+
+        # Update pointers
+        if options.eosType == 'LINEAR':
+            fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt]
+        else:
+            fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt, phihyd]
 
         # Overwrite pickup file
         overwrite_pickup(mit_dir, 'pickup', options.last_timestep, fields, var_names, grid.nz)
