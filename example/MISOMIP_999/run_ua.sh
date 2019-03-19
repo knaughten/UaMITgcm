@@ -15,7 +15,7 @@
 MCR=$WORK/MCR_2017a/v92/
 
 # Make sure MCR cache (as defined in Ua_MCR.sh) exists
-if [ ! -d $WORK/mcr_cache ];
+if [ ! -d $WORK/mcr_cache ]; then
   mkdir $WORK/mcr_cache
 fi
 
