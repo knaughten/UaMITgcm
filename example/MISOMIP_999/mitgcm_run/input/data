@@ -95,9 +95,9 @@
  bathyFile='bathymetry.shice',
  hydrogThetaFile='lev_t.shice',
  hydrogSaltFile='lev_s.shice',
- uVelInitFile='u_init.bin',
- vVelInitFile='v_init.bin',
- pSurfInitFile='eta_init.bin',
+# uVelInitFile='u_init.bin',
+# vVelInitFile='v_init.bin',
+# pSurfInitFile='eta_init.bin',
  checkIniTemp=.false.,
  checkIniSalt=.false.,
 &

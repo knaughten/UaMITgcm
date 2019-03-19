@@ -35,7 +35,7 @@ ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
 ### Archer budget to charge jobs to
-budget_code = 'n02-FISSA'
+budget_code = 'n02-NEL013770'
 
 
 ###### 2. Coupling options ######
@@ -63,7 +63,7 @@ couple_step = 6
 ###           by the code, if it's not already correct.)
 ###           If there are no changes in the ice shelf draft,
 ###           this represents a perfect restart with no loss of information.
-restart_type = 'zero'
+restart_type = 'pickup'
 
 ### Calendar type. 3 options:
 ### 'standard': full calendar with leap years 
@@ -87,7 +87,7 @@ digging = 'none'
 
 ### Should we adjust velocities at each coupling timestep to preserve
 ### barotropic transport?
-adjust_vel = False
+adjust_vel = True
 
 ### Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
 misomip_wall = True

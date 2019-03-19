@@ -14,6 +14,11 @@
 # Path to Matlab Compiler Runtime installation
 MCR=$WORK/MCR_2017a/v92/
 
+# Make sure MCR cache (as defined in Ua_MCR.sh) exists
+if [ ! -d $WORK/mcr_cache ];
+  mkdir $WORK/mcr_cache
+fi
+
 cd $PBS_O_WORKDIR
 echo 'Ua starts '`date` >> jobs.log
 
