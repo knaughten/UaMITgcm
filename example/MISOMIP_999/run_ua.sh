@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#PBS -l select=1
+#PBS -l select=serial=true:ncpus=6
 #PBS -l walltime=00:30:00
 #PBS -j oe
 #PBS -m n
@@ -15,6 +15,7 @@
 MCR=$WORK/MCR_2017a/v92/
 
 # Make sure MCR cache (as defined in Ua_MCR.sh) exists
+# If you want the cache in a different location, modify it here AND in ua_run/Ua_MCR.sh
 if [ ! -d $WORK/mcr_cache ]; then
   mkdir $WORK/mcr_cache
 fi
