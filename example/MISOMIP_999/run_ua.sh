@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#PBS -l select=serial=true:ncpus=6
+#PBS -l select=1
 #PBS -l walltime=00:30:00
 #PBS -j oe
 #PBS -m n
