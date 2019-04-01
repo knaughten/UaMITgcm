@@ -59,12 +59,15 @@ CtrlVar.NameOfRestartFiletoRead=CtrlVar.NameOfRestartFiletoWrite;
 
 %% adapt mesh
 CtrlVar.AdaptMesh=1;         %
-CtrlVar.InfoLevelAdaptiveMeshing=5;
+CtrlVar.InfoLevelAdaptiveMeshing=1;
 CtrlVar.GmshMeshingAlgorithm=8;     % see gmsh manual
 
-CtrlVar.MeshSizeMax=20e3; % max element size (corse resolution)
-CtrlVar.MeshSize=20e3;       % over-all desired element size
-CtrlVar.MeshSizeMin=2e3;   % min ele size (corse resolution)
+% CtrlVar.MeshSizeMax=20e3; % max element size (corse resolution)
+% CtrlVar.MeshSize=20e3;       % over-all desired element size
+% CtrlVar.MeshSizeMin=2e3;   % min ele size (corse resolution)
+CtrlVar.MeshSize=5e3;       % over-all desired element size
+CtrlVar.MeshSizeMax=5e3;    % max element size
+CtrlVar.MeshSizeMin=0.25e3;
 
 % reasonably fine mesh resolution
 %
@@ -166,12 +169,14 @@ CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1;
 CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
 
   
-CtrlVar.AdaptMeshRunStepInterval=1;  % number of run-steps between mesh adaptation
-CtrlVar.AdaptMeshMaxIterations=100;
+% CtrlVar.AdaptMeshRunStepInterval=1;  % number of run-steps between mesh adaptation
+% CtrlVar.AdaptMeshMaxIterations=100;
+% CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan=10;
+% CtrlVar.MeshAdapt.GLrange=[10000 5000 ; 3000 CtrlVar.MeshSizeMin];
+CtrlVar.AdaptMeshRunStepInterval=100;  % number of run-steps between mesh adaptation
+CtrlVar.AdaptMeshMaxIterations=5;
 CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan=10;
-
-CtrlVar.MeshAdapt.GLrange=[10000 5000 ; 3000 CtrlVar.MeshSizeMin];
-
+CtrlVar.MeshAdapt.GLrange=[10000 5000 ; 5000 1000 ; 3000 CtrlVar.MeshSizeMin];
 
 %% Pos. thickness constraints
 CtrlVar.ThickMin=1; % minimum allowed thickness without (potentially) doing something about it
