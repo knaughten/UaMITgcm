@@ -35,7 +35,7 @@ ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
 ### Archer budget to charge jobs to
-budget_code = 'n02-NEL013770'
+budget_code = 'n02-FISSA'
 
 
 ###### 2. Coupling options ######
