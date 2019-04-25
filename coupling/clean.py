@@ -37,12 +37,13 @@ for fname in os.listdir(options.ua_exe_dir):
             shutil.rmtree(path)
 
 # Copy in the original restart with the correct name
-orig_restart = raw_input('Enter path to original Ua restart file: ')
-while True:
-    if os.path.isfile(orig_restart):
-        break
-    orig_restart = raw_input('That file does not exist. Try again: ')
-shutil.copyfile(orig_restart, options.ua_exe_dir+restart_name)
+orig_restart = raw_input('Enter path to original Ua restart file, or press enter if this is not a restart run: ')
+if len(orig_restart) > 0:
+    while True:
+        if os.path.isfile(orig_restart):
+            break
+        orig_restart = raw_input('That file does not exist. Try again: ')
+    shutil.copyfile(orig_restart, options.ua_exe_dir+restart_name)
 
 # Now call the prepare_run.sh script to reset the MITgcm run directory
 # Pass the path to scripts/ as an argument, because prepare_run.sh is called from outside its own directory

@@ -125,7 +125,6 @@ class Options:
         self.hFacMin = check_value('hFacMin', hFacMin, type='float')
         self.hFacMinDr = check_value('hFacMinDr', hFacMinDr, type='float')
         self.readBinaryPrec = check_value('readBinaryPrec', readBinaryPrec, type='int', legal=[32, 64])
-        self.readStatePrec = check_value('readStatePrec', readStatePrec, type='int', legal=[32, 64])
         self.rhoConst = check_value('rhoConst', rhoConst, type='float')
         self.eosType = check_value('eosType', eosType, legal=['MDJWF', 'JMD95', 'LINEAR'])
         if self.eosType == 'LINEAR':
@@ -191,6 +190,11 @@ class Options:
             self.dump_end_nc_name = ''
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
+        self.swap_namelist_postinit = check_value('swap_namelist_postinit', swap_namelist_postinit, type='bool')
+        if self.swap_namelist_postinit:
+            self.namelist_postinit = namelist_postinit
+        else:
+            self.namelist_postinit = ''
 
         # Initialise first and last timesteps to 0 (will be updated later if needed)
         self.first_timestep = 0
@@ -218,11 +222,16 @@ class Options:
 
 # Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to check/update endTime (length of the simulation up until the end of the next segment) and pchkptFreq (length of the next segment). For restart_type 'zero', we need to check/update endTime (length of the next segment). This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
-def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False):
+def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False, first_coupled=False):
 
     # Set file paths
     namelist = mit_dir + 'data'
     namelist_diag = mit_dir + 'data.diagnostics'
+
+    if first_coupled and swap_namelist_postinit:
+        # Overwrite the "data" namelist with the new options post-spinup
+        namelist_new = mit_dir + options.namelist_postinit
+        os.rename(namelist_new, namelist)
 
     # Inner function to find the line defining the frequency of the given diagnostic file name in data.diagnostics, and also extract that frequency and its file index.
     def get_diag_freq (diag_file_head):
@@ -435,7 +444,7 @@ def set_calendar (directory, mit_dir, options):
         # Calculate simulation length (up to the end of the next segment) in seconds
         simulation_length = days_between(ini_year, ini_month, newer_year, newer_month, options.calendar_type)*sec_per_day
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
-        update_namelists(mit_dir, segment_length, simulation_length, options, initial=initial)
+        update_namelists(mit_dir, segment_length, simulation_length, options, initial=initial, first_coupled=first_coupled)
 
     return initial, restart, spinup, first_coupled, finished
 

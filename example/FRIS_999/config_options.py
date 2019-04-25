@@ -6,7 +6,7 @@
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'MISOMIP_999'
+expt_name = 'FRIS_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
@@ -41,9 +41,9 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 24
+total_time = 39*12
 ### Length of ocean spinup period (months)
-spinup_time = 6
+spinup_time = 12
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 6
@@ -70,7 +70,7 @@ restart_type = 'pickup'
 ### 'noleap': every year is 365 days
 ### '360-day': every month is 30 days
 ### For 'standard', you must use the calendar package in MITgcm.
-calendar_type = '360-day'
+calendar_type = 'standard'
 ### How often to do time-averaged diagnostic output?
 ### 'monthly', 'daily', or 'end' (at the end of the segment)
 ### Note 'monthly' does not work with calendar_type='noleap'.
@@ -83,14 +83,14 @@ output_freq = 'monthly'
 ### 'none': don't do any digging
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
-digging = 'none'
+digging = 'bathy'
 
 ### Should we adjust velocities at each coupling timestep to preserve
 ### barotropic transport?
 adjust_vel = True
 
 ### Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
-misomip_wall = True
+misomip_wall = False
 
 ### How should we calculate the pressure load anomaly of the ice shelf draft?
 ### This involves making an assumption about the properties of the water
@@ -110,19 +110,19 @@ pload_salt = 34.2
 ###### 3. MITgcm parameters ######
 
 ### Does your configuration of MITgcm include sea ice?
-use_seaice = False
+use_seaice = True
 ### Does your configuration of MITgcm use the calendar package?
-use_cal_pkg = False
+use_cal_pkg = True
 
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
 ### to find what they have been set to by default.
-deltaT = 300
-hFacMin = 0.05
-hFacMinDr = 0.
+deltaT = 600
+hFacMin = 0.1
+hFacMinDr = 20.
 readBinaryPrec = 64
-rhoConst = 1028.
-eosType = 'LINEAR'
+rhoConst = 1035.
+eosType = 'MDJWF'
 ### The following four variables only matter if eosType='LINEAR'.
 ### Note that Tref and Sref in input/data will be multiplied by
 ### the number of vertical levels; don't include this here
@@ -154,46 +154,45 @@ calendar_file = 'calendar'
 finished_file = 'finished'
 
 ### Bathymetry file read by MITgcm. Should match the value in input/data.
-bathyFile = 'bathymetry.shice'
+bathyFile = 'bathy_WSS'
 ### Ice shelf draft file read by MITgcm.
 ### Should match SHELFICEtopoFile in input/data.shelfice.
-draftFile = 'shelfice_topo.bin'
+draftFile = 'draft_WSS'
 
 ### Initial conditions files read by MITgcm:
 ###
 ### Temperature (match hydrogThetaFile in input/data)
-ini_temp_file = 'lev_t.shice'
+ini_temp_file = 'THETA_MIT.ini'
 ### Salinity (match hydrogSaltFile in input/data)
-ini_salt_file = 'lev_s.shice'
+ini_salt_file = 'SALT_MIT.ini'
 ### Zonal velocity (match uVelInitFile in input/data)
 ### Only needed for restart_type='zero'.
 ### This is assumed not to exist at the beginning,
 ### it will be created with all zeros.
-ini_u_file = 'u_init.bin'
+ini_u_file = ''
 ### Meridional velocity (match vVelInitFile in input/data)
-ini_v_file = 'v_init.bin'
+ini_v_file = ''
 ### Free surface (match pSurfInitFile in input/data)
-ini_eta_file = 'eta_init.bin'
+ini_eta_file = ''
 
 ### Sea ice initial conditions files read by MITgcm
 ### (only matters if use_seaice=True)
 ### They will be created if they don't exist and restart_type='zero'.
 ###
 ### Sea ice area (match AreaFile in input/data.seaice)
-ini_area_file = ''
+ini_area_file = 'SIarea_MIT.ini'
 ### Sea ice thickness (match HeffFile in input/data.seaice)
-ini_heff_file = ''
+ini_heff_file = 'SIheff_MIT.ini'
 ### Snow thickness (match HsnowFile in input/data.seaice)
-ini_hsnow_file = ''
+ini_hsnow_file = 'SIhsnow_MIT.ini'
 ### Sea ice zonal velocity (match uIceFile in input/data.seaice)
-### This will be 
 ini_uice_file = ''
 ### Sea ice meridional velocity (match vIceFile in input/data.seaice)
 ini_vice_file = ''
 
 ### Pressure load anomaly file read by MITgcm.
 ### Should match SHELFICEloadAnomalyFile in input/data.shelfice.
-pload_file = 'phi0surf.bin'
+pload_file = 'pload_WSS'
 
 ### Beginnings of the filenames of various output diagnostic files
 ### containing the given variables.
@@ -204,10 +203,10 @@ pload_file = 'phi0surf.bin'
 ### you want Ua to see
 ### (you can have SHIfwFlx on another output stream too if you want
 ### output at a different frequency for analysis)
-ismr_name = 'MITout_2D'
+ismr_name = 'state2D'
 ### Any files you want to output at output_freq.
 ### Will probably include ismr_name.
-output_names = ['MITout_2D', 'MITout_3D']
+output_names = ['state2D', 'stateUVEL', 'stateVVEL', 'stateWVEL', 'stateTHETA', 'stateSALT', 'statePSI', 'stateEXF', 'stateICE', 'stateAGE']
 
 ### Name for NetCDF files converted by xmitgcm
 ### Doesn't really matter what this is,
@@ -228,8 +227,8 @@ ua_draft_file = 'DataForMIT.mat'
 ### after the spinup.
 ### If you want to do this, set swap_namelist_postinit to True
 ### and set namelist_postinit to the second filename (eg something_else)
-swap_namelist_postinit = False
-namelist_postinit = ''
+swap_namelist_postinit = True
+namelist_postinit = 'data.post_init'
 
 
 
