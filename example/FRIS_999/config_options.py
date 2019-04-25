@@ -41,12 +41,12 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 39*12
+total_time = 4
 ### Length of ocean spinup period (months)
-spinup_time = 12
+spinup_time = 1
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 6
+couple_step = 1
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
@@ -206,7 +206,7 @@ pload_file = 'pload_WSS'
 ismr_name = 'state2D'
 ### Any files you want to output at output_freq.
 ### Will probably include ismr_name.
-output_names = ['state2D', 'stateUVEL', 'stateVVEL', 'stateWVEL', 'stateTHETA', 'stateSALT', 'statePSI', 'stateEXF', 'stateICE', 'stateAGE']
+output_names = ['state2D', 'stateUVEL', 'stateVVEL', 'stateWVEL', 'stateTHETA', 'stateSALT', 'statePSI', 'stateEXF', 'stateICE']
 
 ### Name for NetCDF files converted by xmitgcm
 ### Doesn't really matter what this is,

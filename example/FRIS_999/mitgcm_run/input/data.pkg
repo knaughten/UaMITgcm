@@ -8,7 +8,7 @@
  useShelfIce=.true.,
  useCAL=.true.,
  useDiagnostics=.true.,
- usePTRACERS=.true.,
+ usePTRACERS=.false.,
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### useOBCS=.false.,

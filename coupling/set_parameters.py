@@ -230,7 +230,8 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
 
     if first_coupled and swap_namelist_postinit:
         # Overwrite the "data" namelist with the new options post-spinup
-        namelist_new = mit_dir + options.namelist_postinit
+        print 'Switching to namelist ' + options.namelist_postinit
+        namelist_new = mit_dir + options.namelist_postinit        
         os.rename(namelist_new, namelist)
 
     # Inner function to find the line defining the frequency of the given diagnostic file name in data.diagnostics, and also extract that frequency and its file index.
@@ -292,7 +293,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
         ckpt = segment_length
         ckpt_line = line_that_matters(namelist, 'pchkptFreq')
         old_ckpt = extract_first_int(ckpt_line)
-        check_and_change(old_ckpt, ckpt, ckpt_line, ' pchkptFreq='+str(ckpt)+',\n', namelist, 'pchkptFreq', check='all')        
+        check_and_change(old_ckpt, ckpt, ckpt_line, ' pchkptFreq='+str(ckpt)+',\n', namelist, 'pchkptFreq', check='360')        
 
     # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
     if len(options.output_names) > 0:
@@ -431,7 +432,7 @@ def set_calendar (directory, mit_dir, options):
             f.write(str(interval) + '\n')
         f.close()
 
-        if options.use_cal_pkg:
+        if options.use_cal_pkg and options.restart_type=='zero':
             print 'Updating start date for calendar package'
             # Look for startDate_1 in "data.cal" namelist
             namelist_cal = mit_dir + 'data.cal'

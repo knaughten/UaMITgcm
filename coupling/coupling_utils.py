@@ -161,7 +161,7 @@ def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
         # There is just one variable here, return the whole array
         return data
 
-    if file_head == 'pickup':
+    if file_head.startswith('pickup'):
         # Pickup files do not have an extra dimension for the different variables.
         # Instead this is collapsed into the depth dimension.
         # Unpick the resulting large 3D array into the different variables.
@@ -188,7 +188,7 @@ def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
     for var in var_names:
         # Figure out which index contains this variable
         i = meta['fldlist'].index(var)
-        if file_head == 'pickup':
+        if file_head.startswith('pickup'):
             var_data.append(data[i])
         else:
             var_data.append(data[i,:])

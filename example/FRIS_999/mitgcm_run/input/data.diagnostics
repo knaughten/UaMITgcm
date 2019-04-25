@@ -56,9 +56,9 @@
   fileName(9) = 'stateICE',
   frequency(9) = 2592000.,
 
-  fields(1,10) = 'TRAC01  ',
-  fileName(10) = 'stateAGE',
-  frequency(10) = 2592000.,
+#  fields(1,10) = 'TRAC01  ',
+#  fileName(10) = 'stateAGE',
+#  frequency(10) = 2592000.,
 
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
