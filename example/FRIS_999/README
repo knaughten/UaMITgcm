@@ -6,7 +6,7 @@ cd ../../
 
 Go to Compile-Machine.
 ./compile_ua.sh
-scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/FRIS/ua_run/
+scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/FRIS_999/ua_run/
 
 Go back to Run-Machine.
 qsub -A <budget code> run_coupler.sh
