@@ -190,11 +190,6 @@ class Options:
             self.dump_end_nc_name = ''
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
-        self.swap_namelist_postinit = check_value('swap_namelist_postinit', swap_namelist_postinit, type='bool')
-        if self.swap_namelist_postinit:
-            self.namelist_postinit = namelist_postinit
-        else:
-            self.namelist_postinit = ''
 
         # Initialise first and last timesteps to 0 (will be updated later if needed)
         self.first_timestep = 0
@@ -227,12 +222,6 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
     # Set file paths
     namelist = mit_dir + 'data'
     namelist_diag = mit_dir + 'data.diagnostics'
-
-    if first_coupled and swap_namelist_postinit:
-        # Overwrite the "data" namelist with the new options post-spinup
-        print 'Switching to namelist ' + options.namelist_postinit
-        namelist_new = mit_dir + options.namelist_postinit        
-        os.rename(namelist_new, namelist)
 
     # Inner function to find the line defining the frequency of the given diagnostic file name in data.diagnostics, and also extract that frequency and its file index.
     def get_diag_freq (diag_file_head):

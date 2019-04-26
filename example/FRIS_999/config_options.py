@@ -41,12 +41,12 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 4
+total_time = 12
 ### Length of ocean spinup period (months)
-spinup_time = 1
+spinup_time = 12
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 1
+couple_step = 12
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
@@ -218,18 +218,3 @@ mit_nc_name = 'output.nc'
 ua_melt_file = 'NewMeltrate.mat'
 ### Ice shelf draft file written by Ua
 ua_draft_file = 'DataForMIT.mat'
-
-### If you want different MITgcm options for the spinup
-### and the coupled part of the simulation,
-### you can make two versions of input/data.
-### The first (saved as input/data) will be used for the spinup.
-### The second (saved as input/something_else) will be copied to input/data
-### after the spinup.
-### If you want to do this, set swap_namelist_postinit to True
-### and set namelist_postinit to the second filename (eg something_else)
-swap_namelist_postinit = True
-namelist_postinit = 'data.post_init'
-
-
-
-

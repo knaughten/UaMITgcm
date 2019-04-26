@@ -258,10 +258,7 @@
  deltaTmom=60.,
  abEps=0.1,
  forcing_In_AB=.false.,
-# 1 year (365 days, but will update with leap years since calendar dumps are on)
  pChkptFreq=31536000.,
-# 1 month (30 days, but will update with each month since calendar dumps are on)
-# chkptFreq=2592000.,
  dumpInitAndLast=.false.,
 # Hourly
 # monitorFreq=3600.,
