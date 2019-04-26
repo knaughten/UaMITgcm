@@ -28,13 +28,18 @@ for fname in os.listdir(options.ua_exe_dir):
     if fname.endswith('RestartFile.mat'):
         # Save the name of the restart file
         restart_name = fname
-    # Delete everything except the Ua executable and run script
-    if fname not in ['Ua', 'Ua_MCR.sh']:
-        path = options.ua_exe_dir+fname
-        if os.path.isfile(path):
-            os.remove(path)
-        elif os.path.isdir(path):
-            shutil.rmtree(path)
+    # Don't care about mesh files
+    elif fname in ['NewMeshFile.mat', 'AdaptMesh.mat']:
+        pass    
+    # Don't delete the Ua executable, run script, or other .mat files
+    elif fname in ['Ua', 'Ua_MCR.sh'] or fname.endswith('.mat'):
+        continue
+    # Delete everything else
+    path = options.ua_exe_dir+fname
+    if os.path.isfile(path):
+        os.remove(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
 
 # Copy in the original restart with the correct name
 orig_restart = raw_input('Enter path to original Ua restart file, or press enter if this is not a restart run: ')

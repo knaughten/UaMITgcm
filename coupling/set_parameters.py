@@ -220,7 +220,7 @@ class Options:
 # end class Options
 
 
-# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to check/update endTime (length of the simulation up until the end of the next segment) and pchkptFreq (length of the next segment). For restart_type 'zero', we need to check/update endTime (length of the next segment). This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
+# Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to check/update endTime and pckptFreq (length of the simulation up until the end of the next segment). For restart_type 'zero', we need to check/update endTime (length of the next segment). This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
 def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False, first_coupled=False):
 
@@ -290,10 +290,10 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
 
     if options.restart_type == 'pickup':
         # Update pchkptFreq
-        ckpt = segment_length
+        ckpt = simulation_length
         ckpt_line = line_that_matters(namelist, 'pchkptFreq')
         old_ckpt = extract_first_int(ckpt_line)
-        check_and_change(old_ckpt, ckpt, ckpt_line, ' pchkptFreq='+str(ckpt)+',\n', namelist, 'pchkptFreq', check='360')        
+        check_and_change(old_ckpt, ckpt, ckpt_line, ' pchkptFreq='+str(ckpt)+',\n', namelist, 'pchkptFreq', check='none')        
 
     # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
     if len(options.output_names) > 0:
