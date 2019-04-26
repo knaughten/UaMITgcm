@@ -456,8 +456,8 @@ def gather_output (options, spinup, first_coupled):
     mit_file_names = [options.draftFile, options.bathyFile, options.pload_file]
     if options.restart_type == 'zero':
         mit_file_names += [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file]
-    if options.use_seaice:
-        mit_file_names += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
+        if options.use_seaice:
+            mit_file_names += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
     # Now copy them
     for fname in mit_file_names:
         copy_tmp_file(fname, options.mit_run_dir, new_mit_dir)
