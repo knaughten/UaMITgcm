@@ -96,7 +96,7 @@ CtrlVar.AGlenmin=1e-10; CtrlVar.AGlenmax=1e-7;
 CtrlVar.Cmin=1e-7;  CtrlVar.Cmax=10;        
 CtrlVar.Inverse.Iterations=50;
 CtrlVar.Inverse.WriteRestartFile=1;  % always a good idea to write a restart file. 
-CtrlVar.Inverse.NameOfRestartOutputFile=['InverseRestart_',Experiment];
+CtrlVar.Inverse.NameOfRestartOutputFile=['InverseRestart_',CtrlVar.Experiment];
 CtrlVar.Inverse.NameOfRestartInputFile='';
 CtrlVar.NameOfFileForReadingSlipperinessEstimate='C-Estimate.mat';
 CtrlVar.NameOfFileForReadingAGlenEstimate='AGlen-Estimate.mat';

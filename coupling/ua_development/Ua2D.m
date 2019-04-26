@@ -459,19 +459,18 @@ while 1
                 
                 %ub0=ub ; ud0=ud ; vb0=vb ; vd0=vd;
                 
-                
-                if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
-                    CtrlVar.UaOutputsInfostring='Diagnostic step';
-                    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
-                    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
+%                if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
+%                    CtrlVar.UaOutputsInfostring='Diagnostic step';
+%                    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%                    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
                     
-                    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-                    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
-                        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
-                            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
-                        return
-                    end
-                end
+%                    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
+%                    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
+%                        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
+%                            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
+%                        return
+%                    end
+%                end
             end
             
             F0=F;  % 
