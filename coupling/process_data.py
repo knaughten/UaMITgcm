@@ -444,7 +444,7 @@ def gather_output (options, spinup, first_coupled):
                     move_to_dir(fname, options.mit_run_dir, new_mit_dir)
 
     # Inner function to copy topography/ICs/pload files which are modified every coupling timestep, and for which temporary copies are made prior to modification.
-    def copy_tmp_file (fname, source_dir, target_dir, check_tmp=False):
+    def copy_tmp_file (fname, source_dir, target_dir, warn_tmp=False, check_tmp=False):
         # First check if it was modified this timestep
         if os.path.isfile(source_dir+fname+'.tmp'):
             # Move the temporary copies
@@ -453,6 +453,9 @@ def gather_output (options, spinup, first_coupled):
             # There should have been a temporary copy
             print 'Error (copy_tmp_file): a temporary copy of ' + fname + ' does not exist'
             sys.exit()
+        elif warn_tmp:
+            # Don't make any copy
+            print 'A temporary copy of ' + fname + ' does not exist; this is likely the second coupled segment'
         else:
             # They were not modified, so copy them
             copy_to_dir(fname, source_dir, target_dir)
@@ -481,7 +484,7 @@ def gather_output (options, spinup, first_coupled):
             if fname.endswith('RestartFile.mat'):
                 restart_name = fname
         # Save the temporary copy made last time (restart at the beginning of this segment)
-        copy_tmp_file(restart_name, options.ua_exe_dir, new_ua_dir, check_tmp=True)
+        copy_tmp_file(restart_name, options.ua_exe_dir, new_ua_dir, warn_tmp=True)
         # Make a new temporary copy of the restart at the end of this segment (beginning of the next segment)
         make_tmp_copy(options.ua_exe_dir+restart_name)
         # Also copy melt file from MITgcm

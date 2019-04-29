@@ -17,6 +17,7 @@ example/MISOMIP_999/ua_run/ResultsFiles
 example/MISOMIP_999/ua_run/*.mat
 example/MISOMIP_999/output
 example/MISOMIP_1r*
+example/MISOMIP_RT*
 example/MISOMIP_mesh*
 MISOMIP_netcdf_output
 example/FRIS_999/Ua
@@ -33,4 +34,5 @@ example/FRIS_999/ua_run/matlab*.out
 example/FRIS_999/ua_run/*RunInfo.txt
 example/FRIS_999/ua_run/ResultsFiles
 example/FRIS_999/ua_run/*.mat
+example/FRIS_999/ua_run/*.mat.tmp
 example/FRIS_999/output
