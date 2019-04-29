@@ -8,7 +8,7 @@ import os
 import sys
 
 from config_options import *
-from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between
+from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between, make_tmp_copy
 
 from mitgcm_python.utils import real_dir, days_per_month
 
@@ -222,6 +222,10 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
     # Set file paths
     namelist = mit_dir + 'data'
     namelist_diag = mit_dir + 'data.diagnostics'
+    if not initial:
+        # Make backup copies
+        make_tmp_copy(namelist)
+        make_tmp_copy(namelist_diag)
 
     # Inner function to find the line defining the frequency of the given diagnostic file name in data.diagnostics, and also extract that frequency and its file index.
     def get_diag_freq (diag_file_head):
@@ -320,6 +324,9 @@ def set_calendar (directory, mit_dir, options):
     # Figure out if this the very first segment, based on whether the calendar file already exists
     calfile = directory + options.calendar_file    
     initial = not os.path.isfile(calfile)
+    if not initial:
+        # Make a backup copy
+        make_tmp_copy(calfile)
 
     # Figure out if this is restarting from a previously-finished segment, based on whether the finished-file already exists
     finifile = directory + options.finished_file
