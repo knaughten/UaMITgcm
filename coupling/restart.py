@@ -97,7 +97,7 @@ finifile = options.output_dir+options.finished_file
 if os.path.isfile(finifile):
     os.remove(finifile)
 
-'''# Submit the next jobs
+# Submit the next jobs
 print 'Submitting next MITgcm segment'
 mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
 afterok = [mit_id]
@@ -105,4 +105,4 @@ print 'Submitting next Ua segment'
 ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
 afterok.append(ua_id)
 print 'Submitting next coupler job to start after segment is finished'
-submit_job(options, 'run_coupler.sh', afterok=afterok)'''
+submit_job(options, 'run_coupler.sh', afterok=afterok)
