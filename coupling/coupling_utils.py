@@ -71,7 +71,7 @@ def replace_line (file_name, old_line, new_line):
     # Open the file for reading
     f_r = open(file_name, 'r')
     # Open another file to write to
-    f_w = open(file_name+'.tmp', 'w')
+    f_w = open(file_name+'.replace', 'w')
     for line in f_r:
         if line == old_line:
             # Update this line in the new file
@@ -84,7 +84,7 @@ def replace_line (file_name, old_line, new_line):
     
     # Replace the old file with the new one
     os.remove(file_name)
-    os.rename(file_name+'.tmp', file_name)
+    os.rename(file_name+'.replace', file_name)
 
 
 # Advance the given date (year and month) by num_months

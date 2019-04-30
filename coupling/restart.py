@@ -4,7 +4,7 @@ import os
 import shutil
 
 from set_parameters import Options
-from coupling_utils import copy_to_dir, line_that_matters, extract_first_int
+from coupling_utils import copy_to_dir, line_that_matters, extract_first_int, make_tmp_copy, submit_job
 
 # Make sure the user didn't call this accidentally
 out = raw_input('This will delete all existing results following the restart point, unless they are backed up. Are you sure you want to proceed (yes/no)? ').strip()
@@ -16,9 +16,9 @@ while True:
     out = raw_input('Please answer yes or no. ').strip()
 
 # Get date code to restart from
-date_code = raw_input('Enter the date code to restart at (eg 199201). ').strip()
+date_code = raw_input('Enter the date code to restart at (eg 199201): ').strip()
 # Make sure it's a date
-valid_date = len(date_code)==4
+valid_date = len(date_code)==6
 try:
     int(valid_date)
 except(ValueError):
@@ -37,7 +37,7 @@ if not os.path.isdir(output_date_dir):
     sys.exit()
 
 # Copy the calendar file
-copy_to_dir(options.calendar_file, options.output_date_dir, options.output_dir)
+copy_to_dir(options.calendar_file, output_date_dir, options.output_dir)
 
 # Copy MITgcm run files. First figure out what files we need to copy.
 # Geometry files and namelists which might change each timestep
@@ -50,7 +50,9 @@ if options.restart_type == 'zero':
 elif options.restart_type == 'pickup':
     # Pickup files
     # Figure out the initial timestep based on niter0
-    niter0 = extract_first_int(line_that_matters(options.output_date_dir+'MITgcm/data', 'niter0'))
+    niter0_line = line_that_matters(output_date_dir+'MITgcm/data', 'niter0')
+    start = niter0_line.index('=')
+    niter0 = extract_first_int(niter0_line[start:])
     # Reconstruct timestep stamp for pickup files we want
     niter0_stamp = str(niter0).zfill(10)
     mit_file_names += ['pickup.'+niter0_stamp+'.data', 'pickup.'+niter0_stamp+'.meta']
@@ -58,14 +60,17 @@ elif options.restart_type == 'pickup':
         mit_file_names += ['pickup_seaice.'+niter0_stamp+'.data', 'pickup_seaice.'+niter0_stamp+'.meta']
 # Now copy all the files
 for fname in mit_file_names:
-    copy_to_dir(fname, options.output_date_dir+'MITgcm/', options.mit_run_dir)
+    copy_to_dir(fname, output_date_dir+'MITgcm/', options.mit_run_dir)
 
 # Copy Ua restart file (saved at beginning of segment)
-for fname in os.listdir(options.output_date_dir+'Ua/'):
+for fname in os.listdir(output_date_dir+'Ua/'):
     if fname.endswith('RestartFile.mat'):
-        copy_to_dir(fname, options.output_date_dir+'Ua/', options.ua_exe_dir)
+        restart_name = fname
+copy_to_dir(restart_name, output_date_dir+'Ua/', options.ua_exe_dir)
+# Make a temporary copy of this one too
+make_tmp_copy(options.ua_exe_dir+restart_name)
 # Copy Ua melt rate file
-copy_to_dir(options.ua_melt_file, options.output_date_dir+'Ua/', options.ua_exe_dir)
+copy_to_dir(options.ua_melt_file, output_date_dir+'Ua/', options.output_dir)
 
 # Delete this output folder and all following
 for dname in os.listdir(options.output_dir):
@@ -78,9 +83,24 @@ for dname in os.listdir(options.output_dir):
     except(ValueError):
         # Not numerical
         continue
-    if len(dname) != 4:
+    if len(dname) != 6:
         # Not a date code
         continue
     if int(dname) >= int(date_code):
         # Now we can delete
         shutil.rmtree(options.output_dir+dname)
+
+# Delete the "finished" file if it exists
+finifile = options.output_dir+options.finished_file
+if os.path.isfile(finifile):
+    os.remove(finifile)
+
+# Submit the next jobs
+'''print 'Submitting next MITgcm segment'
+mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
+afterok = [mit_id]
+print 'Submitting next Ua segment'
+ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
+afterok.append(ua_id)
+print 'Submitting next coupler job to start after segment is finished'
+submit_job(options, 'run_coupler.sh', afterok=afterok)'''

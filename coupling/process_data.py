@@ -291,7 +291,7 @@ def adjust_mit_state (mit_dir, grid, options):
     if options.restart_type == 'zero':
         
         # Make backup copies of old initial conditions files before we overwrite them
-        files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file, options.pload_file]
+        files_to_copy = [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file]
         if options.use_seaice:
             files_to_copy += [options.ini_area_file, options.ini_heff_file, options.ini_hsnow_file, options.ini_uice_file, options.ini_vice_file]
         for fname in files_to_copy:
@@ -318,6 +318,7 @@ def adjust_mit_state (mit_dir, grid, options):
         overwrite_pickup(mit_dir, 'pickup', options.last_timestep, fields, var_names, grid.nz)
         if options.use_seaice:
             overwrite_pickup(mit_dir, 'pickup_seaice', options.last_timestep, fields_seaice, var_names_seaice, options.seaice_nz)
+
         # Update namelist so niter0 points to this file
         print 'Updating niter0 in namelist'
         namelist = mit_dir + 'data'
@@ -325,6 +326,7 @@ def adjust_mit_state (mit_dir, grid, options):
         replace_line(namelist, niter0_line, ' niter0='+str(options.last_timestep)+',\n')
 
     print 'Calculating pressure load anomaly'
+    make_tmp_copy(mit_dir+options.pload_file)
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hFacC_new, prec=options.readBinaryPrec)
 
 
@@ -444,7 +446,7 @@ def gather_output (options, spinup, first_coupled):
                     move_to_dir(fname, options.mit_run_dir, new_mit_dir)
 
     # Inner function to copy topography/ICs/pload files which are modified every coupling timestep, and for which temporary copies are made prior to modification.
-    def copy_tmp_file (fname, source_dir, target_dir, warn_tmp=False, check_tmp=False):
+    def copy_tmp_file (fname, source_dir, target_dir, check_tmp=False):
         # First check if it was modified this timestep
         if os.path.isfile(source_dir+fname+'.tmp'):
             # Move the temporary copies
