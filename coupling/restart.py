@@ -1,3 +1,5 @@
+# Restart from the middle of a coupled simulation. Doesn't work if you're restarting from the end - if so, just submit run_coupler.sh!
+
 import sys
 sys.path.insert(0,'./')
 import os
@@ -95,8 +97,8 @@ finifile = options.output_dir+options.finished_file
 if os.path.isfile(finifile):
     os.remove(finifile)
 
-# Submit the next jobs
-'''print 'Submitting next MITgcm segment'
+'''# Submit the next jobs
+print 'Submitting next MITgcm segment'
 mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
 afterok = [mit_id]
 print 'Submitting next Ua segment'

@@ -1,3 +1,5 @@
+# Clean the experiment directory so you can start fresh.
+
 import sys
 sys.path.insert(0,'./')
 import shutil
