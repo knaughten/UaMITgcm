@@ -319,12 +319,6 @@ def adjust_mit_state (mit_dir, grid, options):
         if options.use_seaice:
             overwrite_pickup(mit_dir, 'pickup_seaice', options.last_timestep, fields_seaice, var_names_seaice, options.seaice_nz)
 
-        # Update namelist so niter0 points to this file
-        print 'Updating niter0 in namelist'
-        namelist = mit_dir + 'data'
-        niter0_line = line_that_matters(namelist, 'niter0')
-        replace_line(namelist, niter0_line, ' niter0='+str(options.last_timestep)+',\n')
-
     print 'Calculating pressure load anomaly'
     make_tmp_copy(mit_dir+options.pload_file)
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hFacC_new, prec=options.readBinaryPrec)
