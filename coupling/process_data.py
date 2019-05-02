@@ -468,10 +468,14 @@ def gather_output (options, spinup, first_coupled):
     if not spinup:
         # Deal with Ua
         # Find name of restart file
+        restart_name = None
         for fname in os.listdir(options.ua_exe_dir):
             if fname.endswith('RestartFile.mat'):
                 restart_name = fname
-        if first_coupled:
+        if restart_name is None and (options.ua_ini_restart or not first_coupled):
+            print 'Error (gather_output): there is no Ua restart file.'
+            sys.exit()
+        if first_coupled and not options.ua_ini_restart:
             # There is no actual Ua output yet.
             # The only thing to do is make a temporary copy of the restart file.
             make_tmp_copy(options.ua_exe_dir+restart_name)
@@ -483,7 +487,7 @@ def gather_output (options, spinup, first_coupled):
             for fname in os.listdir(options.ua_output_dir):
                 move_to_dir(fname, options.ua_output_dir, new_ua_dir)
             # Save the temporary copy made last time (restart at the beginning of this segment)
-            copy_tmp_file(restart_name, options.ua_exe_dir, new_ua_dir, check_tmp=True)
+            copy_tmp_file(restart_name, options.ua_exe_dir, new_ua_dir, check_tmp=options.ua_ini_restart)
             # Make a new temporary copy of the restart at the end of this segment (beginning of the next segment)
             make_tmp_copy(options.ua_exe_dir+restart_name)
             # Also copy melt file from MITgcm

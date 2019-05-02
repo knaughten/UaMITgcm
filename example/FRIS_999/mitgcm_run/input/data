@@ -253,7 +253,7 @@
  &PARM03
  niter0=0,
 # 1979-2016
- endTime=1199232000.,
+ endTime=31536000,
  deltaT=600.,
  deltaTmom=60.,
  abEps=0.1,

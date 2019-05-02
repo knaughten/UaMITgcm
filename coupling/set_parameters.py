@@ -115,6 +115,7 @@ class Options:
             # Set dummy values for pload_temp and pload_salt; since they're never used, there's no need to error check
             self.pload_temp = 0.
             self.pload_salt = 0.
+        self.ua_ini_restart = check_value('ua_ini_restart', ua_ini_restart, type='bool')
             
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
         self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')

@@ -106,6 +106,10 @@ pload_option = 'nearest'
 pload_temp = -1.
 pload_salt = 34.2
 
+### Does the first Ua segment start from a restart file
+### you made ahead of time?
+ua_ini_restart = False
+
 
 ###### 3. MITgcm parameters ######
 
