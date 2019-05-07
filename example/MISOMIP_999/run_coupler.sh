@@ -36,7 +36,9 @@ OUT=$?
 
 if [ $OUT == 0 ]; then
     echo 'Coupler ends '`date` >> jobs.log
+    exit 0
 else
     echo 'Error in coupler '`date` >> jobs.log
+    exit 1
 fi
 

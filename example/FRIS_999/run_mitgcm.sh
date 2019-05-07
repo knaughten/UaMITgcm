@@ -25,6 +25,8 @@ OUT=$?
 cd $PBS_O_WORKDIR
 if [ $OUT == 0 ]; then
     echo 'MITgcm ends '`date` >> jobs.log
+    exit 0
 else
     echo 'Error in MITgcm '`date` >> jobs.log
+    exit 1
 fi

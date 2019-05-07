@@ -32,6 +32,8 @@ OUT=$?
 cd $PBS_O_WORKDIR
 if [ $OUT == 0 ]; then
     echo 'Ua ends '`date` >> jobs.log
+    exit 0
 else
     echo 'Error in Ua '`date` >> jobs.log
+    exit 1
 fi
