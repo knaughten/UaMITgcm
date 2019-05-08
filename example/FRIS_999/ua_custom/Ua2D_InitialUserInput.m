@@ -22,7 +22,9 @@ if exist(CtrlVar.NameOfRestartFiletoRead, 'file') == 2
     CtrlVar.ResetTimeStep=0;
 else
     CtrlVar.Restart=0;
-    CtrlVar.time=0; 
+    CtrlVar.time=0;
+    CtrlVar.ReadInitialMesh=1;
+    CtrlVar.ReadInitialMeshFileName = 'MeshFileForInversion.mat';
 end
 
 CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes; 
@@ -35,9 +37,6 @@ CtrlVar.Parallel.uvhAssembly.parfor.isOn=1;     % assembly over integration poin
 CtrlVar.Parallel.uvhAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
 CtrlVar.Parallel.uvAssembly.spmd.isOn=1;
 
-%% Reading in mesh
-CtrlVar.ReadInitialMesh=1;
-CtrlVar.ReadInitialMeshFileName = 'MeshFileForInversion.mat';
 load BoundaryCoordinates MeshBoundaryCoordinates
 
 %% Plotting options

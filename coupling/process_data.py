@@ -475,10 +475,11 @@ def gather_output (options, spinup, first_coupled):
         if restart_name is None and (options.ua_ini_restart or not first_coupled):
             print 'Error (gather_output): there is no Ua restart file.'
             sys.exit()
-        if first_coupled and not options.ua_ini_restart:
+        if first_coupled:
             # There is no actual Ua output yet.
-            # The only thing to do is make a temporary copy of the restart file.
-            make_tmp_copy(options.ua_exe_dir+restart_name)
+            # The only thing to do is make a temporary copy of the restart file, if it exists.
+            if options.ua_ini_restart:
+                make_tmp_copy(options.ua_exe_dir+restart_name)
         else:
             # Make a subdirectory for Ua
             new_ua_dir = new_dir + 'Ua/'
