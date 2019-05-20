@@ -50,6 +50,8 @@ else
 end
 
 if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
+
+    x = MUA.coordinates(:,1); y = MUA.coordinates(:,2);
     
     %% generate draft and mask for MITgcm, interpolated onto MITgcm tracer grid
     %% bathymetry in MITgcm and Ua need to be the same, so
