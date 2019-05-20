@@ -44,6 +44,11 @@ if __name__ == "__main__":
     # Copy the calendar file
     copy_to_dir(options.calendar_file, output_date_dir, options.output_dir)
 
+    # Remove any MITgcm binary output files which are in the run directory (for example if a simulation died prior to this restart and gather_output was never called)
+    for fname in os.listdir(options.mit_run_dir):
+        if fname.endswith('.data') or fname.endswith('.meta'):
+            os.remove(options.mit_run_dir+fname)
+
     # Copy MITgcm run files. First figure out what files we need to copy.
     # Geometry files and namelists which might change each timestep
     mit_file_names = [options.draftFile, options.bathyFile, options.pload_file, 'data', 'data.diagnostics']
