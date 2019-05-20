@@ -54,8 +54,8 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     %% generate draft and mask for MITgcm, interpolated onto MITgcm tracer grid
     %% bathymetry in MITgcm and Ua need to be the same, so
     %% ideally we also generate the bathymetry for MITgcm within Ua
-    
-    B_forMITgcm = MismBed(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
+    FB = scatteredInterpolant(x,y,B,'linear');
+    B_forMITgcm = FB(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
     
     % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
     % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then

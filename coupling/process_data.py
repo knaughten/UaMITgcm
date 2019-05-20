@@ -109,6 +109,16 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     bathy[mask==0] = 0
     draft[mask==0] = 0
 
+    # Hack for now: only do the following if it's not MISOMIP
+    # TODO make sure this works with MISOMIP and remove check
+    if not options.misomip_wall:
+        print 'Reverting to existing bathymetry in open ocean'
+        # Read the existing bathymetry seen by MITgcm
+        bathy_old = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+        # Set new bathymetry to its existing value in the open ocean
+        # This may include regions outside of the Ua domain.
+        bathy[mask==2] = bathy_old[mask==2]
+
     if options.misomip_wall:
         print 'Building walls in MISOMIP domain'
         bathy[0,:] = 0
