@@ -1,0 +1,11 @@
+# Packages
+ &PACKAGES
+ useDiagnostics = .TRUE., 
+ useShelfIce=.true.,
+ useOBCS=.true.,
+ useKPP=.true.,
+ usePP81=.false.,
+ useMY82=.false.,
+ useEXF=.true.,
+ useCAL=.true.,
+&
