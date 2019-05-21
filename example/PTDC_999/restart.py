@@ -34,6 +34,9 @@ if __name__ == "__main__":
         print 'Error: invalid date code ' + date_code
         sys.exit()
 
+    # Read simulation options so we have directories
+    options = Options()
+
     # Figure out if this date is within the ocean-only spinup phase
     ini_year = int(options.startDate[:4])
     ini_month = int(options.startDate[4:6])
@@ -42,9 +45,6 @@ if __name__ == "__main__":
     couple_year, couple_month = add_months(ini_year, ini_month, options.spinup_time)
     spinup = (new_year < couple_year) or (new_year==couple_year and new_month < couple_month)
     first_coupled = new_year==couple_year and new_month==couple_month
-
-    # Read simulation options so we have directories
-    options = Options()
 
     # Make sure this date code exists in the output directory
     output_date_dir = options.output_dir + date_code + '/'
