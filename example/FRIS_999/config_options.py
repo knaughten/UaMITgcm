@@ -41,12 +41,12 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 12
+total_time = 12*39
 ### Length of ocean spinup period (months)
 spinup_time = 12
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 12
+couple_step = 1
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
