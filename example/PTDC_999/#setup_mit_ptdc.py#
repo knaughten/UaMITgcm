@@ -46,8 +46,10 @@ totaltime = int(options.total_time)
 
 if obcs_forcing_data == 'Kimura':
     print 'Using Kimura data for obcs conditions'
+
 elif obcs_forcing_data == 'Holland':
     print 'Using Holland data for obcs conditions'
+
 else: 
     print 'Error: input data for obcs not found'
 
