@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#PBS -l select=serial=true:ncpus=1
+#PBS -l select=1
 #PBS -l walltime=5:00:00
 #PBS -j oe
 #PBS -m n
@@ -26,7 +26,7 @@ echo 'Ua starts '`date` >> jobs.log
 module swap PrgEnv-intel PrgEnv-gnu
 cd $UA_DIR
 
-./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
+aprun -N 1 -n 1 ./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
 OUT=$?
 
 cd $PBS_O_WORKDIR

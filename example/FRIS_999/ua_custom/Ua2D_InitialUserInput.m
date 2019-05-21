@@ -30,12 +30,12 @@ end
 CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes; 
 
 %% parallel settings
-myCluster = parcluster('local') ;  
-myCluster.NumWorkers = 6;
-saveProfile(myCluster);
-CtrlVar.Parallel.uvhAssembly.parfor.isOn=1;     % assembly over integration points done in parallel using parfor
-CtrlVar.Parallel.uvhAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
-CtrlVar.Parallel.uvAssembly.spmd.isOn=1;
+%myCluster = parcluster('local') ;  
+%myCluster.NumWorkers = 6;
+%saveProfile(myCluster);
+%CtrlVar.Parallel.uvhAssembly.parfor.isOn=1;     % assembly over integration points done in parallel using parfor
+%CtrlVar.Parallel.uvhAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
+%CtrlVar.Parallel.uvAssembly.spmd.isOn=1;
 
 load BoundaryCoordinates MeshBoundaryCoordinates
 
