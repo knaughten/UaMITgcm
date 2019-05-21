@@ -1,6 +1,6 @@
 function GenerateInitialDataForMITFile
 
-addpath('../../Ua_InputData');
+addpath('../../../Ua_InputData');
 addpath('./ua_custom');
 
 deltaX=1300;  % in m
@@ -24,7 +24,7 @@ YStr=[-7e5+deltaY/2:deltaY:-7e5+(ny-1/2)*deltaY];
 
 load('GriddedInterpolants_sBh_Bedmachine_Bamber2009.mat');
 
-load('InitialGeometry_UaOutput');
+load('InitialGeometry_UaOutput_Bedmachine_Bamber2009.mat','b','MUA','GF','CtrlVar');
 x=MUA.coordinates(:,1); y=MUA.coordinates(:,2);
 Fb = scatteredInterpolant(x,y,b,'linear');
 
