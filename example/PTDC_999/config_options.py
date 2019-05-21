@@ -6,7 +6,7 @@
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'PTDC_777'
+expt_name = 'PTDC_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
@@ -142,7 +142,6 @@ seaice_nz = 7
 ### Starting date of simulation
 ### Should match startDate_1 in data.cal
 startDate = '19920101'
-
 
 
 ###### 4. Filenames ######

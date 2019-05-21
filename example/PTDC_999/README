@@ -1,4 +1,4 @@
-Set some variables specific to your filesystem (all within this PTDC_777 directory):
+Set some variables specific to your filesystem (all within this PTDC_999 directory):
 
 For Compile-Machine:
 compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD

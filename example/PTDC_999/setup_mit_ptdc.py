@@ -7,11 +7,13 @@ import numpy as np
 from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
+sys.path.append('../../UaMITgcm_git/coupling')
 sys.path.append('../../UaMITgcm_git/tools/')
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz, calc_hfac
 from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.ics_obcs import calc_load_anomaly
+from set_parameters import Options
 
 
 # Global parameters
@@ -31,11 +33,28 @@ rhoConst = 1024.
 hFacMin = 0.05
 hFacMinDr = 0.
 
-# Some additional stuff about the forcing (obcs conditions from Kimuara)
-startyear = 1994 # this is the year the coupled run starts. During the spinup, forcing from the preceding year (startyear-1) will be repeated for spinuptime months.
-endyear = 2014
-spinuptime = 2 # number of years to spin up model with initial forcing
+# Some additional stuff about the forcing
+obcs_forcing_data='Kimura' # either 'Kimura' or 'Holland'
+constant_forcing=False # if set to True, the forcing from options.startDate+options.spinup_time will be taken
+
+# read information about startDates, spinup time and simulation time from the options
+options = Options()
+ini_year = options.startDate[:4]
+ini_month = options.startDate[5:8]
+
+print ini_year
+print ini_month
+exit
+
+
+tartDate = 199201 # this is the year/month the ocean spinup run starts. During the spinup, forcing will be repeated for spinuptime years.
+endDate = 201401 # this should be set equal to startDate if constant forcing is to be applied
+spinuptime = 2 # number of years to spin up model with initial forcing before switching to the coupled run
+
+
 nt = (endyear - startyear + 1 + spinuptime)*12 # total run time in months
+
+
 BC = loadmat('./Kimura_OceanBC.mat')
 
 
