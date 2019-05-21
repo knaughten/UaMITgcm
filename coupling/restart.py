@@ -6,7 +6,7 @@ import os
 import shutil
 
 from set_parameters import Options
-from coupling_utils import copy_to_dir, line_that_matters, extract_first_int, make_tmp_copy, submit_job
+from coupling_utils import copy_to_dir, line_that_matters, extract_first_int, make_tmp_copy, submit_job, add_months
 from clean import clean_ua
 
 if __name__ == "__main__":
@@ -31,6 +31,15 @@ if __name__ == "__main__":
     if not valid_date:
         print 'Error: invalid date code ' + date_code
         sys.exit()
+
+    # Figure out if this date is within the ocean-only spinup phase
+    ini_year = int(options.startDate[:4])
+    ini_month = int(options.startDate[4:6])
+    new_year = int(date_code[:4])
+    new_month = int(date_code[4:])
+    couple_year, couple_month = add_months(ini_year, ini_month, options.spinup_time)
+    spinup = (new_year < couple_year) or (new_year==couple_year and new_month < couple_month)
+    first_coupled = new_year==couple_year and new_month==couple_month
 
     # Read simulation options so we have directories
     options = Options()
@@ -72,7 +81,11 @@ if __name__ == "__main__":
     for fname in mit_file_names:
         copy_to_dir(fname, output_date_dir+'MITgcm/', options.mit_run_dir)
 
-    if os.path.isdir(output_date_dir+'Ua/'):
+    if spinup or first_coupled:
+        # We are restarting within the spinup period. There is no Ua output yet.
+        # Clean the Ua run directory.
+        clean_ua(options.ua_exe_dir)
+    else:
         # Copy Ua restart file (saved at beginning of segment)
         for fname in os.listdir(output_date_dir+'Ua/'):
             if fname.endswith('RestartFile.mat'):
@@ -81,11 +94,7 @@ if __name__ == "__main__":
         # Make a temporary copy of this one too
         make_tmp_copy(options.ua_exe_dir+restart_name)
         # Copy Ua melt rate file
-        copy_to_dir(options.ua_melt_file, output_date_dir+'Ua/', options.output_dir)
-    else:
-        # We are restarting within the spinup period. There is no Ua output yet.
-        # Clean the Ua run directory.
-        clean_ua(options.ua_exe_dir)
+        copy_to_dir(options.ua_melt_file, output_date_dir+'Ua/', options.output_dir)        
 
     # Delete this output folder and all following
     for dname in os.listdir(options.output_dir):
@@ -114,8 +123,9 @@ if __name__ == "__main__":
     print 'Submitting next MITgcm segment'
     mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
     afterok = [mit_id]
-    print 'Submitting next Ua segment'
-    ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
-    afterok.append(ua_id)
+    if not spinup:
+        print 'Submitting next Ua segment'
+        ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
+        afterok.append(ua_id)
     print 'Submitting next coupler job to start after segment is finished'
     submit_job(options, 'run_coupler.sh', afterok=afterok)
