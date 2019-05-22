@@ -109,9 +109,8 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     bathy[mask==0] = 0
     draft[mask==0] = 0
 
-    # Hack for now: only do the following if it's not MISOMIP
-    # TODO make sure this works with MISOMIP and remove check
-    if not options.misomip_wall:
+    # Hack for now: only do the following for FRIS config
+    if options.expt_name == 'FRIS_999':
         print 'Reverting to existing bathymetry in open ocean'
         # Read the existing bathymetry seen by MITgcm
         bathy_old = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
