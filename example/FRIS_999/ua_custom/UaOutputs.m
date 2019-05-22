@@ -132,7 +132,10 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     % ice is grounded
     % -> B_forMITgcm < b_forMITgcm whereever the mask indicates that the
     % ice is afloat. If this is not the case, then the bed is carved
-    % away       
+    % away
+    % -> b_forMITgcm<0 wherever the mask indicates that the ice is afloat.
+    %    If this is not the case, the mask is edited to say the ice is
+    %    grounded, and the draft is set to the bathymetry.
     mask_forMITgcm(J_openocean) = 2;
     
     b_forMITgcm(mask_forMITgcm==2) = 0;
@@ -144,8 +147,7 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     B_forMITgcm(Ifloating(Ierr)) = b_forMITgcm(Ifloating(Ierr))-1;
 
     Ipositivedraft = b_forMITgcm(Ifloating)>0;
-    b_forMITgcm(Ifloating(Ipositivedraft))=0;
-    B_forMITgcm(Ifloating(Ipositivedraft))=0;
+    b_forMITgcm(Ifloating(Ipositivedraft))=B_forMITgcm(Ifloating(Ipositivedraft));
     mask_forMITgcm(Ifloating(Ipositivedraft))=0;
     
     % save B, b and mask
