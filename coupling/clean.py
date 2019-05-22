@@ -19,8 +19,8 @@ def clean_ua (directory):
         # Don't care about mesh files
         elif fname in ['NewMeshFile.mat', 'AdaptMesh.mat']:
             pass    
-        # Don't delete the Ua executable, run script, or other .mat files
-        elif fname in ['Ua', 'Ua_MCR.sh'] or fname.endswith('.mat'):
+        # Don't delete the Ua executable, run script, options file, or other .mat files
+        elif fname in ['Ua', 'Ua_MCR.sh', 'options_for_ua'] or fname.endswith('.mat'):
             continue
         # Delete everything else
         path = directory+fname
