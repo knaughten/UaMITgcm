@@ -62,9 +62,7 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
     % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
     % interpolation is not required
-    % Set extrapolation method to 'nearest' instead of 'linear' (default),
-    % otherwise there might be weird values near the boundary.
-    Fb = scatteredInterpolant(x,y,b,'linear', 'nearest');
+    Fb = scatteredInterpolant(x,y,b,'linear');
     b_forMITgcm = Fb(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
     
     % Next we generate a mask to identify if an MITgcm node is
@@ -144,6 +142,11 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     Ifloating = mask_forMITgcm==1;
     Ierr = find(B_forMITgcm(Ifloating)>=b_forMITgcm(Ifloating));
     B_forMITgcm(Ifloating(Ierr)) = b_forMITgcm(Ifloating(Ierr))-1;
+
+    Ipositivedraft = b_forMITgcm(Ifloating)>0;
+    b_forMITgcm(Ifloating(Ipositivedraft))=0;
+    B_forMITgcm(Ifloating(Ipositivedraft))=0;
+    mask_forMITgcm(Ifloating(Ipositivedraft))=0;
     
     % save B, b and mask
     save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
