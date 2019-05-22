@@ -105,6 +105,31 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     bathy = np.transpose(f['B_forMITgcm'])
     draft = np.transpose(f['b_forMITgcm'])
     mask = np.transpose(f['mask_forMITgcm'])
+    
+    if options.expt_name == 'FRIS_999':
+        print 'Repeating consistency checks from Ua'
+        index = (mask==2)*(draft!=0)
+        num_flagged = np.count_nonzero(index)
+        if num_flagged > 0:
+            print 'Warning: ' + str(num_flagged) + ' open-ocean points have nonzero draft'
+            draft[index] = 0
+        index = (mask==0)*(bathy!=draft)
+        num_flagged = np.count_nonzero(index)
+        if num_flagged > 0:
+            print 'Warning: ' + str(num_flagged) + ' grounded points have bathymetry not equal to ice draft'
+            bathy[index] = draft[index]
+        index = (mask==1)*(bathy>=draft)
+        num_flagged = np.count_nonzero(index)
+        if num_flagged > 0:
+            print 'Warning: ' + str(num_flagged) + ' floating points have bathymetry shallower than ice draft'
+            bathy[index] = draft[index]-1
+        index = (mask==1)*(draft>0)
+        num_flagged = np.count_nonzero(index)
+        if num_flagged > 0:
+            print 'Warning: ' + str(num_flagged) + ' floating points have positive ice shelf draft'
+            draft[index] = bathy[index]
+            mask[index] = 0            
+        
     # Mask grounded ice out of both fields
     bathy[mask==0] = 0
     draft[mask==0] = 0
@@ -135,7 +160,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft')
 
     print 'Zapping ice shelf drafts which are too thin'
-    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr)[0]
+    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr, only_grow=options.expt_name=='FRIS_999')[0]
 
     # Make a copy of the original bathymetry and ice shelf draft
     make_tmp_copy(mit_dir+options.draftFile)
