@@ -104,32 +104,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     f = loadmat(ua_draft_file)
     bathy = np.transpose(f['B_forMITgcm'])
     draft = np.transpose(f['b_forMITgcm'])
-    mask = np.transpose(f['mask_forMITgcm'])
-    
-    if options.expt_name == 'FRIS_999':
-        print 'Repeating consistency checks from Ua'
-        index = (mask==2)*(draft!=0)
-        num_flagged = np.count_nonzero(index)
-        if num_flagged > 0:
-            print 'Warning: ' + str(num_flagged) + ' open-ocean points have nonzero draft'
-            draft[index] = 0
-        index = (mask==0)*(bathy!=draft)
-        num_flagged = np.count_nonzero(index)
-        if num_flagged > 0:
-            print 'Warning: ' + str(num_flagged) + ' grounded points have bathymetry not equal to ice draft'
-            bathy[index] = draft[index]
-        index = (mask==1)*(bathy>=draft)
-        num_flagged = np.count_nonzero(index)
-        if num_flagged > 0:
-            print 'Warning: ' + str(num_flagged) + ' floating points have bathymetry shallower than ice draft'
-            bathy[index] = draft[index]-1
-        index = (mask==1)*(draft>0)
-        num_flagged = np.count_nonzero(index)
-        if num_flagged > 0:
-            print 'Warning: ' + str(num_flagged) + ' floating points have positive ice shelf draft'
-            draft[index] = bathy[index]
-            mask[index] = 0            
-        
+    mask = np.transpose(f['mask_forMITgcm'])        
     # Mask grounded ice out of both fields
     bathy[mask==0] = 0
     draft[mask==0] = 0
