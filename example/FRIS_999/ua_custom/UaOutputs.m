@@ -144,14 +144,13 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     b_forMITgcm(mask_forMITgcm==2) = 0;
     
     B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
-    
-    Ifloating = mask_forMITgcm==1;
-    Ierr = find(B_forMITgcm(Ifloating)>=b_forMITgcm(Ifloating));
-    B_forMITgcm(Ifloating(Ierr)) = b_forMITgcm(Ifloating(Ierr))-1;
 
-    Ipositivedraft = b_forMITgcm(Ifloating)>0;
-    b_forMITgcm(Ifloating(Ipositivedraft))=B_forMITgcm(Ifloating(Ipositivedraft));
-    mask_forMITgcm(Ifloating(Ipositivedraft))=0;
+    Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
+    B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
+    
+    Ipos = find((mask_forMITgcm==1).*(b_forMITgcm>0));
+    b_forMITgcm(Ipos) = B_forMITgcm(Ipos);
+    mask_forMITgcm(Ipos) = 0;
     
     % save B, b and mask
     save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
