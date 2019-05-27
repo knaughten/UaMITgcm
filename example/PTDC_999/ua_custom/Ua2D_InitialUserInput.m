@@ -28,6 +28,7 @@ CtrlVar.TriNodes=3;
 CtrlVar.kH=1;
 CtrlVar.nip=6;
 CtrlVar.niph=6;
+CtrlVar.AdaptMesh=1;
 
 % timestepping
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget; 
@@ -74,8 +75,8 @@ CtrlVar.MeltRateFactor=1;
 CtrlVar.MeltReductionTime=Inf;
 
 CtrlVar.MeshSizeMax=10e3;
-CtrlVar.MeshSize=CtrlVar.MeshSizeMax;
-CtrlVar.MeshSizeMin=CtrlVar.MeshSizeMax/15;
+CtrlVar.MeshSize=CtrlVar.MeshSizeMax/5;
+CtrlVar.MeshSizeMin=CtrlVar.MeshSizeMax/25;
 %CtrlVar.MeshSizeFastFlow=CtrlVar.MeshSizeMax/10;
 %CtrlVar.MeshSizeIceShelves=CtrlVar.MeshSizeMax/10;
 CtrlVar.MeshSizeBoundary=CtrlVar.MeshSize;
@@ -144,17 +145,17 @@ CtrlVar.ExplicitMeshRefinementCriteria(I).p=[0.7];
 CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
 CtrlVar.ExplicitMeshRefinementCriteria(I).Use=true;
                                                    
-CtrlVar.MeshAdapt.GLrange=[20000 CtrlVar.MeshSize ; 5000  CtrlVar.MeshSizeMin];
+CtrlVar.MeshAdapt.GLrange=[20000 CtrlVar.MeshSizeMax; 5000  CtrlVar.MeshSize; 2000 CtrlVar.MeshSizeMin];
 
 CtrlVar.RefineMeshOnStart=0;
 CtrlVar.InfoLevelAdaptiveMeshing=1;                                            
-CtrlVar.AdaptMeshInitial=0  ; % remesh in first iteration (Itime=1)  even if mod(Itime,CtrlVar.AdaptMeshInterval)~=0.
+CtrlVar.AdaptMeshInitial=1  ; % remesh in first iteration (Itime=1)  even if mod(Itime,CtrlVar.AdaptMeshInterval)~=0.
 CtrlVar.AdaptMeshAndThenStop=0;    % if true, then mesh will be adapted but no further calculations performed
                                    % useful, for example, when trying out different remeshing options (then use CtrlVar.doAdaptMeshPlots=1 to get plots)
 %CtrlVar.MeshRefinementMethod='explicit:local';
 CtrlVar.AdaptMeshMaxIterations=1;
 CtrlVar.SaveAdaptMeshFileName='MeshFileAdapt';    %  file name for saving adapt mesh. If left empty, no file is written
-CtrlVar.AdaptMeshRunStepInterval=50 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
+CtrlVar.AdaptMeshRunStepInterval=20 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
 CtrlVar.doAdaptMeshPlots=0; 
 
 %%

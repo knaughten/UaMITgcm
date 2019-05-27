@@ -15,7 +15,6 @@ from mitgcm_python.make_domain import do_digging, do_zapping
 from mitgcm_python.ics_obcs import calc_load_anomaly
 from set_parameters import Options
 
-
 # Global parameters
 # These are all things set in the input/data namelist.
 nx = 180    # first part of delX
@@ -46,14 +45,12 @@ totaltime = int(options.total_time)
 
 if obcs_forcing_data == 'Kimura':
     print 'Using Kimura data for obcs conditions'
+    BC = loadmat('../../MIT_InputData/Kimura_OceanBC.mat')
 elif obcs_forcing_data == 'Holland':
     print 'Using Holland data for obcs conditions'
+    sys.exit('mat file needs generating first!')
 else: 
     print 'Error: input data for obcs not found'
-
-
-BC = loadmat('./Kimura_OceanBC.mat')
-
 
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
