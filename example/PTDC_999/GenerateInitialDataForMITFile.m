@@ -23,80 +23,63 @@ YStr=[-7e5+deltaY/2:deltaY:-7e5+(ny-1/2)*deltaY];
 [XStr_m,YStr_m]=ndgrid(XStr,YStr);
 
 load('GriddedInterpolants_sBh_Bedmachine_Bamber2009.mat');
-
 load('InitialGeometry_UaOutput_Bedmachine_Bamber2009.mat','b','MUA','GF','CtrlVar');
-x=MUA.coordinates(:,1); y=MUA.coordinates(:,2);
-Fb = scatteredInterpolant(x,y,b,'linear');
 
-% make long arrays for center points of structured grid boxes
-X=XStr_m(:);
-Y=YStr_m(:);
-% ice boundary
-IF = [MUA.Boundary.x(:) MUA.Boundary.y(:)];
-
-% initialise all necessary variables and matrices
-Flag=zeros(nx*ny,1);
-Draft=zeros(nx*ny,1);
-Bathy=zeros(nx*ny,1);
+MUAold = MUA; Fold = F; lold = l; BCsOld = BCs; GFold = GF;
     
-% calculate bathymetry for MITgcm tracer cells: take value at corresponding Ua node
-Bathy = FB(X,Y);
+[MUAnew.coordinates,MUAnew.connectivity]=FE2dRefineMesh(MUAold.coordinates,MUAold.connectivity);
+MUAnew=CreateMUA(CtrlVar,MUAnew.connectivity,MUAnew.coordinates);
 
-%% assign flags for open ocean
-% criterion: midpoint of tracer cell falls outside Ua domain
-IN = inpoly([X,Y],IF);
-Iice = find(IN); Iocean = find(IN==0);
-Flag(Iocean) = 2;
+[UserVar,~,Fnew,~,~]=MapFbetweenMeshes(UserVar,RunInfo,CtrlVar,MUAold,MUAnew,Fold,BCsOld,lold);
+GFnew = GL2d(Fnew.B,Fnew.S,Fnew.h,Fnew.rhow,Fnew.rho,MUAnew.connectivity,CtrlVar);
 
-[GLgeo,GLnodes,GLele]=GLgeometry(MUA.connectivity,MUA.coordinates,GF,CtrlVar);
-[~,LakeNodes]=LakeOrOcean_UaMITgcm(CtrlVar,MUA,GF,GLgeo,GLnodes,GLele);
-Index_LakeNodes = find(LakeNodes==1);
-GF.node(Index_LakeNodes) = 1;
+xnew = MUAnew.coordinates(:,1); ynew = MUAnew.coordinates(:,2);
+xold = MUAold.coordinates(:,1); yold = MUAold.coordinates(:,2);
+X = UserVar.UaMITgcm.MITgcmGridX; Y = UserVar.UaMITgcm.MITgcmGridY;
+[nx,ny] = size(X);
+dX = UserVar.UaMITgcm.MITgcmGridX(2,1)-UserVar.UaMITgcm.MITgcmGridX(1,1);
+dY = UserVar.UaMITgcm.MITgcmGridY(1,2)-UserVar.UaMITgcm.MITgcmGridY(1,1);
 
-FGF = scatteredInterpolant(MUA.coordinates(:,1),MUA.coordinates(:,2),GF.node);
+Mask = 0*X(:);
 
-%% criterion: MIT grid cell is only grounded if all four corner cells are grounded in Ua
-GFMITnodes = FGF(XStr_m(Iice)-deltaX/2,YStr_m(Iice)-deltaY/2)+FGF(XStr_m(Iice)-deltaX/2,YStr_m(Iice)+deltaY/2)+...
-FGF(XStr_m(Iice)+deltaX/2,YStr_m(Iice)+deltaY/2)+FGF(XStr_m(Iice)+deltaX/2,YStr_m(Iice)-deltaY/2);
+% Generate edges of MIT boxes
+MITXedges = [X(1,1)-dX/2:dX:X(end,1)+dX/2];
+MITYedges = [Y(1,1)-dY/2:dY:Y(1,end)+dY/2];
 
-Jshelf = find(GFMITnodes<3.5); Jground = find(GFMITnodes>=3.5);
-Flag(Iice(Jshelf))=1;
-Flag(Iice(Jground))=0;
-%%%%%%%%%%%%%%%%%%%%
+% Assign ice shelf mask
+% criterion: every MIT cell that countains melt nodes is given mask value 1
+% (ice shelf)
+[MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUAnew,GFnew);
+h=histogram2(xnew(MeltNodesNew),ynew(MeltNodesNew),MITXedges,MITYedges);
+Mask(h.Values>0)=1;
 
-%% do consistency checks
+% Assign open ocean mask
+IN = inpoly([X(:),Y(:)],[MUAnew.Boundary.x(:) MUAnew.Boundary.y(:)]); 
+Iocean = find(IN==0 & Mask~=1);
+Mask(Iocean) = 2;
 
-Ishelf=find(Flag==1);
-Iocean=find(Flag==2);
+mask_forMITgcm = reshape(Mask,nx,ny);
 
-% areas where ice shelf and open ocean bathymetry are above sea level are
-%set to zero 
-Ishelfocean=[Ishelf(:);Iocean(:)];
-I=Bathy(Ishelfocean)>=0;
-Bathy(Ishelfocean(I))=0;
-Flag(Ishelfocean(I))=0;
+%% Generate b and B fields
+B_forMITgcm = FB(X,Y);
 
-Ishelf=find(Flag==1);
-Iocean=find(Flag==2);
-Igrounded=find(Flag==0);
+% We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
+% methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
+% interpolation is not required
+Fb = scatteredInterpolant(xold,yold,Fold.b,'linear');
+b_forMITgcm = Fb(X,Y);
 
-Bathy(Igrounded)=0;
-Flag(Igrounded)=0;
+%% Consistency checks
+b_forMITgcm(mask_forMITgcm==2) = 0;
 
-Draft(Ishelf)= Fb(X(Ishelf),Y(Ishelf));
+B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
 
-% areas where draft is above sea level or below bathymetry are set to zero
-% and treated as grounded
-I = (Draft>=0 & Draft<Bathy);
-Draft(I)=0; Bathy(I); Flag(I)=0;
+Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
+B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
 
-Flag = reshape(Flag,nx,ny);
-Draft = reshape(Draft,nx,ny);
-Bathy = reshape(Bathy,nx,ny);
-
-B_forMITgcm = Bathy;
-b_forMITgcm = Draft;
-mask_forMITgcm = Flag;
+Ipos = find((mask_forMITgcm==1).*(b_forMITgcm>0));
+b_forMITgcm(Ipos) = B_forMITgcm(Ipos);
+mask_forMITgcm(Ipos) = 0;
 
 save ua_custom/DataForMIT.mat B_forMITgcm b_forMITgcm mask_forMITgcm
 
