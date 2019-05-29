@@ -7,8 +7,8 @@ import numpy as np
 from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
-sys.path.append('../../coupling')
-sys.path.append('../../tools/')
+sys.path.append('../../UaMITgcm_git/tools/')
+sys.path.append('../../UaMITgcm_git/coupling/')
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz, calc_hfac
 from mitgcm_python.make_domain import do_digging, do_zapping
@@ -33,24 +33,54 @@ hFacMin = 0.05
 hFacMinDr = 0.
 
 # Some additional stuff about the forcing
-obcs_forcing_data='Kimura' # either 'Kimura' or 'Holland'
-constant_forcing=False # if set to True, the forcing from options.startDate+options.spinup_time will be taken
+obcs_forcing_data = 'Kimura' # either 'Kimura' or 'Holland'
+constant_forcing = False# False # if set to True, the forcing from options.startDate+options.spinup_time will be taken
 
 # read information about startDates, spinup time and simulation time from the options
 options = Options()
-ini_year = int(options.startDate[:4])
-ini_month = int(options.startDate[4:6])
-spinup = int(options.spinup_time)
-totaltime = int(options.total_time)
+ini_year = int(options.startDate[:4]) # this is the start year and should take the spinup into account
+ini_month = int(options.startDate[4:6]) # this is the start month and should take the spinup into account
+spinup = int(options.spinup_time) # in months
+totaltime = int(options.total_time) # in months
 
-if obcs_forcing_data == 'Kimura':
-    print 'Using Kimura data for obcs conditions'
-    BC = loadmat('../../MIT_InputData/Kimura_OceanBC.mat')
-elif obcs_forcing_data == 'Holland':
-    print 'Using Holland data for obcs conditions'
-    sys.exit('mat file needs generating first!')
-else: 
-    print 'Error: input data for obcs not found'
+# generate array of months/years for OBCS forcing
+class OBCSForcingArray:
+
+    def __init__ (self):
+        # first, initialize variables
+        self.nt = totaltime
+        self.years,self.months = np.zeros(totaltime), np.zeros(totaltime)
+
+        # assign years and months for forcing
+        if constant_forcing:
+            print 'Constant OBCS forcing turned ON'
+            out = raw_input('You have chosen constant OBCS forcing. Enter the date code (eg 199201):').strip()
+            # make sure input is a valid date
+            valid_date = len(out)==6
+            try:
+                int(valid_date)
+            except(ValueError):
+                valid_date = False
+            if not valid_date:
+                print 'Error: invalid date code ' + out
+                sys.exit()
+            # assign input to array
+            self.years = self.years + int(out[:4])
+            self.months = self.months + int(out[4:6])
+        else:
+            print 'Time-varying OBCS forcing turned ON'
+            self.years = self.years + ini_year + np.floor(np.arange(totaltime)/12)
+            self.months = self.months + np.mod(np.arange(totaltime),12) + 1
+
+        # assign forcing data
+        if obcs_forcing_data == 'Kimura':
+            print 'Using Kimura data for obcs conditions'
+            self.BC = loadmat('../../MIT_InputData/Kimura_OceanBC.mat')
+        elif obcs_forcing_data == 'Holland':
+            print 'Using Holland data for obcs conditions'
+            sys.exit('mat file needs generating first!')
+        else: 
+            print 'Error: input data for obcs not found'
 
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
@@ -121,42 +151,30 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
 
 # Returns temperature and salinity profiles, varying with depth, to be used for initial and boundary conditions.
 # Pass option='warm' or 'cold'.
-def ts_profile(x,y,z):
+def ts_profile(x,y,z,obcs):
 
-    sizetz = (nt,np.sum(nz))
+    sizetz = (obcs.nt,np.sum(nz))
     t_profile, s_profile, u_profile, v_profile = np.zeros(sizetz), np.zeros(sizetz), np.zeros(sizetz), np.zeros(sizetz)
+
+    L = np.sqrt((x-obcs.BC['x'][:,0])**2+(y-obcs.BC['y'][:,0])**2)
+    IL = np.nanargmin(L)
     
-    findspinupyear = np.in1d(BC['year'],startyear-1)
-    findstartyear = np.in1d(BC['year'],startyear)
-    Ispinup = np.where(findspinupyear) 
-    Ispinup = Ispinup[0]
-    Ispinup = np.tile(Ispinup,spinuptime)
-
-    Istart = np.where(findstartyear)
-    Istart = Istart[0][0]
- 
-    L = np.sqrt((x-BC['x'][:,0])**2+(y-BC['y'][:,0])**2)
-    IL = np.nanargmin(L)   
-
-    for i in range(0,len(Ispinup)): # initial forcing for spinup time
-        t_profile[i,:] = np.interp(-z,-BC['depth'][:,0],BC['Theta'][IL,:,Ispinup[i]])
-        s_profile[i,:] = np.interp(-z,-BC['depth'][:,0],BC['Salt'][IL,:,Ispinup[i]])
-        u_profile[i,:] = np.interp(-z,-BC['depth'][:,0],BC['Ups'][IL,:,Ispinup[i]])
-        v_profile[i,:] = np.interp(-z,-BC['depth'][:,0],BC['Vps'][IL,:,Ispinup[i]])
-        
-    for i in range(0,nt-len(Ispinup)):
-	t_profile[len(Ispinup)+i,:] = np.interp(-z,-BC['depth'][:,0],BC['Theta'][IL,:,Istart+i])
-        s_profile[len(Ispinup)+i,:] = np.interp(-z,-BC['depth'][:,0],BC['Salt'][IL,:,Istart+i])
-        u_profile[len(Ispinup)+i,:] = np.interp(-z,-BC['depth'][:,0],BC['Ups'][IL,:,Istart+i])
-        v_profile[len(Ispinup)+i,:] = np.interp(-z,-BC['depth'][:,0],BC['Vps'][IL,:,Istart+i])
+    for i in range(0,obcs.nt):
+        findtime = np.in1d(obcs.BC['year'],obcs.years[i]) & np.in1d(obcs.BC['month'],obcs.months[i])
+        Itime = np.where(findtime)
+        Itime = Itime[0][0]
+	t_profile[i,:] = np.interp(-z,-obcs.BC['depth'][:,0],obcs.BC['Theta'][IL,:,Itime])
+        s_profile[i,:] = np.interp(-z,-obcs.BC['depth'][:,0],obcs.BC['Salt'][IL,:,Itime])
+        u_profile[i,:] = np.interp(-z,-obcs.BC['depth'][:,0],obcs.BC['Ups'][IL,:,Itime])
+        v_profile[i,:] = np.interp(-z,-obcs.BC['depth'][:,0],obcs.BC['Vps'][IL,:,Itime])
 
     return t_profile, s_profile, u_profile, v_profile
 
 # Creates OBCS for the southern/western boundary, and initial conditions for temperature and salinity (cold), using the T/S profiles above. Also calculates the pressure load anomaly.
-def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file_S, obcs_salt_file_S, obcs_uvel_file_S, obcs_vvel_file_S, obcs_temp_file_W, obcs_salt_file_W, obcs_uvel_file_W, obcs_vvel_file_W, pload_file, prec):
+def make_ics_obcs (grid, obcs, ini_temp_file, ini_salt_file, obcs_temp_file_S, obcs_salt_file_S, obcs_uvel_file_S, obcs_vvel_file_S, obcs_temp_file_W, obcs_salt_file_W, obcs_uvel_file_W, obcs_vvel_file_W, pload_file, prec):
     
-    sizetzx = (nt,np.sum(nz),nx)
-    sizetzy = (nt,np.sum(nz),ny)
+    sizetzx = (obcs.nt,np.sum(nz),nx)
+    sizetzy = (obcs.nt,np.sum(nz),ny)
     OBS_t, OBS_s, OBS_u, OBS_v = np.zeros(sizetzx), np.zeros(sizetzx), np.zeros(sizetzx), np.zeros(sizetzx)
     OBW_t, OBW_s, OBW_u, OBW_v = np.zeros(sizetzy), np.zeros(sizetzy), np.zeros(sizetzy), np.zeros(sizetzy)
 
@@ -164,7 +182,7 @@ def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file_S, obcs_sa
     for i in xrange(0,nx):
         x = grid.x[i]
         y = grid.y[0]-dy/2
-        t_profile, s_profile, u_profile, v_profile = ts_profile(x,y,grid.z)
+        t_profile, s_profile, u_profile, v_profile = ts_profile(x,y,grid.z,obcs)
         OBS_t[:,:,i] = t_profile
         OBS_s[:,:,i] = s_profile
         OBS_u[:,:,i] = u_profile
@@ -174,7 +192,7 @@ def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file_S, obcs_sa
     for i in xrange(0,ny):
         x = grid.x[0]-dx/2
         y = grid.y[i]
-        t_profile, s_profile, u_profile, v_profile = ts_profile(x,y,grid.z)
+        t_profile, s_profile, u_profile, v_profile = ts_profile(x,y,grid.z,obcs)
         OBW_t[:,:,i] = t_profile
         OBW_s[:,:,i] = s_profile
         OBW_u[:,:,i] = u_profile
@@ -213,11 +231,14 @@ input_dir = 'mitgcm_run/input/'
 print 'Building grid'
 grid = BasicGrid()
 
+print 'Reading obcs data'
+obcs = OBCSForcingArray()
+
 print 'Creating topography'
 make_topo(grid, './ua_custom/DataForMIT.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64, dig_option='bathy')
 
 print 'Creating initial and boundary conditions'
-make_ics_obcs(grid, input_dir+'T_ini.bin', input_dir+'S_ini.bin', input_dir+'OBSt.bin', input_dir+'OBSs.bin', input_dir+'OBSu.bin', input_dir+'OBSv.bin', input_dir+'OBWt.bin', input_dir+'OBWs.bin', input_dir+'OBWu.bin', input_dir+'OBWv.bin', input_dir+'pload.mdjwf', prec=64)
+make_ics_obcs(grid, obcs, input_dir+'T_ini.bin', input_dir+'S_ini.bin', input_dir+'OBSt.bin', input_dir+'OBSs.bin', input_dir+'OBSu.bin', input_dir+'OBSv.bin', input_dir+'OBWt.bin', input_dir+'OBWs.bin', input_dir+'OBWu.bin', input_dir+'OBWv.bin', input_dir+'pload.mdjwf', prec=64)
 
 
 
