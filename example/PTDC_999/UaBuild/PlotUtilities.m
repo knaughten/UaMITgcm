@@ -1,3 +1,0 @@
-%%
-% Ua plot utilties
-%
