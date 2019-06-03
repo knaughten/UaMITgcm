@@ -28,7 +28,7 @@ CtrlVar.TriNodes=3;
 CtrlVar.kH=1;
 CtrlVar.nip=6;
 CtrlVar.niph=6;
-CtrlVar.AdaptMesh=1;
+CtrlVar.AdaptMesh=0;
 
 % timestepping
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget; 
