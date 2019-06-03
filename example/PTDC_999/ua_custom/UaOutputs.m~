@@ -76,38 +76,42 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     % criterion: every MIT cell that countains melt nodes is given mask value 1
     % (ice shelf)
     [MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUAnew,GFnew);
-    [Nmeltnodes,~,~] = histcounts2(xnew(MeltNodesNew),ynew(MeltNodesNew),MITXedges,MITYedges);
-    Mask(Nmeltnodes>0)=1;
-
-    % Assign open ocean mask
-    IN = inpoly([X(:),Y(:)],[MUAnew.Boundary.x(:) MUAnew.Boundary.y(:)]); 
-    Iocean = find(IN==0 & Mask~=1);
-    Mask(Iocean) = 2;
-
-    mask_forMITgcm = reshape(Mask,nx,ny);
-
-    %% Generate b and B fields
-    load(UserVar.GeometryInterpolants,'FB');
-    B_forMITgcm = FB(X,Y);
-
-    % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
-    % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
-    % interpolation is not required
-    Fb = scatteredInterpolant(xold,yold,Fold.b,'linear');
-    b_forMITgcm = Fb(X,Y);
-    
-    %% Consistency checks
-    b_forMITgcm(mask_forMITgcm==2) = 0;
-    
-    B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
-
-    Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
-    B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
-    
-    Ipos = find((mask_forMITgcm==1).*(b_forMITgcm>0));
-    b_forMITgcm(Ipos) = B_forMITgcm(Ipos);
-    mask_forMITgcm(Ipos) = 0;
-
+    hist_melt=histogram2(xnew(MeltNodesNew),ynew(MeltNodesNew),MITXedges,MITYedges,'Visible','off');
+    Mask(hist_melt.Values>0)=1;
+    close(hist_melt);
+    clear hist_melt; 
+% 
+%     % Assign open ocean mask
+%     IN = inpoly([X(:),Y(:)],[MUAnew.Boundary.x(:) MUAnew.Boundary.y(:)]); 
+%     Iocean = find(IN==0 & Mask~=1);
+%     Mask(Iocean) = 2;
+% 
+%     mask_forMITgcm = reshape(Mask,nx,ny);
+% 
+%     %% Generate b and B fields
+%     load(UserVar.GeometryInterpolants,'FB');
+%     B_forMITgcm = FB(X,Y);
+% 
+%     % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
+%     % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
+%     % interpolation is not required
+%     Fb = scatteredInterpolant(xold,yold,Fold.b,'linear');
+%     b_forMITgcm = Fb(X,Y);
+%     
+%     %% Consistency checks
+%     b_forMITgcm(mask_forMITgcm==2) = 0;
+%     
+%     B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
+% 
+%     Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
+%     B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
+%     
+%     Ipos = find((mask_forMITgcm==1).*(b_forMITgcm>0));
+%     b_forMITgcm(Ipos) = B_forMITgcm(Ipos);
+%     mask_forMITgcm(Ipos) = 0;
+    B_forMITgcm = 0;
+    b_forMITgcm = 0;
+    mask_forMITgcm = 0;
     % save B, b and mask
     save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
 
