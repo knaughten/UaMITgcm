@@ -22,6 +22,7 @@
  OBNuiceFile='SIuice_MIT.OBCS_N',
  OBNviceFile='SIvice_MIT.OBCS_N',
  useOBCSsponge=.true.,
+ useSeaiceSponge=.true.,
  useOBCSbalance=.false.,
  useOBCStides=.false.,
 ############################################################################
@@ -171,17 +172,20 @@
 ### useStevensAdvection=.true.,
 ### &
 
-### Sea ice sponge parameters - unused - need ALLOW_OBCS_SEAICE_SPONGE
-### &OBCS_PARM05
-###  Arelaxobcsinner=0.,
-###  Arelaxobcsbound=0.,
-###  Hrelaxobcsinner=0.,
-###  Hrelaxobcsbound=0.,
+### Sea ice sponge parameters
+ &OBCS_PARM05
+ seaiceSpongeThickness=8,
+ Arelaxobcsinner=31557600.,
+ Hrelaxobcsinner=31557600.,
+ SNrelaxobcsinner=31557600.,
+ Arelaxobcsbound=604800.,
+ Hrelaxobcsbound=604800.,
+ SNrelaxobcsbound=604800.,
+### Default parameters
+######################################
 ###  SLrelaxobcsinner=0.,
 ###  SLrelaxobcsbound=0.,
-###  SNrelaxobcsinner=0.,
-###  SNrelaxobcsbound=0.,
-###  seaiceSpongeThickness=0,
-### &
+######################################
+ &
 
 

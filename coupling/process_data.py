@@ -134,8 +134,18 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
         print 'Digging ice shelf drafts which are too deep'
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft')
 
-    print 'Zapping ice shelf drafts which are too thin'
+    print 'Fixing ice shelf drafts which are too thin'
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr, only_grow=options.expt_name=='FRIS_999')[0]
+
+    # Figure out largest changes in ice shelf draft, not counting grounding/ungrounding
+    draft_old = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+    ddraft = np.ma.masked_where(draft==0, np.ma.masked_where(draft_old==0, draft-draft_old))
+    if np.amin(ddraft) < 0:
+        print 'Greatest thinning of ice shelf draft is ' + str(np.abs(np.amin(ddraft))) + ' m'
+    if np.amax(ddraft) > 0:
+        print 'Greatest thickening of ice shelf draft is ' + str(np.amax(ddraft)) + ' m'
+    print str(np.count_nonzero((grid.ice_mask)*(mask==2))) + ' cells grounded'
+    print str(np.count_nonzero((grid.land_mask)*(mask==1))) + ' cells ungrounded'
 
     # Make a copy of the original bathymetry and ice shelf draft
     make_tmp_copy(mit_dir+options.draftFile)

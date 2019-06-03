@@ -19,8 +19,8 @@
  exactConserv=.true.,
  implicitFreeSurface=.true.,
  useRealFreshWaterFlux=.true.,
- nonlinFreeSurf=4,
- select_rStar=2,
+ nonlinFreeSurf=0,
+ select_rStar=0,
  hFacInf=0.05,
  hFacMin=0.1,
  hFacMinDr=20.,
@@ -259,7 +259,7 @@
  abEps=0.1,
  forcing_In_AB=.false.,
  pChkptFreq=31536000.,
- dumpInitAndLast=.false.,
+ dumpInitAndLast=.true.,
 # Hourly
 # monitorFreq=3600.,
 # Daily
