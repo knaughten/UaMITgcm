@@ -36,6 +36,7 @@ example/FRIS_999/ua_run/ResultsFiles
 example/FRIS_999/ua_run/*.mat
 example/FRIS_999/ua_run/*.mat.tmp
 example/FRIS_999/output*
-example/FRIS_eta
+example/FRIS_999/output
+example/FRIS_999/compile_ua_laptop.sh
 example/old
 example/PTDC_999/Kimura_OceanBC.mat

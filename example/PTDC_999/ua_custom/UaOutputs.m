@@ -50,84 +50,67 @@ end
 
 if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     
-    x = MUA.coordinates(:,1); y = MUA.coordinates(:,2);
-    X = UserVar.UaMITgcm.MITgcmGridX(:); Y = UserVar.UaMITgcm.MITgcmGridY(:);
-    [nx,ny] = size(X);
-    dX = UserVar.UaMITgcm.MITgcmGridX(2,1)-UserVar.UaMITgcm.MITgcmGridX(1,1);
-    dY = UserVar.UaMITgcm.MITgcmGridY(1,2)-UserVar.UaMITgcm.MITgcmGridY(1,1);
-    
-    %% generate draft and mask for MITgcm, interpolated onto MITgcm tracer grid
-    %% bathymetry in MITgcm and Ua need to be the same, so
-    %% ideally we also generate the bathymetry for MITgcm within Ua
-    
-    load(UserVar.GeometryInterpolants,'FB');
-    Bathy = FB(X,Y);
-
-    % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
-    % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
-    % interpolation is not required
-    Fb = scatteredInterpolant(x,y,b,'linear');
-    Draft = 0*Bathy;
-    
-    % Generate new mask for MITgcm
-    Mask = 0*Bathy;
-      
-    % Assign mask for open ocean
-    % criterion: midpoint of tracer cell falls outside Ua domain
-    IN = inpoly([X,Y],[MUA.Boundary.x(:) MUA.Boundary.y(:)]);
-    Iice = find(IN); Iocean = find(IN==0);
-    Mask(Iocean) = 2;
-
-    [GLgeo,GLnodes,GLele]=GLgeometry(MUA.connectivity,MUA.coordinates,GF,CtrlVar);
-    [~,LakeNodes]=LakeOrOcean_UaMITgcm(CtrlVar,MUA,GF,GLgeo,GLnodes,GLele);
-    Index_LakeNodes = find(LakeNodes==1);
-    GF.node(Index_LakeNodes) = 1;
-
-    FGF = scatteredInterpolant(x,y,GF.node);
-
-    % criterion: MIT grid cell is only grounded if all four corner cells are grounded in Ua
-    GFMITnodes = FGF(X(Iice)-dX/2,Y(Iice)-dY/2)+FGF(X(Iice)-dX/2,Y(Iice)+dY/2)+...
-    FGF(X(Iice)+dX/2,Y(Iice)+dY/2)+FGF(X(Iice)+dX/2,Y(Iice)-dY/2);
-
-    Jshelf = find(GFMITnodes<3.5); Jground = find(GFMITnodes>=3.5);
-    Mask(Iice(Jshelf))=1;
-    Mask(Iice(Jground))=0;
-    %%%%%%%%%%%%%%%%%%%%
-
-    % do consistency checks
-    Ishelf=find(Mask==1);
-    Iocean=find(Mask==2);
-
-    % areas where ice shelf and open ocean bathymetry are above sea level are
-    %set to zero 
-    Ishelfocean=[Ishelf(:);Iocean(:)];
-    I=Bathy(Ishelfocean)>=0;
-    Bathy(Ishelfocean(I))=0;
-    Mask(Ishelfocean(I))=0;
-
-    Ishelf=find(Mask==1);
-    Iocean=find(Mask==2);
-    Igrounded=find(Mask==0);
-
-    Bathy(Igrounded)=0;
-    Mask(Igrounded)=0;
-    
-    Draft(Ishelf)= Fb(X(Ishelf),Y(Ishelf));
-
-    % areas where draft is above sea level or below bathymetry are set to zero
-    % and treated as grounded
-    I = (Draft>=0 & Draft<Bathy);
-    Draft(I)=0; Bathy(I); Mask(I)=0;
-
-    Mask = reshape(Mask,nx,ny);
-    Draft = reshape(Draft,nx,ny);
-    Bathy = reshape(Bathy,nx,ny);
-
-    B_forMITgcm = Bathy;
-    b_forMITgcm = Draft;
-    mask_forMITgcm = Mask;
-    
+%     %% Generate mask
+%     MUAold = MUA; Fold = F; lold = l; BCsOld = BCs; GFold = GF;
+%     
+%     [MUAnew.coordinates,MUAnew.connectivity]=FE2dRefineMesh(MUAold.coordinates,MUAold.connectivity);
+%     MUAnew=CreateMUA(CtrlVar,MUAnew.connectivity,MUAnew.coordinates);
+% 
+%     [UserVar,~,Fnew,~,~]=MapFbetweenMeshes(UserVar,RunInfo,CtrlVar,MUAold,MUAnew,Fold,BCsOld,lold);
+%     GFnew = GL2d(Fnew.B,Fnew.S,Fnew.h,Fnew.rhow,Fnew.rho,MUAnew.connectivity,CtrlVar);
+% 
+%     xnew = MUAnew.coordinates(:,1); ynew = MUAnew.coordinates(:,2);
+%     xold = MUAold.coordinates(:,1); yold = MUAold.coordinates(:,2);
+%     X = UserVar.UaMITgcm.MITgcmGridX; Y = UserVar.UaMITgcm.MITgcmGridY;
+%     [nx,ny] = size(X);
+%     dX = UserVar.UaMITgcm.MITgcmGridX(2,1)-UserVar.UaMITgcm.MITgcmGridX(1,1);
+%     dY = UserVar.UaMITgcm.MITgcmGridY(1,2)-UserVar.UaMITgcm.MITgcmGridY(1,1);
+%     
+%     Mask = 0*X(:);
+% 
+%     % Generate edges of MIT boxes
+%     MITXedges = [X(1,1)-dX/2:dX:X(end,1)+dX/2];
+%     MITYedges = [Y(1,1)-dY/2:dY:Y(1,end)+dY/2];
+% 
+%     % Assign ice shelf mask
+%     % criterion: every MIT cell that countains melt nodes is given mask value 1
+%     % (ice shelf)
+%     [MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUAnew,GFnew);
+%     h=histogram2(xnew(MeltNodesNew),ynew(MeltNodesNew),MITXedges,MITYedges,'Visible','off');
+%     Mask(h.Values>0)=1;
+% 
+%     % Assign open ocean mask
+%     IN = inpoly([X(:),Y(:)],[MUAnew.Boundary.x(:) MUAnew.Boundary.y(:)]); 
+%     Iocean = find(IN==0 & Mask~=1);
+%     Mask(Iocean) = 2;
+% 
+%     mask_forMITgcm = reshape(Mask,nx,ny);
+% 
+%     %% Generate b and B fields
+%     load(UserVar.GeometryInterpolants,'FB');
+%     B_forMITgcm = FB(X,Y);
+% 
+%     % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
+%     % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
+%     % interpolation is not required
+%     Fb = scatteredInterpolant(xold,yold,Fold.b,'linear');
+%     b_forMITgcm = Fb(X,Y);
+%     
+%     %% Consistency checks
+%     b_forMITgcm(mask_forMITgcm==2) = 0;
+%     
+%     B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
+% 
+%     Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
+%     B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
+%     
+%     Ipos = find((mask_forMITgcm==1).*(b_forMITgcm>0));
+%     b_forMITgcm(Ipos) = B_forMITgcm(Ipos);
+%     mask_forMITgcm(Ipos) = 0;
+    B_forMITgcm = 0;
+    b_forMITgcm = 0;
+    mask_forMITgcm = 0;
     % save B, b and mask
     save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
-         
+
 end

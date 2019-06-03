@@ -7,7 +7,7 @@ MATLAB_PATH=/usr/share/modules/apps/MATLAB/R2017a
 # Path to UaMITgcm repository
 REPO_DIR=$HOME/Documents/UaMITgcm/UaMITgcm_git
 # Path to Ua build directory (will be created if it doesn't exist)
-UA_BUILD=$HOME/Documents/UaMITgcm/cases/PTDC_999/UaBuild
+UA_BUILD=$HOME/Documents/UaMITgcm/UaMITgcm_git/example/PTDC_999/UaBuild
 # Path to configuration-specific Ua files to overwrite
 UA_CASE_UPDATES=$PWD/ua_custom
 # Path to Ua source directory (default use the one inside UaMITgcm)
@@ -28,6 +28,8 @@ cp $UA_SOURCE/*.m $UA_BUILD
 # Need to collapse a couple of subdirectories for more Matlab files
 cp `find $UA_SOURCE/UaUtilities/ -name "*.m"` $UA_BUILD
 cp `find $UA_SOURCE/NewestVertexBisection/ -name "*.m"` $UA_BUILD
+# Copy mesh2d files
+cp `find $UA_SOURCE/Mesh2d/ -name "*.m"` $UA_BUILD
 # Also copy everything from updates folders
 cp -r $UA_COUPLING_UPDATES/* $UA_BUILD
 cp -r $UA_CASE_UPDATES/* $UA_BUILD

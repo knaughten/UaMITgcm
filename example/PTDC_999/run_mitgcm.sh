@@ -1,6 +1,6 @@
 #!/bin/bash --login
 #PBS -l select=12
-#PBS -l walltime=04:00:00
+#PBS -l walltime=02:00:00
 #PBS -j oe
 #PBS -m n
 #PBS -r n
