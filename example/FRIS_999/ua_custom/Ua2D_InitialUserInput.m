@@ -8,7 +8,9 @@ CtrlVar.Experiment=UserVar.UaMITgcm.Experiment;
 CtrlVar.TimeDependentRun=1; 
 CtrlVar.TotalNumberOfForwardRunSteps=10e10; % an arbitrary large number
 CtrlVar.TotalTime=UserVar.UaMITgcm.runTime;
-CtrlVar.dt = 1e-3;
+CtrlVar.dt = 1e-2;
+CtrlVar.ATSTargetIterations = 6;
+CtrlVar.ATSintervalUp = 3;
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;
 
 CtrlVar.WriteRestartFile = 1;  
