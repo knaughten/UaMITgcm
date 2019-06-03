@@ -76,7 +76,7 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     % criterion: every MIT cell that countains melt nodes is given mask value 1
     % (ice shelf)
     [MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUAnew,GFnew);
-    h=histogram2(xnew(MeltNodesNew),ynew(MeltNodesNew),MITXedges,MITYedges);
+    h=histogram2(xnew(MeltNodesNew),ynew(MeltNodesNew),MITXedges,MITYedges,'Visible','off');
     Mask(h.Values>0)=1;
 
     % Assign open ocean mask
@@ -110,5 +110,7 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     
     % save B, b and mask
     save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
+
+    Klear;
          
 end

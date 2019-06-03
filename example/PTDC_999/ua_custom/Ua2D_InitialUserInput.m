@@ -67,7 +67,7 @@ CtrlVar.GeometricalVarsDefinedEachTransienRunStepByDefineGeometry='SB';
 CtrlVar.doplots=0;
 CtrlVar.PlotWaitBar=0;
 CtrlVar.PlotOceanLakeNodes=0;
-CtrlVar.PlotMesh=1;  CtrlVar.PlotBCs=1;
+CtrlVar.PlotMesh=0;  CtrlVar.PlotBCs=0;
 
 CtrlVar.MeltNodesDefinition='edge-wise';
 CtrlVar.MassBalanceGeometryFeedback = 0;
