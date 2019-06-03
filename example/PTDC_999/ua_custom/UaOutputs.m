@@ -111,6 +111,4 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     % save B, b and mask
     save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
 
-    Klear;
-         
 end
