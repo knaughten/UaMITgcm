@@ -93,6 +93,7 @@ if __name__ == "__main__":
         copy_to_dir(restart_name, output_date_dir+'Ua/', options.ua_exe_dir)
         # Make a temporary copy of this one too
         make_tmp_copy(options.ua_exe_dir+restart_name)
+    if not spinup:
         # Copy Ua melt rate file
         copy_to_dir(options.ua_melt_file, output_date_dir+'Ua/', options.output_dir)        
 
