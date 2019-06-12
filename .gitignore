@@ -41,4 +41,5 @@ example/FRIS_999/compile_ua_laptop.sh
 example/old
 example/FRIS_old
 example/FRIS_post_spinup
+example/FRIS_300
 example/PTDC_999/Kimura_OceanBC.mat

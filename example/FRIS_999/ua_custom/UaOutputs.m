@@ -60,7 +60,7 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     B_forMITgcm = FB(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
     % Fill missing values with zeros
     % TODO: extend srFBedrock so there are no missing values
-    B_forMITgcm(isnan(B_forMITgcm)) = 0;
+    %B_forMITgcm(isnan(B_forMITgcm)) = 0;
     
     % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
     % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
