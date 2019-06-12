@@ -139,15 +139,22 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     % -> b_forMITgcm<0 wherever the mask indicates that the ice is afloat.
     %    If this is not the case, the mask is edited to say the ice is
     %    grounded, and the draft is set to the bathymetry.
+
+    disp('Running consistency checks');
+
     mask_forMITgcm(J_openocean) = 2;
     
+    disp(['There are ',num2str(nnz((mask_forMITgcm==2).*(b_forMITgcm~=0))),' open-ocean points with nonzero ice shelf draft']);
     b_forMITgcm(mask_forMITgcm==2) = 0;
     
+    disp(['There are ',num2str(nnz((mask_forMITgcm==0).*(B_forMITgcm~=b_forMITgcm))),' grounded points where ice shelf draft does not equal bedrock depth']);
     B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
 
+    disp(['There are ',num2str(nnz((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm))),' ice shelf points with negative water column thickness']);
     Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
     B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
     
+    disp(['There are ',num2str(nnz((mask_forMITgcm==1).*(b_forMITgcm>0))),' ice shelf points with positive draft']);
     Ipos = find((mask_forMITgcm==1).*(b_forMITgcm>0));
     b_forMITgcm(Ipos) = B_forMITgcm(Ipos);
     mask_forMITgcm(Ipos) = 0;
