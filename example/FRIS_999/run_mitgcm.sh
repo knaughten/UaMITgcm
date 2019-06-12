@@ -1,6 +1,6 @@
 #!/bin/bash --login
 #PBS -l select=6
-#PBS -l walltime=4:00:00
+#PBS -l walltime=3:00:00
 #PBS -j oe
 #PBS -m n
 #PBS -r n
@@ -19,7 +19,7 @@ cd run/
 export TMPDIR=/work/n02/n02/`whoami`/SCRATCH
 export OMP_NUM_THREADS=1
 
-aprun -n 144 -N 24 ./mitgcmuv
+aprun -n 140 -N 24 ./mitgcmuv
 OUT=$?
 
 cd $PBS_O_WORKDIR

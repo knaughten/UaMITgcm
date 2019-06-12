@@ -1,7 +1,7 @@
 # Open-boundaries
  &OBCS_PARM01
- OB_Ieast=264*-1,
- OB_Jnorth=228*-1,
+ OB_Ieast=308*-1,
+ OB_Jnorth=250*-1,
  useOBCSprescribe=.true.,
  OBEtFile='THETA_MIT.OBCS_E',
  OBEsFile='SALT_MIT.OBCS_E',

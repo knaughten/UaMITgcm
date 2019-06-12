@@ -473,7 +473,7 @@ def gather_output (options, spinup, first_coupled):
             copy_to_dir(fname, source_dir, target_dir)
 
     # List of such files to copy from MITgcm run directory
-    mit_file_names = [options.draftFile, options.bathyFile, options.pload_file, 'data', 'data.diagnostics']
+    mit_file_names = [options.draftFile, options.bathyFile, options.pload_file, 'data', 'data.diagnostics', 'STDOUT.0000', 'STDERR.0000']
     if options.restart_type == 'zero':
         mit_file_names += [options.ini_temp_file, options.ini_salt_file, options.ini_u_file, options.ini_v_file, options.ini_eta_file]
         if options.use_seaice:
@@ -506,6 +506,9 @@ def gather_output (options, spinup, first_coupled):
             # Move Ua output into this folder
             for fname in os.listdir(options.ua_output_dir):
                 move_to_dir(fname, options.ua_output_dir, new_ua_dir)
+            # Move the stdout and stderr files too
+            move_to_dir('matlab_std.out', options.ua_exe_dir, new_ua_dir)
+            move_to_dir('matlab_err.out', options.ua_exe_dir, new_ua_dir)
             # Save the temporary copy made last time (restart at the beginning of this segment)
             copy_tmp_file(restart_name, options.ua_exe_dir, new_ua_dir, check_tmp=options.ua_ini_restart)
             # Make a new temporary copy of the restart at the end of this segment (beginning of the next segment)

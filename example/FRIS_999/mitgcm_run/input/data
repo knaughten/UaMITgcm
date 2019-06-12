@@ -19,8 +19,8 @@
  exactConserv=.true.,
  implicitFreeSurface=.true.,
  useRealFreshWaterFlux=.true.,
- nonlinFreeSurf=0,
- select_rStar=0,
+ nonlinFreeSurf=4,
+ select_rStar=2,
  hFacInf=0.05,
  hFacMin=0.1,
  hFacMinDr=20.,
@@ -326,8 +326,8 @@
 # Gridding parameters
  &PARM04
  usingSphericalPolarGrid=.true.,
- xgOrigin=275.,
- ygOrigin=-83.93,
+ xgOrigin=274.5,
+ ygOrigin=-85.,
  dxSpacing=0.25,
  delYfile='delY_WSS',
  delR= 10., 10., 10., 10., 10., 25., 25., 25., 25., 25.,
