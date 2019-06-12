@@ -1,4 +1,4 @@
-![alt text](./Logo "UaMITgcm")
+![alt text](./logo/UaMITgcm.png "UaMITgcm")
 
 # UaMITgcm
 Coupling scripts for Ua and MITgcm.
