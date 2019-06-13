@@ -1,4 +1,6 @@
-![alt text](./logo/UaMITgcm.png "UaMITgcm")
+Welcome to the {\'U}a-MITgcm 
+
+![Ua-MITgcm-logo](./logo/UaMITgcm.png "UaMITgcm")
 
 # UaMITgcm
 Coupling scripts for Ua and MITgcm.
