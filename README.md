@@ -1,4 +1,4 @@
-Welcome to the &#218;a-MITgcm 
+Welcome to the &#218;a-MITgcm repository. This code has been developed and is maintained by Kaitlin Naughten (kaight@bas.ac.uk) and Jan De Rydt (jan.rydt@northumbria.ac.uk). 
 
 ![Ua-MITgcm-logo](./logo/UaMITgcm.png "UaMITgcm")
 
