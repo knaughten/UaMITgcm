@@ -1,4 +1,4 @@
-Welcome to the &#218a-MITgcm 
+Welcome to the &#218;a-MITgcm 
 
 ![Ua-MITgcm-logo](./logo/UaMITgcm.png "UaMITgcm")
 
