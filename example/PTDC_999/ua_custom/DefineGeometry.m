@@ -20,6 +20,10 @@ if contains(FieldsToBeDefined,'B')
     B = FB(MUA.coordinates(:,1),MUA.coordinates(:,2));
     fprintf('Done B \n');
     
+    if any(isnan(B))
+        error('NaN values in B');
+    end
+    
 end
 
 %% Step II. sea surface
@@ -58,9 +62,11 @@ if contains(FieldsToBeDefined,'s') || contains(FieldsToBeDefined,'b')
     h = s-b;
     I = find(h<=CtrlVar.ThickMin);
     s(I) = b(I)+CtrlVar.ThickMin;
+    
+    if any(isnan(s)|isnan(b))
+        error('NaN values in s or b');
+    end
 end
 
-if any(isnan(s)|isnan(b)|isnan(B)|isnan(S))
-	error('NaN values in s, S, b or B');
-end
+
 
