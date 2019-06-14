@@ -58,15 +58,16 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     %% ideally we also generate the bathymetry for MITgcm within Ua
     load srFBedrock FB
     B_forMITgcm = FB(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
-    % Fill missing values with zeros
-    % TODO: extend srFBedrock so there are no missing values
-    %B_forMITgcm(isnan(B_forMITgcm)) = 0;
     
     % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
     % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
     % interpolation is not required
-    Fb = scatteredInterpolant(x,y,b,'linear');
+    % Fill out-of-bounds values with NaN so they can be set to zero later
+    Fb = scatteredInterpolant(x,y,b,'linear','none');
     b_forMITgcm = Fb(UserVar.UaMITgcm.MITgcmGridX,UserVar.UaMITgcm.MITgcmGridY);
+    b_forMITgcm(isnan(b_forMITgcm))=0;
+
+    % 
     
     % Next we generate a mask to identify if an MITgcm node is
     % 0. grounded ice
@@ -143,6 +144,9 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     disp('Running consistency checks');
 
     mask_forMITgcm(J_openocean) = 2;
+
+    % save B, b and mask before consistency checks
+    save([UserVar.UaMITgcm.UaOutputDirectory,'/DataForMIT_pre_checks.mat'],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
     
     disp(['There are ',num2str(nnz((mask_forMITgcm==2).*(b_forMITgcm~=0))),' open-ocean points with nonzero ice shelf draft']);
     b_forMITgcm(mask_forMITgcm==2) = 0;
