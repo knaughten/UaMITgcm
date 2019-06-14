@@ -26,7 +26,7 @@ end
 if contains(FieldsToBeDefined,'S')
 
     S = zeros(MUA.Nnodes,1);
-    fprintf('Done s and S \n');
+    fprintf('Done S \n');
     
 end
 
