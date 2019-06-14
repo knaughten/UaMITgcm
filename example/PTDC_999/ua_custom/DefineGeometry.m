@@ -1,6 +1,6 @@
 function [UserVar,s,b,S,B,alpha]=DefineGeometry(UserVar,CtrlVar,MUA,time,FieldsToBeDefined)
 
-%persistent Fs Fb
+persistent Fs FB Fh_init
 
 if nargin<5
     FieldsToBeDefined='sbSB';
@@ -10,46 +10,55 @@ MUAnew = MUA;
 alpha=0 ;
 fprintf('Loading s, b, S and B \n');
 
-load(UserVar.GeometryInterpolants);
+if isempty(Fs)
+    load(UserVar.GeometryInterpolants);
+end
 
 %% Step I. Bed
+if contains(FieldsToBeDefined,'B')
+    
+    B = FB(MUA.coordinates(:,1),MUA.coordinates(:,2));
+    fprintf('Done B \n');
+    
+end
 
-B = FB(MUA.coordinates(:,1),MUA.coordinates(:,2));
-fprintf('Done B \n');
+%% Step II. sea surface
+if contains(FieldsToBeDefined,'S')
 
-%% Step II. Surface
+    S = 0*s;
+    fprintf('Done s and S \n');
+    
+end
 
-s = Fs(MUA.coordinates(:,1),MUA.coordinates(:,2));
-S = 0*s;
+%% Step III. ice surface and draft
 
-fprintf('Done s and S \n');
+if contains(FieldsToBeDefined,'s') || contains(FieldsToBeDefined,'b') 
+    s = Fs(MUA.coordinates(:,1),MUA.coordinates(:,2));
+    h_init = Fh_init(MUA.coordinates(:,1),MUA.coordinates(:,2));
+    fprintf('Done h \n');
 
-%% Step III. Ice thickness: combination of Millan, RTOPO and Dutrieux
+    %% Step IV. Density from firn model
 
-h_init = Fh_init(MUA.coordinates(:,1),MUA.coordinates(:,2));
-fprintf('Done h \n');
+    rho = Load_Rho(UserVar,MUA,h_init);
 
-%% Step IV. Density from firn model
+    %% Step V. Ice draft
+    % step 1: first guess for b, based on s, B and rho
+    b1 = max([B(:),rho(:).*s(:)./(rho(:)-1024)],[],2);
+    h1 = s - b1;
 
-rho = Load_Rho(UserVar,MUA,h_init);
+    % refine
+    [b,s,h,~]=Calc_bs_From_hBS(CtrlVar,MUA,h1,S,B,rho,1024);
 
-%% Step V. Ice draft
-% step 1: first guess for b, based on s, B and rho
-b1 = max([B(:),rho(:).*s(:)./(rho(:)-1024)],[],2);
-h1 = s - b1;
+    fprintf('Done b \n');
 
-% refine
-[b,s,h,~]=Calc_bs_From_hBS(CtrlVar,MUA,h1,S,B,rho,1024);
+    % all s above zero
+    s(s<0)=0;
 
-fprintf('Done b \n');
-
-% all s above zero
-s(s<0)=0;
-
-% check minimum ice thickness
-h = s-b;
-I = find(h<=CtrlVar.ThickMin);
-s(I) = b(I)+CtrlVar.ThickMin;
+    % check minimum ice thickness
+    h = s-b;
+    I = find(h<=CtrlVar.ThickMin);
+    s(I) = b(I)+CtrlVar.ThickMin;
+end
 
 if any(isnan(s)|isnan(b)|isnan(B)|isnan(S))
 	error('NaN values in s, S, b or B');

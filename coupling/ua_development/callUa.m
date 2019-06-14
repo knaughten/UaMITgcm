@@ -73,27 +73,15 @@ load(MeltFile);
 
 UserVar.UaMITgcm.MITgcmMelt = meltrate(:);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Read MITgcm grid and check if it’s lat/lon or Cartesian %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+%% Read MITgcm grid %%
+%%%%%%%%%%%%%%%%%%%%%%
 % read tracer gridpoints
 lon=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XC']);
 lat=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YC']);
 
-% check if grid is lat/lon and convert to cartesian if required
-if (all(lon(:)>=0) && all(lon(:)<=360))
-    % Convert from 0-360 range to -180-180 range
-    index = lon > 180;
-    lon(index) = lon(index) - 360;
-end
-if (all(lon(:)>=-180) && all(lon(:)<=180) && all(lat(:)>=-90) && all(lat(:)<=90))
-    [x,y] = ll2psxy(lat,lon,-71,0);
-else
-    x = lon;    y = lat;
-end
-
-UserVar.UaMITgcm.MITgcmGridX = x;
-UserVar.UaMITgcm.MITgcmGridY = y;
+UserVar.UaMITgcm.MITgcmGridX = lon;
+UserVar.UaMITgcm.MITgcmGridY = lat;
 
 %%%%%%%%%%%%
 %% run Ua %%

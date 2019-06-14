@@ -49,7 +49,7 @@ CtrlVar.uvhTimeSteppingMethod='supg';
 
 load BoundaryCoordinates MeshBoundaryCoordinates
 
-CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes; 
+CtrlVar.UaOutputsDt = 1/365.25; 
             % times (in years) at which Ua needs to produce output
 
 CtrlVar.WriteRestartFile=1;
