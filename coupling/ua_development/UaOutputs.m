@@ -21,6 +21,8 @@ function UserVar=UaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,GF,InvStartValues,InvFina
 %
 
 time=CtrlVar.time; 
+disp(time);
+disp(UserVar.UaMITgcm.UaOutputTimes);
 
 if ismember(time,UserVar.UaMITgcm.UaOutputTimes) %% check if we need to write output
   
@@ -38,7 +40,7 @@ if ismember(time,UserVar.UaMITgcm.UaOutputTimes) %% check if we need to write ou
         
     if strcmp(UserVar.UaMITgcm.UaOutputFormat,'matlab')
 
-        save([FileName,'.mat'],'UserVar','CtrlVar','MUA','time','s','b','S','B','h','ub','vb','C','dhdt','AGlen','m','n','rho','rhow','as','ab','GF');
+        save(FileName,'UserVar','CtrlVar','MUA','time','s','b','S','B','h','ub','vb','C','dhdt','AGlen','m','n','rho','rhow','as','ab','GF');
 
     elseif strcmp(UserVar.UaMITgcm.UaOutputFormat,'netcdf')
 
@@ -137,10 +139,10 @@ if ismember(time,UserVar.UaMITgcm.UaOutputTimes) %% check if we need to write ou
         disp(['There are ',num2str(nnz((mask_forMITgcm==2).*(b_forMITgcm~=0))),' open-ocean points with nonzero ice shelf draft']);
         b_forMITgcm(mask_forMITgcm==2) = 0;
 
-        disp(['There are ',num2str(nnz((mask_forMITgcm==0).*(B_forMITgcm~=b_forMITgcm))),' grounded points where ice shelf draft does not equal bedrock depth']);
+        disp(['There are ',num2str(nnz((mask_forMITgcm==0).*(B_forMITgcm~=b_forMITgcm))),' grounded points where ice draft does not equal bedrock depth']);
         B_forMITgcm(mask_forMITgcm==0) = b_forMITgcm(mask_forMITgcm==0);
 
-         disp(['There are ',num2str(nnz((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm))),' ice shelf points with negative water column thickness']);
+        disp(['There are ',num2str(nnz((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm))),' ice shelf points with negative water column thickness']);
         Ierr = find((mask_forMITgcm==1).*(B_forMITgcm>=b_forMITgcm));
         B_forMITgcm(Ierr) = b_forMITgcm(Ierr)-1;
 
