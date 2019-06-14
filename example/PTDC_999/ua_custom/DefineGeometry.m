@@ -25,7 +25,7 @@ end
 %% Step II. sea surface
 if contains(FieldsToBeDefined,'S')
 
-    S = 0*s;
+    S = zeros(MUA.Nnodes,1);
     fprintf('Done s and S \n');
     
 end
