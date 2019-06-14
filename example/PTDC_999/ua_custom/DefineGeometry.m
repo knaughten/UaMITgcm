@@ -2,13 +2,16 @@ function [UserVar,s,b,S,B,alpha]=DefineGeometry(UserVar,CtrlVar,MUA,time,FieldsT
 
 persistent Fs FB Fh_init
 
+s=[]; b=[]; S=[]; B=[];
+alpha=0 ;
+
 if nargin<5
     FieldsToBeDefined='sbSB';
 end
 
 MUAnew = MUA;
-alpha=0 ;
-fprintf('Loading s, b, S and B \n');
+
+fprintf(['Loading ',FieldsToBeDefined,'\n']);
 
 if isempty(Fs)
     load(UserVar.GeometryInterpolants);
