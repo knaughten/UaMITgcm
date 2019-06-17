@@ -45,22 +45,22 @@ UserVar.UaMITgcm.StartMonth = Start(5:6);
 UserVar.UaMITgcm.runTime = CAL(2)/365.25; % in years
 
 % generate array of output times for Ua, converted to years
-for ii=3:length(CAL)
-    OutputInterval(ii-2) = CAL(ii);
-end
+%for ii=3:length(CAL)
+%    OutputInterval(ii-2) = CAL(ii);
+%end
 
-if OutputInterval(1)==-1
-    UserVar.UaMITgcm.UaOutputTimes = [1:UserVar.UaMITgcm.runTime*365.25]/365.25;
-elseif OutputInterval(1)==CAL(2)
-    UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)]/365.25;
-else
-    UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval)/365.25;
-end
+%if OutputInterval(1)==-1
+%    UserVar.UaMITgcm.UaOutputTimes = [1:UserVar.UaMITgcm.runTime*365.25]/365.25;
+%elseif OutputInterval(1)==CAL(2)
+%    UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)]/365.25;
+%else
+%    UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval)/365.25;
+%end
 
 % based on the OutputTimes we set the ATStimeStepTarget to be the minimum
 % gap between successive output times. This should prevent Ua from
 % 'overstepping'. 
-UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
+%UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read MITgcm melt rates %%

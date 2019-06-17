@@ -31,7 +31,7 @@ CtrlVar.niph=6;
 CtrlVar.AdaptMesh=1;
 
 % timestepping
-CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget; 
+CtrlVar.ATStimeStepTarget = 1/365.25; 
 CtrlVar.dtmin = 1e-10;
 CtrlVar.ATStimeStepFactorUp=2 ;
 CtrlVar.ATStimeStepFactorDown=1e2 ;
@@ -49,7 +49,7 @@ CtrlVar.uvhTimeSteppingMethod='supg';
 
 load BoundaryCoordinates MeshBoundaryCoordinates
 
-CtrlVar.UaOutputsDt = 1/365.25; 
+CtrlVar.UaOutputsDt = 1/365.25;
             % times (in years) at which Ua needs to produce output
 
 CtrlVar.WriteRestartFile=1;
