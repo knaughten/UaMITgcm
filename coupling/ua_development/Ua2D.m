@@ -3,19 +3,21 @@ function Ua2D(UserVar,varargin)
 %% Driver for the 2HD �a model
 % 
 
+
+
 if nargin==0
     UserVar=[];
 end
 
 SetUaPath() %% set path
 
-% Remove this check because it doesn't work with the compiler.
+% Remove this check because it doens't work with the compiler
 %if ~exist(fullfile(cd,'Ua2D_InitialUserInput.m'),'file')
-    
+%    
 %    fprintf('The input-file Ua2D_InitialUserInput.m not found in the working directory (%s).\n',pwd)
 %    fprintf('This input-file is required for Ua to run.\n')
 %    return
-    
+%    
 %end
 
 warning('off','MATLAB:triangulation:PtsNotInTriWarnId')
@@ -266,7 +268,7 @@ end
 
 %% UaOutputs
 CtrlVar.UaOutputsCounter=0;
-% if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5 || CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter)==0 )
+% if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
 %     CtrlVar.UaOutputsInfostring='First call';
 %     CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
 %     
@@ -280,6 +282,7 @@ CtrlVar.UaOutputsCounter=0;
 %     end
 % end
 %
+
 
 CtrlVar.CurrentRunStepNumber0=CtrlVar.CurrentRunStepNumber;
 
@@ -459,18 +462,19 @@ while 1
                 
                 %ub0=ub ; ud0=ud ; vb0=vb ; vd0=vd;
                 
-%                if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
-%                    CtrlVar.UaOutputsInfostring='Diagnostic step';
-%                    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
-%                    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
-                    
-%                    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-%                    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
-%                        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
-%                            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
-%                        return
-%                    end
-%                end
+                
+%                 if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
+%                     CtrlVar.UaOutputsInfostring='Diagnostic step';
+%                     CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%                     fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
+%                     
+%                     UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
+%                     if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
+%                         fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
+%                             CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
+%                         return
+%                     end
+%                 end
             end
             
             F0=F;  % 
@@ -599,28 +603,28 @@ while 1
     
     % UaOutputs
     
-    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter+1))<1e-5)
-        CtrlVar.UaOutputsInfostring='inside transient loop and inside run-step loop';
-        CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
-        
-        if CtrlVar.MassBalanceGeometryFeedback>0
-            CtrlVar.time=CtrlVar.time+CtrlVar.dt;  % I here need the mass balance at the end of the time step, hence must increase t
-            [UserVar,F]=GetMassBalance(UserVar,CtrlVar,MUA,F);
-            CtrlVar.time=CtrlVar.time-CtrlVar.dt; % and then take it back to t at the beginning. 
-            %[UserVar,as,ab,dasdh,dabdh]=GetMassBalance(UserVar,CtrlVar,MUA,CtrlVar.time+CtrlVar.dt,s,b,h,S,B,rho,rhow,GF);
-        end
-        
-        fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
-        
-        UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-        %UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,s,b,S,B,h,ub,vb,ud,vd,uo,vo,dhdt,dsdt,dbdt,C,AGlen,m,n,rho,rhow,g,as,ab,dasdh,dabdh,GF,BCs,l);
-        
-        if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
-            fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
-                CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
-            return
-        end
-    end
+%     if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
+%         CtrlVar.UaOutputsInfostring='inside transient loop and inside run-step loop';
+%         CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%         
+%         if CtrlVar.MassBalanceGeometryFeedback>0
+%             CtrlVar.time=CtrlVar.time+CtrlVar.dt;  % I here need the mass balance at the end of the time step, hence must increase t
+%             [UserVar,F]=GetMassBalance(UserVar,CtrlVar,MUA,F);
+%             CtrlVar.time=CtrlVar.time-CtrlVar.dt; % and then take it back to t at the beginning. 
+%             %[UserVar,as,ab,dasdh,dabdh]=GetMassBalance(UserVar,CtrlVar,MUA,CtrlVar.time+CtrlVar.dt,s,b,h,S,B,rho,rhow,GF);
+%         end
+%         
+%         fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
+%         
+%         UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
+%         %UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,s,b,S,B,h,ub,vb,ud,vd,uo,vo,dhdt,dsdt,dbdt,C,AGlen,m,n,rho,rhow,g,as,ab,dasdh,dabdh,GF,BCs,l);
+%         
+%         if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
+%             fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
+%                 CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
+%             return
+%         end
+%     end
     
     if CtrlVar.WriteRestartFile==1 && mod(CtrlVar.CurrentRunStepNumber,CtrlVar.WriteRestartFileInterval)==0
         WriteForwardRunRestartFile(UserVar,CtrlVar,MUA,BCs,F,F.GF,l,RunInfo); 
@@ -647,9 +651,9 @@ end
 %[etaInt,xint,yint,exx,eyy,exy,Eint,e,txx,tyy,txy]=calcStrainRatesEtaInt(CtrlVar,MUA,ub,vb,AGlen,n);
 %[wSurf,wSurfInt,wBedInt,wBed]=calcVerticalSurfaceVelocity(rho,rhow,h,S,B,b,ub,vb,as,ab,exx,eyy,xint,yint,MUA.coordinates,MUA.connectivity,MUA.nip,CtrlVar);
 
-if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
+if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
     CtrlVar.UaOutputsInfostring='Last call';
-%    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
     if CtrlVar.MassBalanceGeometryFeedback>0
         CtrlVar.time=CtrlVar.time+CtrlVar.dt;
         [UserVar,F]=GetMassBalance(UserVar,CtrlVar,MUA,F);
@@ -666,6 +670,8 @@ if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))
         return
     end
 end
+
+
 
 %% saving outputs
 
