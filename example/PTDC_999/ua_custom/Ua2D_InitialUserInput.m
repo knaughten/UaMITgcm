@@ -50,7 +50,7 @@ CtrlVar.uvhTimeSteppingMethod='supg';
 load BoundaryCoordinates MeshBoundaryCoordinates
 
 CtrlVar.UaOutputsDt = 1/365.25;
-            % times (in years) at which Ua needs to produce output
+            % times (in years) at which Ua needs to call UaOutputs
 
 CtrlVar.WriteRestartFile=1;
 CtrlVar.WriteRestartFileInterval=50;
