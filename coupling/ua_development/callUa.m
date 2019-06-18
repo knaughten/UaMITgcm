@@ -54,7 +54,7 @@ if OutputInterval(1)==-1
 elseif OutputInterval(1)==CAL(2)
    UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)];
 else
-   UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval)/365.25;
+   UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval);
 end
 
 % based on the OutputTimes we set the ATStimeStepTarget to be the minimum
