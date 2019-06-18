@@ -44,15 +44,15 @@ UserVar.UaMITgcm.StartMonth = Start(5:6);
 %convert physical run time to years and save in double format 
 UserVar.UaMITgcm.runTime = CAL(2)/365.25; % in years
 
-% generate array of output times for Ua, converted to years
+% generate array of output times for Ua, units are kept in days
 for ii=3:length(CAL)
    OutputInterval(ii-2) = CAL(ii);
 end
 
 if OutputInterval(1)==-1
-   UserVar.UaMITgcm.UaOutputTimes = [1:UserVar.UaMITgcm.runTime*365.25]/365.25;
+   UserVar.UaMITgcm.UaOutputTimes = [1:UserVar.UaMITgcm.runTime*365.25];
 elseif OutputInterval(1)==CAL(2)
-   UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)]/365.25;
+   UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)];
 else
    UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval)/365.25;
 end

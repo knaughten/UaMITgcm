@@ -154,6 +154,7 @@ CtrlVar.AdaptMeshAndThenStop=0;    % if true, then mesh will be adapted but no f
                                    % useful, for example, when trying out different remeshing options (then use CtrlVar.doAdaptMeshPlots=1 to get plots)
 %CtrlVar.MeshRefinementMethod='explicit:local';
 CtrlVar.AdaptMeshMaxIterations=1;
+CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan = 20;
 CtrlVar.SaveAdaptMeshFileName='MeshFileAdapt';    %  file name for saving adapt mesh. If left empty, no file is written
 CtrlVar.AdaptMeshRunStepInterval=20 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
 CtrlVar.doAdaptMeshPlots=0; 

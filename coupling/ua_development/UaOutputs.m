@@ -20,9 +20,14 @@ function UserVar=UaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,GF,InvStartValues,InvFina
 %
 %
 
-time=CtrlVar.time; 
+time=365.25*CtrlVar.time; %time in days
+
 disp(time);
-disp(UserVar.UaMITgcm.UaOutputTimes);
+disp(UserVar.UaMITgcm.UaOutputTimes)
+format long;
+disp(UserVar.UaMITgcm.UaOutputTimes-time);
+disp(ismember(time,UserVar.UaMITgcm.UaOutputTimes));
+
 
 if ismember(time,UserVar.UaMITgcm.UaOutputTimes) %% check if we need to write output
   
