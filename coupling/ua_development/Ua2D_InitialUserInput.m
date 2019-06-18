@@ -18,7 +18,7 @@ CtrlVar.UaOutputsDt = 1/365.25;
 
             % times (in years) at which Ua needs to produce output
 
-CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;
+CtrlVar.ATStimeStepTarget = 1/365.25; %UserVar.UaMITgcm.ATStimeStepTarget;
 CtrlVar.WriteRestartFile = 1;  
 
 %% parallel settings

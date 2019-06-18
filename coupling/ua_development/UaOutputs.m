@@ -27,9 +27,10 @@ format long;
 disp(UserVar.UaMITgcm.UaOutputTimes)
 disp(UserVar.UaMITgcm.UaOutputTimes-time);
 disp(ismember(time,UserVar.UaMITgcm.UaOutputTimes));
+disp(min(abs(UserVar.UaMITgcm.UaOutputTimes-time)));
+disp(CtrlVar.dtmin);
 
-
-if ismember(time,UserVar.UaMITgcm.UaOutputTimes) %% check if we need to write output
+if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we need to write output
   
     v2struct(F);
     % check if folder 'UaOutputsDirectory' exists, if not create
