@@ -22,13 +22,8 @@ function UserVar=UaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,GF,InvStartValues,InvFina
 
 time=365.25*CtrlVar.time; %time in days
 
-disp(time);
-format long;
-disp(UserVar.UaMITgcm.UaOutputTimes)
-disp(UserVar.UaMITgcm.UaOutputTimes-time);
-disp(ismember(time,UserVar.UaMITgcm.UaOutputTimes));
-disp(min(abs(UserVar.UaMITgcm.UaOutputTimes-time)));
-disp(CtrlVar.dtmin);
+fprintf('Output requested at %s\n',num2str(UserVar.UaMITgcm.UaOutputTimes));
+fprintf('Current runtime is %s\n',num2str(time));
 
 if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we need to write output
   
@@ -39,7 +34,7 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
     end
 
     % write output in matlab or netcdf format
-    DaysSinceStart = num2str(sprintf('%04d',round(time*365.25)));
+    DaysSinceStart = num2str(sprintf('%04d',round(time)));
     FileName=sprintf([UserVar.UaMITgcm.UaOutputDirectory,'/',CtrlVar.Experiment,'_',...
             UserVar.UaMITgcm.StartYear,UserVar.UaMITgcm.StartMonth,'_',DaysSinceStart]);
     fprintf(' Saving data in %s \n',FileName);
