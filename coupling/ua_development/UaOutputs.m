@@ -123,7 +123,7 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
         % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
         % interpolation is not required
         Fb = scatteredInterpolant(xUa_old,yUa_old,F_old.b,'linear');
-        b_forMITgcm = Fb(XMIT,YMIT);
+        b_forMITgcm = Fb(xMIT,yMIT);
 
         % finally, we perform a few consistency checks:
         % -> b_forMITgcm=0 for open ocean
