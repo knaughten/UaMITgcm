@@ -121,7 +121,7 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
         % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
         % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
         % interpolation is not required
-        Fb = scatteredInterpolant(xold,yold,Fold.b,'linear');
+        Fb = scatteredInterpolant(xUa_old,yUa_old,F_old.b,'linear');
         b_forMITgcm = Fb(XMIT,YMIT);
 
         % finally, we perform a few consistency checks:
