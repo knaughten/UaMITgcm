@@ -71,8 +71,10 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
         
         %% check if MITgcm grid is lat/lon or polar stereographic. If lat/lon, convert Ua coordinates to lat/lon.
 
-        lonMIT = UserVar.UaMITgcm.MITgcmGridX;
+        lonMIT = UserVar.UaMITgcm.MITgcmGridX; % 2d arrays
+        [nx,ny] = size(lonMIT);
         latMIT = UserVar.UaMITgcm.MITgcmGridY;
+        
         if (all(lonMIT(:)>=0) && all(lonMIT(:)<=360))
             % Convert from 0-360 range to -180-180 range
             index = lonMIT > 180;
@@ -85,14 +87,13 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
             xMIT = lonMIT;  yMIT = latMIT;
             lonUa_new = xUa_new;    latUa_new = yUa_new;      
         end
-        [XMIT,YMIT] = ndgrid(xMIT,yMIT);
-        [nx,ny] = size(XMIT);
+        
         
         %% original MITgcm grid (either lat/lon or polar stereographic) is always assumed to be rectangular 
         dX = lonMIT(2,1)-lonMIT(1,1);
         dY = latMIT(1,2)-latMIT(1,1);
 
-        Mask = 0*XMIT(:);
+        Mask = 0*xMIT(:);
 
         % Generate edges of regular MIT boxes
         MITXedges = [lonMIT(1,1)-dX/2:dX:lonMIT(end,1)+dX/2];
@@ -115,7 +116,7 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
 
         %% Generate b and B fields
         % Obtain bed at MITgcm tracer points via DefineGeometry
-        MITmesh.coordinates = [XMIT(:) YMIT(:)];
+        MITmesh.coordinates = [xMIT(:) yMIT(:)];
         [~,~,~,~,B_forMITgcm,~]=DefineGeometry(UserVar,CtrlVar,MITmesh,[],'B');
 
         % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated

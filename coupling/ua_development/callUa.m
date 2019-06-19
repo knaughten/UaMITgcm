@@ -77,8 +77,8 @@ UserVar.UaMITgcm.MITgcmMelt = meltrate(:);
 %% Read MITgcm grid %%
 %%%%%%%%%%%%%%%%%%%%%%
 % read tracer gridpoints
-lon=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XC']);
-lat=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YC']);
+lon=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XC']); % 2d array
+lat=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YC']); % 2d array
 
 UserVar.UaMITgcm.MITgcmGridX = lon;
 UserVar.UaMITgcm.MITgcmGridY = lat;
