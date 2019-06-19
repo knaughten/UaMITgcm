@@ -22,8 +22,8 @@ function UserVar=UaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,GF,InvStartValues,InvFina
 
 time=365.25*CtrlVar.time; %time in days
 
-fprintf('Output requested at %s\n',num2str(UserVar.UaMITgcm.UaOutputTimes));
-fprintf('Current runtime is %s\n',num2str(time));
+fprintf('Output requested after [%s] days\n',num2str(UserVar.UaMITgcm.UaOutputTimes));
+fprintf('Current runtime is %s days\n',num2str(time));
 
 if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we need to write output
   
@@ -58,16 +58,16 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
     if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
 
         %% Generate mask
-        MUAold = MUA; Fold = F; lold = l; BCsOld = BCs; GFold = GF;
+        MUA_old = MUA; F_old = F; l_old = l; BCs_old = BCs; GF_old = GF;
 
-        [MUAnew.coordinates,MUAnew.connectivity]=FE2dRefineMesh(MUAold.coordinates,MUAold.connectivity);
-        MUAnew=CreateMUA(CtrlVar,MUAnew.connectivity,MUAnew.coordinates);
+        [MUA_new.coordinates,MUA_new.connectivity]=FE2dRefineMesh(MUA_old.coordinates,MUA_old.connectivity);
+        MUA_new=CreateMUA(CtrlVar,MUA_new.connectivity,MUA_new.coordinates);
 
-        [UserVar,~,Fnew,~,~]=MapFbetweenMeshes(UserVar,RunInfo,CtrlVar,MUAold,MUAnew,Fold,BCsOld,lold);
-        GFnew = GL2d(Fnew.B,Fnew.S,Fnew.h,Fnew.rhow,Fnew.rho,MUAnew.connectivity,CtrlVar);
+        [UserVar,~,F_new,~,~]=MapFbetweenMeshes(UserVar,RunInfo,CtrlVar,MUA_old,MUA_new,F_old,BCs_old,l_old);
+        GF_new = GL2d(F_new.B,F_new.S,F_new.h,F_new.rhow,F_new.rho,MUA_new.connectivity,CtrlVar);
 
-        xUa_new = MUAnew.coordinates(:,1); yUa_new = MUAnew.coordinates(:,2);
-        xUa_old = MUAold.coordinates(:,1); yUa_old = MUAold.coordinates(:,2);
+        xUa_new = MUA_new.coordinates(:,1); yUa_new = MUA_new.coordinates(:,2);
+        xUa_old = MUA_old.coordinates(:,1); yUa_old = MUA_old.coordinates(:,2);
         
         %% check if MITgcm grid is lat/lon or polar stereographic. If lat/lon, convert Ua coordinates to lat/lon.
 
@@ -101,7 +101,7 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
         % Assign ice shelf mask
         % criterion: every MIT cell that countains melt nodes is given mask value 1
         % (ice shelf)
-        [MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUAnew,GFnew);
+        [MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUA_new,GF_new);
         [Nmeltnodes,~,~] = histcounts2(lonUa_new(MeltNodesNew),latUa_new(MeltNodesNew),MITXedges,MITYedges);
         Mask(Nmeltnodes>0)=1;
 
