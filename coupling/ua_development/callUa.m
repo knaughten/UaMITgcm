@@ -51,8 +51,8 @@ end
 
 if OutputInterval(1)==-1
    UserVar.UaMITgcm.UaOutputTimes = [1:UserVar.UaMITgcm.runTime*365.25];
-elseif OutputInterval(1)==CAL(2)
-   UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)];
+%elseif OutputInterval(1)==CAL(2)
+%   UserVar.UaMITgcm.UaOutputTimes = [OutputInterval(1) 2*OutputInterval(1)];
 else
    UserVar.UaMITgcm.UaOutputTimes = cumsum(OutputInterval);
 end
