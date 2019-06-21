@@ -80,8 +80,14 @@ UserVar.UaMITgcm.MITgcmMelt = meltrate(:);
 lon=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XC']); % 2d array
 lat=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YC']); % 2d array
 
-UserVar.UaMITgcm.MITgcmGridX = lon;
-UserVar.UaMITgcm.MITgcmGridY = lat;
+UserVar.UaMITgcm.MITgcmCGridX = lon;
+UserVar.UaMITgcm.MITgcmCGridY = lat;
+
+lon=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XG']); % 2d array
+lat=rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YG']); % 2d array
+
+UserVar.UaMITgcm.MITgcmGGridX = lon;
+UserVar.UaMITgcm.MITgcmGGridY = lat;
 
 %%%%%%%%%%%%
 %% run Ua %%

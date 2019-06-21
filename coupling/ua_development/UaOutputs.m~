@@ -84,10 +84,11 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
             lonCMIT(index) = lonCMIT(index) - 360;
         end
         if (all(lonCMIT(:)>=-180) && all(lonCMIT(:)<=180) && all(latCMIT(:)>=-90) && all(latCMIT(:)<=90))
-            [xCMIT,yCMIT] = ll2psxy(latCMIT,lonCMIT,-71,0);
+            %[xCMIT,yCMIT] = ll2psxy(latCMIT,lonCMIT,-71,0);
             [latUa_new,lonUa_new] = psxy2ll(xUa_new,yUa_new,-71,0);
         else
             xCMIT = lonCMIT;  yCMIT = latCMIT;
+            XGMIT = lonGMIT;  yGMIT = latGMIT;
             lonUa_new = xUa_new;    latUa_new = yUa_new;      
         end
         
@@ -95,7 +96,7 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
         
         %% Generate edges of MITgcm grid cells. The MITgcm grid (either lat/lon or polar stereographic) is always assumed to be rectangular 
         MITXedges = [lonGMIT(:,1) 2*lonCMIT(end,1)-lonGMIT(end,1)];
-        MITYedges = [latGMIT(1,:) 2*latCMIT(1,end)-latGMIT(1,end)];
+        MITYedges = [latGMIT(1,:) 2*latCMIT(end,1)-latGMIT(end,1)];
 
         % Assign ice shelf mask
         % criterion: every MIT cell that countains melt nodes is given mask value 1
@@ -114,14 +115,14 @@ if min(abs(UserVar.UaMITgcm.UaOutputTimes-time))<CtrlVar.dtmin %% check if we ne
 
         %% Generate b and B fields
         % Obtain bed at MITgcm tracer points via DefineGeometry
-        MITmesh.coordinates = [xCMIT(:) yCMIT(:)];
+        MITmesh.coordinates = [xMIT(:) yMIT(:)];
         [~,~,~,~,B_forMITgcm,~]=DefineGeometry(UserVar,CtrlVar,MITmesh,[],'B');
 
         % We use a linear interpolation to map the Ua draft onto the MITgcm grid. Note that more sophisticated
         % methods can be implemented, such as 'data binning'. If the MITgcm tracer points are a subset of the Ua nodes then
         % interpolation is not required
         Fb = scatteredInterpolant(xUa_old,yUa_old,F_old.b,'linear');
-        b_forMITgcm = Fb(xCMIT(:),yCMIT(:));
+        b_forMITgcm = Fb(xMIT(:),yMIT(:));
 
         % finally, we perform a few consistency checks:
         % -> b_forMITgcm=0 for open ocean
