@@ -51,13 +51,12 @@ def zero_ini_files (options):
         check_create_zero_file(options.ini_vice_file, pload)    
     
 
-# Copy the XC and YC grid files from one directory to another.
+# Copy the grid files from one directory to another.
 # In practice, they will be copied from the MITgcm run directory to the central output directory, so that Ua can read them.
 def copy_grid (mit_dir, out_dir):
-    copy_to_dir('XC.data', mit_dir, out_dir)
-    copy_to_dir('XC.meta', mit_dir, out_dir)
-    copy_to_dir('YC.data', mit_dir, out_dir)
-    copy_to_dir('YC.meta', mit_dir, out_dir)
+    for prefix in ['XC', 'YC', 'XG', 'YG']:
+        for suffix in ['.data', '.meta']:
+            copy_to_dir(prefix+suffix, mit_dir, out_dir)
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
