@@ -2,55 +2,57 @@ function [UserVar,s,b,S,B,alpha]=DefineGeometry(UserVar,CtrlVar,MUA,time,FieldsT
 
 persistent FB Fs Fb Fc
 
+s=[]; b=[]; S=[]; B=[];
+alpha=0 ;
 
 if nargin<5
     FieldsToBeDefined='sbSB';
 end
 
-alpha=0 ;
-
-
-if isempty(FB)
-
-        
-        fprintf('Loading Interpolants for s, b and B ')
-        
-        load srFBedrock FB
-        load srFicebed Fb
-        load srFs2 Fs
-        fprintf('done\n')
-        
-
-end
-
-
 x=MUA.coordinates(:,1); y=MUA.coordinates(:,2);
 
+fprintf(['Loading ',FieldsToBeDefined,'\n']);
 
-if ~isempty(strfind(FieldsToBeDefined,'S'))
-    S=zeros(MUA.Nnodes,1);
-else
-    S=NaN;
-end
-
-if ~isempty(strfind(FieldsToBeDefined,'s'))
-    s=Fs(x,y);
-else
-    s=NaN;
-end
-
-if ~isempty(strfind(FieldsToBeDefined,'b'))
-    b=Fb(x,y);
-else
-    b=NaN;
-end
-
-if ~isempty(strfind(FieldsToBeDefined,'B'))
-
+%% Step I. Bed
+if contains(FieldsToBeDefined,'B')
+    if isempty(FB)
+        load srFBedrock FB
+    end
     B=FB(x,y);
+    fprintf('Done B \n');
+    if any(isnan(B))
+        error('NaN values in B');
+    end
+end
 
-else
-    B=NaN;
+%% Step II. sea surface
+if contains(FieldsToBeDefined,'S')
+    S = zeros(MUA.Nnodes,1);
+    fprintf('Done S \n');
+end
+
+%% Step III. ice base
+if contains(FieldsToBeDefined,'b')
+    if isempty(Fb)
+        load srFicebed Fb
+    end
+    b=Fb(x,y);
+    fprintf('Done b \n');
+    if any(isnan(b))
+        error('NaN values in b');
+    end
+end
+
+%% Step IV. ice surface
+if contains(FieldsToBeDefined,'s')
+    if isempty(Fs)
+        load srFs2 Fs
+    end
+    s=Fs(x,y);
+    fprintf('Done s \n');
+    if any(isnan(s))
+        error('NaN values in s');
+    end
 end
 
 

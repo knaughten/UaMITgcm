@@ -30,8 +30,8 @@ end
 
 %% Basal melt
 if isempty(DTbmelt)
-	DTbmelt = scatteredInterpolant(UserVar.UaMITgcm.MITgcmGridX(:),...
-        UserVar.UaMITgcm.MITgcmGridY(:),UserVar.UaMITgcm.MITgcmMelt(:),'linear');
+	DTbmelt = scatteredInterpolant(UserVar.UaMITgcm.MITgcmCGridX(:),...
+        UserVar.UaMITgcm.MITgcmCGridY(:),UserVar.UaMITgcm.MITgcmMelt(:),'linear');
 end
 
 x = MUA.coordinates(:,1);

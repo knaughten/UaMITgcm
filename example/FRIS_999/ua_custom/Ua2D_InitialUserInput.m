@@ -11,7 +11,7 @@ CtrlVar.TotalTime=UserVar.UaMITgcm.runTime;
 CtrlVar.dt = 1e-2;
 CtrlVar.ATSTargetIterations = 6;
 CtrlVar.ATSintervalUp = 3;
-CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;
+CtrlVar.ATStimeStepTarget = 1/365.25;
 
 CtrlVar.WriteRestartFile = 1;  
 CtrlVar.NameOfRestartFiletoWrite=[CtrlVar.Experiment,'-RestartFile.mat'];
@@ -29,7 +29,7 @@ else
     CtrlVar.ReadInitialMeshFileName = 'MeshFileForInversion.mat';
 end
 
-CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes; 
+CtrlVar.UaOutputsDt = 1/365.25;
 
 %% parallel settings
 %myCluster = parcluster('local') ;  

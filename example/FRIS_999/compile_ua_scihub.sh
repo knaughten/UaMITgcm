@@ -30,6 +30,7 @@ cp $UA_SOURCE/*.m $UA_BUILD
 # Need to collapse a couple of subdirectories for more Matlab files
 cp `find $UA_SOURCE/UaUtilities/ -name "*.m"` $UA_BUILD
 cp `find $UA_SOURCE/NewestVertexBisection/ -name "*.m"` $UA_BUILD
+cp `find $UA_SOURCE/Mesh2d/ -name "*.m"` $UA_BUILD
 # Also copy everything from updates folders
 cp -r $UA_COUPLING_UPDATES/* $UA_BUILD
 cp -r $UA_CASE_UPDATES/* $UA_BUILD
