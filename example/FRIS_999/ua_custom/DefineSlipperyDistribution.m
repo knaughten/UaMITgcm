@@ -4,7 +4,7 @@ persistent FC
 
 if isempty(FC)
     load(CtrlVar.NameOfFileForReadingSlipperinessEstimate,'xC','yC','C');
-    FC = scatteredInterpolant(xC,yC,C,'linear','none');
+    FC = scatteredInterpolant(xC,yC,C,'linear', 'nearest');
     fprintf('\n Read slipperiness from file \n');
 end
 

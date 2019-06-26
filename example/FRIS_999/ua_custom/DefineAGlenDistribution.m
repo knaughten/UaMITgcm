@@ -9,7 +9,7 @@ if isempty(FA)
     load(CtrlVar.NameOfFileForReadingAGlenEstimate,'AGlen','n','xA','yA')
     fprintf(' done \n')
     
-    FA=scatteredInterpolant(xA,yA,AGlen,'linear','none');
+    FA=scatteredInterpolant(xA,yA,AGlen,'linear', 'nearest'); 
 end
 x=MUA.coordinates(:,1); y=MUA.coordinates(:,2);
 
