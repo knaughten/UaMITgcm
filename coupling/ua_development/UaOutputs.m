@@ -147,5 +147,5 @@ if strcmp(CtrlVar.UaOutputsInfostring,'Last call')==1
     b_forMITgcm = reshape(b_forMITgcm,nx,ny);
 
     %% now save B, b and mask
-    save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName,'-v6'],'B_forMITgcm','b_forMITgcm','mask_forMITgcm');
+    save([UserVar.UaMITgcm.UaOutputDirectory,'/',UserVar.UaMITgcm.UaDraftFileName],'B_forMITgcm','b_forMITgcm','mask_forMITgcm','-v6');
 end
