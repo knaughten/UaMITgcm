@@ -14,17 +14,17 @@ CtrlVar.RestartTime=0;
 CtrlVar.ResetTime=1;
 CtrlVar.ResetTimeStep=0;    % perhaps this has to be reconsidered if model has issues converging
 
-CtrlVar.UaOutputsDt = 1/365.25;
+CtrlVar.UaOutputsDt = UserVar.UaMITgcm.UaOutputTimes;
 
             % times (in years) at which Ua needs to produce output
 
-CtrlVar.ATStimeStepTarget = 1/365.25; %UserVar.UaMITgcm.ATStimeStepTarget;
+CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget;
 CtrlVar.WriteRestartFile = 1;  
 
 %% parallel settings
-myCluster = parcluster('local') ;  
-myCluster.NumWorkers = 6;
-saveProfile(myCluster);
+% myCluster = parcluster('local') ;  
+% myCluster.NumWorkers = 6;
+% saveProfile(myCluster);
 
 % CtrlVar.Parallel.uvhAssembly.parfor.isOn=1;     % assembly over integration points done in parallel using parfor
 % CtrlVar.Parallel.uvhAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
