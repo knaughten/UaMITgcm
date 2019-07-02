@@ -1,11 +1,14 @@
-######################################################
+
 # Create the initial topography, initial conditions,
 # and boundary conditions for MITgcm.
 ######################################################
 
 import numpy as np
+import csv
 from scipy.io import loadmat
 import sys
+import shutil
+import os
 # Get mitgcm_python in the path
 sys.path.append('../../UaMITgcm_git/tools/')
 sys.path.append('../../UaMITgcm_git/coupling/')
@@ -240,10 +243,20 @@ make_topo(grid, './ua_custom/DataForMIT.mat', input_dir+'bathymetry.shice', inpu
 print 'Creating initial and boundary conditions'
 make_ics_obcs(grid, obcs, input_dir+'T_ini.bin', input_dir+'S_ini.bin', input_dir+'OBSt.bin', input_dir+'OBSs.bin', input_dir+'OBSu.bin', input_dir+'OBSv.bin', input_dir+'OBWt.bin', input_dir+'OBWs.bin', input_dir+'OBWu.bin', input_dir+'OBWv.bin', input_dir+'pload.mdjwf', prec=64)
 
-
-
-
-    
+print 'Copy Ua restart file from Ua_InputData'
+with open('/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/RunTable.csv', 'rb') as csvfile:
+    runs = csv.reader(csvfile, delimiter=',')
+    for row in runs:
+	if options.expt_name in row[:]:
+	   filename = '/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/'+row[0]+'_InverseRestartFile.mat'
+	   if os.path.isfile(filename):
+		shutil.copyfile(filename,'./ua_run/'+options.expt_name+'-RestartFile.mat')
+   		shutil.copyfile(filename,'./ua_custom/'+options.expt_name+'-RestartFile.mat')
+		print 'Copied '+filename
+	   else:
+		print 'Ua restart file '+filename+' not found'
+       		sys.exit()
+		 
 
 
     
