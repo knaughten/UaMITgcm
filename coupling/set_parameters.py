@@ -107,6 +107,11 @@ class Options:
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
+        # Set default value for preserve_ocean_mask, until we roll it out to all config_options.py
+        try:
+            self.preserve_ocean_mask = check_value('preserve_ocean_mask', preserve_ocean_mask, type='bool')
+        except(NameError):
+            self.preserve_ocean_mask = False
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
         if self.pload_option == 'constant':
             self.pload_temp = check_value('pload_temp', pload_temp, type='float')

@@ -111,6 +111,13 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     index = bathy > 0
     bathy[index] = 0
     draft[index] = 0
+    if options.preserve_ocean_mask:
+        print 'Blocking out specified regions'
+        # Read the existing bathymetry seen by MITgcm
+        bathy_old = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+        # Find regions which Ua say are open ocean, but MITgcm say are masked
+        index = (mask==2)*(bathy_old==0)
+        bathy[index] = 0
 
     if options.misomip_wall:
         print 'Building walls in MISOMIP domain'

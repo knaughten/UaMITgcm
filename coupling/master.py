@@ -38,11 +38,12 @@ if __name__ == "__main__":
                 print 'Adjusting MITgcm topography'
                 adjust_mit_geom(options.ua_output_dir+options.ua_draft_file, options.mit_run_dir, grid, options)
 
-        if options.restart_type=='zero':
-            print 'Setting new initial conditions for MITgcm'        
-        elif options.restart_type=='pickup':        
-            print 'Adjusting MITgcm pickup file'
-        adjust_mit_state(options.mit_run_dir, grid, options)
+        if options.restart_type=='zero' or (not spinup and not first_coupled):
+            if options.restart_type == 'zero':
+                print 'Setting new initial conditions for MITgcm'
+            elif options.restart_type=='pickup':
+                print 'Adjusting MITgcm pickup file'
+            adjust_mit_state(options.mit_run_dir, grid, options)
 
 
     # Is there any output we need to deal with?

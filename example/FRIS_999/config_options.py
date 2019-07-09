@@ -91,6 +91,9 @@ adjust_vel = True
 
 ### Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
 misomip_wall = False
+### Flag to preserve the MITgcm land mask in regions outside the Ua domain. 
+### This is necessary for the FRIS setup.
+preserve_ocean_mask = True
 
 ### How should we calculate the pressure load anomaly of the ice shelf draft?
 ### This involves making an assumption about the properties of the water
@@ -121,7 +124,7 @@ use_cal_pkg = True
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
 ### to find what they have been set to by default.
-deltaT = 600
+deltaT = 300
 hFacMin = 0.1
 hFacMinDr = 20.
 readBinaryPrec = 64
