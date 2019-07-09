@@ -58,8 +58,8 @@ end
 %ab is defined on a grid (x,y)  I need to check in the future if coordinates are defined on the same grid and if not then do an
 %interpolation
 if isempty(DTbmelt)
-	DTbmelt = scatteredInterpolant(UserVar.UaMITgcm.MITgcmGridX(:),...
-        UserVar.UaMITgcm.MITgcmGridY(:),UserVar.UaMITgcm.MITgcmMelt(:),'linear');
+	DTbmelt = scatteredInterpolant(UserVar.UaMITgcm.MITgcmCGridX(:),...
+        UserVar.UaMITgcm.MITgcmCGridY(:),UserVar.UaMITgcm.MITgcmMelt(:),'linear');
 end
 
 x = MUA.coordinates(:,1); y = MUA.coordinates(:,2);

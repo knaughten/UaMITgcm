@@ -1,9 +1,7 @@
 function Ua2D(UserVar,varargin)
 
-%% Driver for the 2HD Úa model
+%% Driver for the 2HD ï¿½a model
 % 
-
-
 
 if nargin==0
     UserVar=[];
@@ -11,13 +9,13 @@ end
 
 SetUaPath() %% set path
 
-% The following lines were removed because they are incompatible with the matlab compiler
+% Remove this check because it doesn't work with the compiler.
 %if ~exist(fullfile(cd,'Ua2D_InitialUserInput.m'),'file')
-%    
+    
 %    fprintf('The input-file Ua2D_InitialUserInput.m not found in the working directory (%s).\n',pwd)
 %    fprintf('This input-file is required for Ua to run.\n')
 %    return
-%    
+    
 %end
 
 warning('off','MATLAB:triangulation:PtsNotInTriWarnId')
@@ -268,21 +266,20 @@ end
 
 %% UaOutputs
 CtrlVar.UaOutputsCounter=0;
-if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
-    CtrlVar.UaOutputsInfostring='First call';
-    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
-    
-    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
-    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-    
-    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
-        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
-            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
-        return
-    end
-end
+% if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5 || CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter)==0 )
+%     CtrlVar.UaOutputsInfostring='First call';
+%     CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%     
+%     fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
+%     UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
+%     
+%     if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
+%         fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
+%             CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
+%         return
+%     end
+% end
 %
-
 
 CtrlVar.CurrentRunStepNumber0=CtrlVar.CurrentRunStepNumber;
 
@@ -462,19 +459,18 @@ while 1
                 
                 %ub0=ub ; ud0=ud ; vb0=vb ; vd0=vd;
                 
-                
-                if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
-                    CtrlVar.UaOutputsInfostring='Diagnostic step';
-                    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
-                    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
+%                if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
+%                    CtrlVar.UaOutputsInfostring='Diagnostic step';
+%                    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%                    fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
                     
-                    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-                    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
-                        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
-                            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
-                        return
-                    end
-                end
+%                    UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
+%                    if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
+%                        fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
+%                            CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
+%                        return
+%                    end
+%                end
             end
             
             F0=F;  % 
@@ -603,7 +599,7 @@ while 1
     
     % UaOutputs
     
-    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
+    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter+1))<1e-5)
         CtrlVar.UaOutputsInfostring='inside transient loop and inside run-step loop';
         CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
         
@@ -651,9 +647,9 @@ end
 %[etaInt,xint,yint,exx,eyy,exy,Eint,e,txx,tyy,txy]=calcStrainRatesEtaInt(CtrlVar,MUA,ub,vb,AGlen,n);
 %[wSurf,wSurfInt,wBedInt,wBed]=calcVerticalSurfaceVelocity(rho,rhow,h,S,B,b,ub,vb,as,ab,exx,eyy,xint,yint,MUA.coordinates,MUA.connectivity,MUA.nip,CtrlVar);
 
-if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
+if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
     CtrlVar.UaOutputsInfostring='Last call';
-    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
     if CtrlVar.MassBalanceGeometryFeedback>0
         CtrlVar.time=CtrlVar.time+CtrlVar.dt;
         [UserVar,F]=GetMassBalance(UserVar,CtrlVar,MUA,F);
@@ -670,8 +666,6 @@ if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputs
         return
     end
 end
-
-
 
 %% saving outputs
 
