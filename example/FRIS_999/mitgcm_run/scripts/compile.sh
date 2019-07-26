@@ -5,7 +5,7 @@
 
 # USER VARIABLE
 # Path to MITgcm source code: recommend to use the one inside UaMITgcm
-MIT_SOURCE=$WORK/UaMITgcm/MITgcm_67g
+MIT_SOURCE=$WORK/UaMITgcm/MITgcm_67k
 # Path to file containing Fortran flags etc
 BUILD_OPTIONS=../linux_amd64_archer_ifort
 

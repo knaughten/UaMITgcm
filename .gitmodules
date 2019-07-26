@@ -7,3 +7,6 @@
 [submodule "UaSource"]
 	path = UaSource_22Nov2018
 	url = https://github.com/GHilmarG/UaSource.git
+[submodule "MITgcm_67k"]
+	path = MITgcm_67k
+	url = git@github.com:MITgcm/MITgcm.git
