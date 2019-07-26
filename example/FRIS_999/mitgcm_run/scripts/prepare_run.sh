@@ -34,11 +34,6 @@ SHARED=/work/n02/n02/shared/baspog/MITgcm
 WSS_IN=$SHARED/WS/WSS
 ln -s $WSS_IN/* .
 ln -s $SHARED/reanalysis/ERAI_075/* .
-# Remove problem humidity files and link in the new ones
-rm ERAinterim_spfh2m_*
-ln -s $SHARED/reanalysis/ERAI_075_humidity_fix_new/* .
-# Link in dummy 2018 files so simulation doesn't crash right before the end
-ln -s /work/n02/n02/kaight/ERAinterim_2018/* .
 
 # Deep copy of some files that will be modified
 rm -f draft_WSS bathy_WSS pload_WSS

@@ -11,8 +11,6 @@
  SEAICEnEVPstarSteps=100,
  SEAICEadvScheme=33,
  SEAICE_drag=0.003,
- SEAICE_scaleDrag=.false.,
- SEAICE_scaleDragFile='',
  SEAICEdiffKhHeff=20.,
  SEAICEdiffKhSnow=20.,
  SEAICEdiffKhArea=20.,

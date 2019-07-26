@@ -168,7 +168,7 @@ print 'Building grid'
 grid = BasicGrid()
 
 print 'Creating topography'
-make_topo(grid, 'ua_custom/DataForMIT.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', prec=64)
+make_topo(grid, 'ua_custom/DataForMIT.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', dig_option='bathy', prec=64)
 
 print 'Creating initial and boundary conditions'
 make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEt_cold', input_dir+'OBEs_cold', input_dir+'OBEt_warm', input_dir+'OBEs_warm', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
