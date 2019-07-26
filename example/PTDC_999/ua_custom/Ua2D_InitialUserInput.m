@@ -143,7 +143,7 @@ CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
 CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
 CtrlVar.ExplicitMeshRefinementCriteria(I).p=[0.7];
 CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Use=true;
+CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
                                                    
 CtrlVar.MeshAdapt.GLrange=[20000 CtrlVar.MeshSizeMax; 5000  CtrlVar.MeshSize; 2000 CtrlVar.MeshSizeMin];
 
@@ -155,7 +155,7 @@ CtrlVar.AdaptMeshAndThenStop=0;    % if true, then mesh will be adapted but no f
 CtrlVar.AdaptMeshMaxIterations=1;
 CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan = 20;
 CtrlVar.SaveAdaptMeshFileName='MeshFileAdapt';    %  file name for saving adapt mesh. If left empty, no file is written
-CtrlVar.AdaptMeshRunStepInterval=20 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
+CtrlVar.AdaptMeshRunStepInterval=50 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
 CtrlVar.doAdaptMeshPlots=0; 
 
 %%
