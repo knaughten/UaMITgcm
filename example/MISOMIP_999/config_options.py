@@ -41,7 +41,7 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 24
+total_time = 1224
 ### Length of ocean spinup period (months)
 spinup_time = 24
 ### Length of coupling timestep (months)
