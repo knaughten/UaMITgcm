@@ -43,10 +43,10 @@ budget_code = 'n02-FISSA'
 ### Total length of simulation (months)
 total_time = 24
 ### Length of ocean spinup period (months)
-spinup_time = 6
+spinup_time = 24
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 6
+couple_step = 24
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
@@ -83,7 +83,7 @@ output_freq = 'monthly'
 ### 'none': don't do any digging
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
-digging = 'none'
+digging = 'bathy'
 
 ### Should we adjust velocities at each coupling timestep to preserve
 ### barotropic transport?
