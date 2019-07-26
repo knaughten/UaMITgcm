@@ -11,7 +11,7 @@ UA_BUILD=$HOME/UaBuild
 # Path to configuration-specific Ua files to overwrite
 UA_CASE_UPDATES=$PWD/ua_custom
 # Path to Ua source directory (default use the one inside UaMITgcm)
-UA_SOURCE=$REPO_DIR/UaSource
+UA_SOURCE=$REPO_DIR/UaSource_22Nov2018
 # Path to coupling-specific Ua files to overwrite
 UA_COUPLING_UPDATES=$REPO_DIR/coupling/ua_development
 
