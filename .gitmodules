@@ -4,3 +4,12 @@
 [submodule "tools/xmitgcm"]
 	path = tools/xmitgcm
 	url = https://github.com/xgcm/xmitgcm.git
+[submodule "MITgcm_67k"]
+	path = MITgcm_67k
+	url = git@github.com:MITgcm/MITgcm.git
+[submodule "MITgcm_67g"]
+	path = MITgcm_67g
+	url = git@github.com:MITgcm/MITgcm.git
+[submodule "UaSource_22Nov2018"]
+	path = UaSource_22Nov2018
+	url = git@github.com:GHilmarG/UaSource.git
