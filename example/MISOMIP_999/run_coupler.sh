@@ -12,7 +12,7 @@
 # Path to UaMITgcm repository
 REPO_DIR=$WORK/UaMITgcm
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
-MIT_SOURCE=$REPO_DIR/MITgcm_67g
+MIT_SOURCE=$REPO_DIR/MITgcm
 
 cd $PBS_O_WORKDIR
 echo 'Coupler starts '`date` >> jobs.log
