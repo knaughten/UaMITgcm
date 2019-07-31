@@ -22,7 +22,7 @@ yGL_all = {};
 for i=1:length(segment_dir)
     
     % Get paths to each Ua output file within this segment
-    path = [output_path,'/',num2str(segment_dir(i)),'/'];
+    path = [output_path,'/',num2str(segment_dir(i)),'/Ua/'];
     files = dir(path);
     ua_files = {};
     for j=1:length(files)
@@ -84,5 +84,6 @@ for i=1:length(gl_vars)
     ncwrite(out_file, gl_vars{i}, gl_data{i});
 end
 
+end
     
 
