@@ -10,7 +10,7 @@
  SEAICE_evpBeta=20.,
  SEAICEnEVPstarSteps=100,
  SEAICEadvScheme=33,
- SEAICE_drag=0.003,
+ SEAICE_drag=0.002,
  SEAICEdiffKhHeff=20.,
  SEAICEdiffKhSnow=20.,
  SEAICEdiffKhArea=20.,
@@ -20,6 +20,7 @@
  SEAICEetaZmethod=3,
  SEAICEaddSnowMass=.false.,
  SEAICE_frazilFrac=0.01, 
+ HO=0.25,
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### SEAICEuseDYNAMICS=ifdef SEAICE_ALLOW_DYNAMICS,

@@ -48,11 +48,11 @@
   fileName(7) = 'statePSI',
   frequency(7) = 2592000.,
 
-  fields(1,8)  = 'EXFhs   ','EXFhl   ','EXFlwdn ','EXFswdn ','EXFtaux ','EXFtauy ','EXFuwind','EXFvwind','EXFatemp','EXFevap ','EXFpreci','EXFsnow ','EXFpress','EXFroff ',
+  fields(1,8)  = 'EXFhs   ','EXFhl   ','EXFlwdn ','EXFswdn ','EXFtaux ','EXFtauy ','EXFuwind','EXFvwind','EXFatemp','EXFevap ','EXFpreci','EXFaqh  ','EXFpress','EXFroff ',
   fileName(8) = 'stateEXF',
   frequency(8) = 2592000.,
 
-  fields(1,9)  = 'SIarea  ','SIheff  ','SIhsnow ','SIuice  ','SIvice  ','SItaux  ','SItauy  ','SIpress ','SIempmr ','SIdHbOCN','SIdHbATC','SIdHbATO','SIdHbFLO',
+  fields(1,9)  = 'SIarea  ','SIheff  ','SIhsnow ','SIuice  ','SIvice  ','SItaux  ','SItauy  ','SIpress ','SIempmr ','SIdHbOCN','SIdHbATC','SIdHbATO','SIdHbFLO','SIatmFW ','SIacSubl',
   fileName(9) = 'stateICE',
   frequency(9) = 2592000.,
 

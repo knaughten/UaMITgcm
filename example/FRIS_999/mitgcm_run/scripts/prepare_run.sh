@@ -33,7 +33,8 @@ cp ../input/* .
 SHARED=/work/n02/n02/shared/baspog/MITgcm
 WSS_IN=$SHARED/WS/WSS
 ln -s $WSS_IN/* .
-ln -s $SHARED/reanalysis/ERAI_075/* .
+ln -s $WORK/ERA5/mit/* .
+#ln -s $SHARED/reanalysis/ERAI_075/* .
 
 # Deep copy of some files that will be modified
 rm -f draft_WSS bathy_WSS pload_WSS
