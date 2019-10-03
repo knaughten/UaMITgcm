@@ -134,9 +134,9 @@ class Options:
         if self.correct_obcs_online and self.couple_step % 12 != 0:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')            
         if self.correct_obcs_online:
-            transient_obcs = check_value('transient_obcs', transient_obcs, type='bool')
+            self.transient_obcs = check_value('transient_obcs', transient_obcs, type='bool')
         else:
-            transient_obcs = False            
+            self.transient_obcs = False            
             
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
         self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')

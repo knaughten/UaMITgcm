@@ -31,13 +31,17 @@ cp ../input/* .
 
 # Link input files stored elsewhere
 SHARED=/work/n02/n02/shared/baspog/MITgcm
-WSFRIS_IN=../input/
-#ln -s $WSFRIS_IN/* .
-#ln -s $WORK/ERA5/mit/* .
+WSFRIS_IN=$SHARED/WS/WSFRIS
+ln -s $WSFRIS_IN/* .
+ln -s $SHARED/UKESM/piControl/* .
+# REPLACE THESE FILES once piControl tas data is available.
+ln -s $WORK/dummy_tas/* .
 
 # Deep copy of some files that will be modified
-rm -f draft_WSFRIS bathy_WSFRIS pload_tmp
-cp -f $WSFRIS_IN/draft_WSFRIS $WSFRIS_IN/bathy_WSFRIS $WSFRIS_IN/pload_tmp .
+rm -f draft_WSFRIS bathy_WSFRIS pload_WSFRIS
+cp -f $WSFRIS_IN/draft_WSFRIS $WSFRIS_IN/bathy_WSFRIS $WSFRIS_IN/pload_WSFRIS .
+rm -f UVEL*.OBCS_E* VVEL*.OBCS_N*
+cp -f $WSFRIS_IN/UVEL*.OBCS_E* $WSFRIS_IN/VVEL*.OBCS_N* .
 
 # Link executable
 ln -s ../build/mitgcmuv .

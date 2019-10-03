@@ -41,9 +41,9 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 12*40
+total_time = 12*30
 ### Length of ocean spinup period (months)
-spinup_time = 12
+spinup_time = 12*30
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 12
@@ -70,7 +70,7 @@ restart_type = 'pickup'
 ### 'noleap': every year is 365 days
 ### '360-day': every month is 30 days
 ### For 'standard', you must use the calendar package in MITgcm.
-calendar_type = 'standard'
+calendar_type = '360-day'
 ### How often to do time-averaged diagnostic output?
 ### 'monthly', 'daily', or 'end' (at the end of the segment)
 ### Note 'monthly' does not work with calendar_type='noleap'.
