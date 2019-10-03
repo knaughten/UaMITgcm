@@ -1,9 +1,9 @@
 # SEAICE parameters
  &SEAICE_PARM01
  SEAICEwriteState=.true.,
- AreaFile='SIarea_MIT.ini',
- HeffFile='SIheff_MIT.ini',
- HsnowFile='SIhsnow_MIT.ini',
+ AreaFile='SIarea_piControl.ini',
+ HeffFile='SIheff_piControl.ini',
+ HsnowFile='SIhsnow_piControl.ini',
  SEAICE_multDim=7,
  SEAICEuseEVPstar=true,
  SEAICE_evpAlpha=20.,

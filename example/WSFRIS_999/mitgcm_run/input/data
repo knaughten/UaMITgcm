@@ -388,8 +388,8 @@
 # Input datasets
  &PARM05
  bathyFile='bathy_WSFRIS',
- hydrogThetaFile='THETA_MIT.ini',
- hydrogSaltFile='SALT_MIT.ini',
+ hydrogThetaFile='THETA_piControl.ini',
+ hydrogSaltFile='SALT_piControl.ini',
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### bathyFile=' ',

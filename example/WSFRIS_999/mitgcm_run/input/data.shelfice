@@ -3,7 +3,7 @@
 # ===================================
  &SHELFICE_PARM01
  SHELFICEtopoFile='draft_WSFRIS',
- SHELFICEloadAnomalyFile='pload_tmp',
+ SHELFICEloadAnomalyFile='pload_WSFRIS',
  no_slip_shelfice = .false.,
  SHELFICEconserve=.true.,
  SHELFICEwriteState=.true.,
