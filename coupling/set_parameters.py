@@ -8,7 +8,7 @@ import os
 import sys
 
 from config_options import *
-from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between, make_tmp_copy
+from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between, make_tmp_copy, comment_line
 
 from mitgcm_python.utils import real_dir, days_per_month
 
@@ -107,11 +107,15 @@ class Options:
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
-        # Set default value for preserve_ocean_mask, until we roll it out to all config_options.py
+        # Set default values for preserve_ocean_mask and preserve_static_ice, until we roll it out to all config_options.py
         try:
             self.preserve_ocean_mask = check_value('preserve_ocean_mask', preserve_ocean_mask, type='bool')
         except(NameError):
             self.preserve_ocean_mask = False
+        try:
+            self.preserve_static_ice = check_value('preserve_static_ice', preserve_static_ice, type='bool')
+        except(NameError):
+            self.preserve_static_ice = False
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
         if self.pload_option == 'constant':
             self.pload_temp = check_value('pload_temp', pload_temp, type='float')
@@ -121,9 +125,26 @@ class Options:
             self.pload_temp = 0.
             self.pload_salt = 0.
         self.ua_ini_restart = check_value('ua_ini_restart', ua_ini_restart, type='bool')
+        # Default value for correct_obcs_online
+        try:
+            self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
+        except(NameError):
+            self.correct_obcs_online = False
+        # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
+        if self.correct_obcs_online and self.couple_step % 12 != 0:
+            throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')            
+        if self.correct_obcs_online:
+            transient_obcs = check_value('transient_obcs', transient_obcs, type='bool')
+        else:
+            transient_obcs = False            
             
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
         self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')
+        # Default value for use_ini_deltaTmom
+        try:
+            self.use_ini_deltaTmom = check_value('use_ini_deltaTmom', use_ini_deltaTmom, type='bool')
+        except(NameError):
+            self.use_ini_deltaTmom = False
         self.deltaT = check_value('deltaT', deltaT, type='int')
         # Make sure ocean timestep evenly divides 1 day
         if sec_per_day % self.deltaT != 0:
@@ -181,6 +202,10 @@ class Options:
             self.ini_vice_file = ''
         self.pload_file = pload_file
         self.ismr_name = ismr_name
+        if self.correct_obcs_online:
+            self.etan_name = etan_name
+        else:
+            self.etan_name = ''
         self.output_names = check_value('output_names', output_names, type='list')
         if self.use_xmitgcm:
             self.mit_nc_name = mit_nc_name
@@ -196,6 +221,16 @@ class Options:
             self.dump_end_nc_name = ''
         self.ua_melt_file = ua_melt_file
         self.ua_draft_file = ua_draft_file
+        if self.correct_obcs_online:
+            self.obcs_file_w_u = obcs_file_w_u
+            self.obcs_file_e_u = obcs_file_e_u
+            self.obcs_file_s_v = obcs_file_s_v
+            self.obcs_file_n_v = obcs_file_n_v
+        else:
+            self.obcs_file_w_u = None
+            self.obcs_file_e_u = None
+            self.obcs_file_s_v = None
+            self.obcs_file_n_v = None
 
         # Initialise first and last timesteps to 0 (will be updated later if needed)
         self.first_timestep = 0
@@ -319,6 +354,22 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
             else:
                 check = 'all'
             check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, check=check)
+
+    if use_ini_deltaTmom:
+        # Find the line setting deltaTmom
+        # If this line doesn't exist (or is uncommented), don't throw an error, just return None.
+        deltaTmom_line = line_that_matters(namelist, 'deltaTmom', throw_error=False)
+        if initial and deltaTmom_line is None:
+            print 'Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?'
+            sys.exit()
+        if not initial and deltaTmom_line is not None:
+            # Need to comment it out
+            comment_line(namelist, deltaTmom_line)
+            # Make sure there isn't another one
+            deltaTmom_line_2 = line_that_matters(namelist, 'deltaTmom', throw_error=False)
+            if deltaTmom_line_2 is not None:
+                print 'Error (update_namelists): deltaTmom is set multiple times in ' + namelist + '. Choose one so we can comment it out without confusion.'
+                sys.exit()
             
 # end function update_namelists
 

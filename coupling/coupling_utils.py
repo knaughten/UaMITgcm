@@ -47,7 +47,7 @@ def active_line_contains (line, substr, ignore_case=True):
 
     
 # Return the last line in a file satisfying active_line_contains. In a namelist, this is the line of the file that actually defines the given variable.
-def line_that_matters (file_name, substr, ignore_case=True):
+def line_that_matters (file_name, substr, ignore_case=True, throw_error=True):
     
     line_to_save = None
     f = open(file_name, 'r')
@@ -58,7 +58,7 @@ def line_that_matters (file_name, substr, ignore_case=True):
     f.close()
     
     # Make sure we found it
-    if line_to_save is None:
+    if line_to_save is None and thow_error:
         print 'Error (line_that_matters): ' + file_name + ' does not contain ' + substr
         sys.exit()
         
@@ -85,6 +85,11 @@ def replace_line (file_name, old_line, new_line):
     # Replace the old file with the new one
     os.remove(file_name)
     os.rename(file_name+'.replace', file_name)
+
+
+# Comment out a line (where # at the beginning of a line makes a comment)
+def comment_line (file_name, line):
+    replace_line(file_name, line, '#'+line)
 
 
 # Advance the given date (year and month) by num_months
@@ -133,29 +138,38 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
             return num_days
 
 
-# Find the most recently modified MITgcm binary output file of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
-# If there is an expected value for the timestep number corresponding to this output, check that it agrees.
+# Read MITgcm binary output file(s) of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
+# Will either read the most recently modified file (time_option='last') or time-average all available files (time_option='avg').
+# If there is an expected value for the timestep number corresponding to the 'last' output, check that it agrees.
 # For pickups, you must pass nz, which is the number of vertical layers in the model (for normal pickups) OR the number of sea ice vertical layers (for sea ice pickups).
-def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
+def read_mit_output (time_option, directory, file_head, var_names, timestep=None, nz=None):
 
     # Check if var_names is a string rather than a list
     if isinstance(var_names, str):
         var_names = [var_names]
 
-    # Read the most recent file
-    data, its, meta = rdmds(directory+file_head, itrs=np.Inf, returnmeta=True)
+    if time_option == 'last':
+        # Read the most recent file
+        data, its, meta = rdmds(directory+file_head, itrs=np.Inf, returnmeta=True)
+    elif time_option == 'avg':
+        # Read all files
+        data, its, meta = rdmds(directory+file_head, itrs=np.nan, returnmeta=True)
+        if len(its) > 1:
+            # Time-average
+            data = np.mean(data, axis=0)
     if len(data)==0:
         # Nothing was read, no such files exist
-        print 'Error (read_last_output): no such files ' + directory+file_head+'.*.data exist.'
+        print 'Error (read_mit_output): no such files ' + directory+file_head+'.*.data exist.'
         if var_names is None:
             # This looks like a case of missing dump files
             print 'Make sure that dumpInitAndLast=.true. in input/data.'
         sys.exit()
-    print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
-    # Make sure it agrees with any expected timestep number
-    if timestep is not None and its[0] != timestep:
-        print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + str(timestep)
-        sys.exit()
+    if time_option == 'last':
+        print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
+        # Make sure it agrees with any expected timestep number
+        if timestep is not None and its[0] != timestep:
+            print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + str(timestep)
+            sys.exit()
         
     if var_names is None:
         # There is just one variable here, return the whole array
@@ -166,7 +180,7 @@ def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
         # Instead this is collapsed into the depth dimension.
         # Unpick the resulting large 3D array into the different variables.
         if nz is None:
-            print 'Error (read_last_output): must define nz for pickup files'
+            print 'Error (read_mit_output): must define nz for pickup files'
             sys.exit()
         data_unpick = []
         for var in meta['fldlist']:
@@ -179,7 +193,7 @@ def read_last_output (directory, file_head, var_names, timestep=None, nz=None):
                 data_unpick.append(data[0,:])
                 data = data[1:,:]
             else:
-                print 'Error (read_last_output): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.'
+                print 'Error (read_mit_output): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.'
                 sys.exit()
         data = data_unpick            
 
@@ -331,5 +345,16 @@ def move_processed_files (directory, tmpdir, prefixes, tstep):
 # Make a temporary copy of the given file with the suffix .tmp
 def make_tmp_copy (file_path):
     shutil.copyfile(file_path, file_path+'.tmp')
+
+
+# Make a list of filenames in the given directory that start with the given string, and return in alphabetical order.
+def get_file_list (directory, prefix):
+    output_files = []
+    for fname in os.listdir(directory):
+        if fname.startswith(prefix):
+            output_files.append(fname)
+    output_files.sort()
+    return output_files
+    
                 
                 

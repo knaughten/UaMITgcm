@@ -8,13 +8,14 @@ import os
 import shutil
 import sys
 
-from coupling_utils import read_last_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line
+from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list
 
-from mitgcm_python.utils import convert_ismr, calc_hfac, xy_to_xyz, z_to_xyz
+from mitgcm_python.utils import convert_ismr, calc_hfac, xy_to_xyz, z_to_xyz, mask_land_ice
 from mitgcm_python.make_domain import do_digging, do_zapping
-from mitgcm_python.file_io import read_binary, write_binary, set_dtype
+from mitgcm_python.file_io import read_binary, write_binary, set_dtype, read_netcdf
 from mitgcm_python.interpolation import discard_and_fill
-from mitgcm_python.ics_obcs import calc_load_anomaly
+from mitgcm_python.ics_obcs import calc_load_anomaly, balance_obcs
+from mitgcm_python.calculus import area_average
 
 
 # Create dummy initial conditions files for the files which might not exist
@@ -72,7 +73,7 @@ def extract_melt_rates (mit_dir, ua_out_file, grid, options):
     # Read the most recent ice shelf melt rate output and convert to m/y,
     # melting is negative as per Ua convention.
     # Make sure it's from the last timestep of the previous simulation.
-    ismr = -1*convert_ismr(read_last_output(mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
+    ismr = -1*convert_ismr(read_mit_output('last', mit_dir, options.ismr_name, 'SHIfwFlx', timestep=options.last_timestep))
 
     if os.path.isfile(ua_out_file):
         # Make a backup copy of the old file
@@ -111,6 +112,7 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
     index = bathy > 0
     bathy[index] = 0
     draft[index] = 0
+    
     if options.preserve_ocean_mask:
         print 'Blocking out specified regions'
         # Read the existing bathymetry seen by MITgcm
@@ -118,6 +120,14 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
         # Find regions which Ua say are open ocean, but MITgcm say are masked
         index = (mask==2)*(bathy_old==0)
         bathy[index] = 0
+        
+    if options.preserve_static_ice:
+        print 'Reinstating static ice shelves in regions outside Ua domain'
+        # Read the existing ice shelf draft seen by MITgcm
+        draft_old = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+        # Find regions which Ua say are open ocean, but MITgcm say are ice shelves
+        index = (mask==2)*(draft_old<0)
+        draft[index] = draft_old[index]
 
     if options.misomip_wall:
         print 'Building walls in MISOMIP domain'
@@ -176,7 +186,7 @@ def adjust_mit_state (mit_dir, grid, options):
 
         # Inner function to read the final dump of a given variable
         def read_last_dump (var_name):
-            return read_last_output(mit_dir, var_name, None, timestep=options.last_timestep)
+            return read_mit_output('last', mit_dir, var_name, None, timestep=options.last_timestep)
 
         # Read the final ocean state variables
         temp = read_last_dump('T')
@@ -199,7 +209,7 @@ def adjust_mit_state (mit_dir, grid, options):
         if options.eosType != 'LINEAR':
             # Also need PhiHyd
             var_names += ['PhiHyd']
-        fields = read_last_output(mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
+        fields = read_mit_output('last', mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
         if options.eosType == 'LINEAR':
             [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt] = fields
         else:
@@ -208,7 +218,7 @@ def adjust_mit_state (mit_dir, grid, options):
         if options.use_seaice:
             # Read the sea ice pickup too
             var_names_seaice = ['siTICES', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE', 'siSigm1', 'siSigm2', 'siSigm12']
-            fields_seaice = read_last_output(mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
+            fields_seaice = read_mit_output('last', mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
             temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = fields_seaice
 
         # Make sure there are no ptracers in this simulation
@@ -521,8 +531,49 @@ def gather_output (options, spinup, first_coupled):
                 print 'Error gathering output'
                 print 'Ua did not create the draft file '+ua_draft_file
                 sys.exit()
-            
-        
+
+
+# Edit the OBCS normal velocity files (for next and all following years,
+# if they're transient) to prevent massive drift in the sea surface height.
+# This correction will be performed each coupling step, based on the mean
+# sea surface height over the last step, and will relax this toward zero.
+# Only called if options.correct_obcs_online = True.
+def correct_next_obcs (options):
+
+    # Read sea surface height from last coupling step, time-averaged
+    directory = options.output_dir + options.last_start_date + '/MITgcm/'
+    if options.use_xmitgcm:
+        eta = read_netcdf(directory+options.mit_nc_name, 'ETAN', time_average=True)
+    else:
+        eta = read_mit_output('avg', directory, options.etan_name, 'ETAN')
+    # Mask out the land and ice shelves, and area-average
+    eta = mask_land_ice(eta, grid)
+    eta_avg = area_average(eta, grid)
+    # Figure out time period in years
+    d_t = options.couple_step/12.
+
+    if options.transient_obcs:
+        # Figure out the range of years to process
+        # First find the last year available, based on the files in the directory
+        for fname in [options.obcs_file_w_u, options.obcs_file_e_u, options.obcs_file_s_v, options.obcs_file_n_v]:
+            if fname is not None:
+                file_list = get_file_list(options.mit_run_dir, fname)
+                break
+        if file_list is None:
+            print 'Error (correct_next_obcs): you must set the OBCS file names in at least one of obcs_file_w_u, etc.'
+            sys.exit()
+        end_year = int(file_list[-1][-4:])
+        # Now choose the start year, based on the start date of the next simulation segment (previously written in calendar file)
+        f = open(options.output_dir+options.calendar_file, 'r')
+        date_code = f.readline().strip()
+        f.close()
+        start_year = int(date_code[:4])        
+    else:
+        start_year = None
+        end_year = None
+
+    # Now apply the correction to the relevant files
+    balance_obcs(grid, option='correct', obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year, end_year=end_year)        
     
 
 

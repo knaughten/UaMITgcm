@@ -1,6 +1,6 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output
+from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs
 from coupling_utils import submit_job
 
 # Top-level coupling function.
@@ -55,6 +55,10 @@ if __name__ == "__main__":
 
         print 'Gathering output'
         gather_output(options, spinup, first_coupled)
+
+        if not finished and options.correct_obcs_online:
+            print 'Balancing OBCS based on last changes in sea surface height'
+            correct_next_obcs(options)
 
 
     # Do we need to submit more jobs?

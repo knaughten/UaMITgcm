@@ -46,7 +46,7 @@ total_time = 12*40
 spinup_time = 12
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 6
+couple_step = 12
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
@@ -92,8 +92,11 @@ adjust_vel = True
 ### Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
 misomip_wall = False
 ### Flag to preserve the MITgcm land mask in regions outside the Ua domain. 
-### This is necessary for the FRIS setup.
+### This is necessary for the FRIS and WSFRIS setups.
 preserve_ocean_mask = True
+### Flag to allow static ice shelves in regions outside the Ua domain.
+### This is necessary for the WSFRIS setup.
+preserve_static_ice = True
 
 ### How should we calculate the pressure load anomaly of the ice shelf draft?
 ### This involves making an assumption about the properties of the water
@@ -113,6 +116,15 @@ pload_salt = 34.2
 ### you made ahead of time?
 ua_ini_restart = False
 
+### Do you want the coupler to adjust the incoming OBCS velocities such that
+### the volume of the domain is approximately conserved on an annual basis?
+### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
+### preserved).
+correct_obcs_online = True
+### Are the OBCS transient (one file per variable per boundary per year)
+### as opposed to a monthly climatology?
+transient_obcs = True
+
 
 ###### 3. MITgcm parameters ######
 
@@ -120,6 +132,13 @@ ua_ini_restart = False
 use_seaice = True
 ### Does your configuration of MITgcm use the calendar package?
 use_cal_pkg = True
+
+### Does your configuration have a different value for deltaTmom
+### (not equal to deltaT) just for the first ocean segment?
+### If so, set this variable to true, and make sure that input/data has
+### deltaTmom set for the first segment. The code will comment it out
+### in later segments so deltaTmom=deltaT implicitly.
+use_ini_deltaTmom = True
 
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
@@ -211,8 +230,10 @@ pload_file = 'pload_WSFRIS'
 ### (you can have SHIfwFlx on another output stream too if you want
 ### output at a different frequency for analysis)
 ismr_name = 'state2D'
+### Contains ETAN (only needed if correct_obcs_online)
+etan_name = 'state2D'
 ### Any files you want to output at output_freq.
-### Will probably include ismr_name.
+### Will probably include ismr_name and etan_name.
 output_names = ['state2D', 'stateUVEL', 'stateVVEL', 'stateWVEL', 'stateTHETA', 'stateSALT', 'statePSI', 'stateEXF', 'stateICE']
 
 ### Name for NetCDF files converted by xmitgcm
@@ -225,3 +246,17 @@ mit_nc_name = 'output.nc'
 ua_melt_file = 'NewMeltrate.mat'
 ### Ice shelf draft file written by Ua
 ua_draft_file = 'DataForMIT.mat'
+
+### Filenames for OBCS normal velocities (or the beginnings of the filenames,
+### followed by the year, if transient_obcs = True)
+### Only matters if correct_obcs_online = True.
+### For boundaries which are closed, just set to None.
+### Make sure that mitgcm_run/scripts/prepare_run.sh copies these files into
+### mitgcm_run/run/, not just links them, as they will be overwritten!
+obcs_file_w_u = None
+obcs_file_e_u = 'UVEL_piControl.OBCS_E_'
+obcs_file_s_v = None
+obcs_file_n_v = 'VVEL_piControl.OBCS_N_'
+
+
+
