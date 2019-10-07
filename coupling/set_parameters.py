@@ -105,6 +105,11 @@ class Options:
         if self.calendar_type=='noleap' and self.output_freq=='monthly':
             throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
+        # Set default value for filling
+        try:
+            self.filling = check_value('filling', filling, type='bool')
+        except(NameError):
+            self.filling = False
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
         # Set default values for preserve_ocean_mask and preserve_static_ice, until we roll it out to all config_options.py

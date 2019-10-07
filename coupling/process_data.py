@@ -11,7 +11,7 @@ import sys
 from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list
 
 from mitgcm_python.utils import convert_ismr, calc_hfac, xy_to_xyz, z_to_xyz, mask_land_ice
-from mitgcm_python.make_domain import do_digging, do_zapping
+from mitgcm_python.make_domain import do_filling, do_digging, do_zapping
 from mitgcm_python.file_io import read_binary, write_binary, set_dtype, read_netcdf
 from mitgcm_python.interpolation import discard_and_fill
 from mitgcm_python.ics_obcs import calc_load_anomaly, balance_obcs
@@ -135,6 +135,10 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
         draft[0,:] = 0
         bathy[-1,:] = 0
         draft[-1,:] = 0
+
+    if options.filling:
+        print 'Filling in isolated ocean bottom cells'
+        do_filling(bathy, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
 
     if options.digging == 'none':
         print 'Not doing digging as per user request'

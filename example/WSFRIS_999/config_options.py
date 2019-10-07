@@ -84,6 +84,8 @@ output_freq = 'monthly'
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
 digging = 'bathy'
+### Should we fill isolated single bottom cells to prevent pooling of dense water?
+filling = True
 
 ### Should we adjust velocities at each coupling timestep to preserve
 ### barotropic transport?
