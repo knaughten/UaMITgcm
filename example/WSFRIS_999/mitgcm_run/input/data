@@ -34,7 +34,7 @@
 # See data.exf, with variables exf_iprec and exf_iprec_obcs (both default 32)
  readBinaryPrec=64,
  useSingleCpuIO=.true.,
- debugLevel=1,
+ debugLevel=-1,
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### nh_Am2=1.,

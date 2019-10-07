@@ -58,7 +58,7 @@ def line_that_matters (file_name, substr, ignore_case=True, throw_error=True):
     f.close()
     
     # Make sure we found it
-    if line_to_save is None and thow_error:
+    if line_to_save is None and throw_error:
         print 'Error (line_that_matters): ' + file_name + ' does not contain ' + substr
         sys.exit()
         

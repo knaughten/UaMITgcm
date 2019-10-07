@@ -29,7 +29,7 @@
   frequency(2) = 2592000.,
 
   fields(1,3)  = 'VVEL    ',
-  fileName(3) = 'stateVVEL',
+  fileName(3) =  'stateVVEL',
   frequency(3) = 2592000.,
 
   fields(1,4)  = 'WVEL    ',
