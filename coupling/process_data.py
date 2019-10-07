@@ -538,7 +538,7 @@ def gather_output (options, spinup, first_coupled):
 # This correction will be performed each coupling step, based on the mean
 # sea surface height over the last step, and will relax this toward zero.
 # Only called if options.correct_obcs_online = True.
-def correct_next_obcs (options):
+def correct_next_obcs (grid, options):
 
     # Read sea surface height from last coupling step, time-averaged
     directory = options.output_dir + options.last_start_date + '/MITgcm/'
@@ -573,7 +573,7 @@ def correct_next_obcs (options):
         end_year = None
 
     # Now apply the correction to the relevant files
-    balance_obcs(grid, option='correct', obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year, end_year=end_year)        
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year, end_year=end_year)        
     
 
 

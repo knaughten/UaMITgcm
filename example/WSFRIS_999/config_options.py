@@ -163,7 +163,7 @@ seaice_nz = 7
 
 ### Starting date of simulation
 ### Should match startDate_1 in data.cal
-startDate = '19790101'
+startDate = '26800101'
 
 
 

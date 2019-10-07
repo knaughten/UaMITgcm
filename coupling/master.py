@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
         if not finished and options.correct_obcs_online:
             print 'Balancing OBCS based on last changes in sea surface height'
-            correct_next_obcs(options)
+            correct_next_obcs(grid, options)
 
 
     # Do we need to submit more jobs?
