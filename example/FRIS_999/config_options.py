@@ -41,12 +41,12 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 12*40
+total_time = 12*20
 ### Length of ocean spinup period (months)
-spinup_time = 12
+spinup_time = 12*20
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 6
+couple_step = 12
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
@@ -84,6 +84,8 @@ output_freq = 'monthly'
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
 digging = 'bathy'
+### Should we fill isolated single bottom cells to prevent pooling of dense water?
+filling = True
 
 ### Should we adjust velocities at each coupling timestep to preserve
 ### barotropic transport?
@@ -113,6 +115,15 @@ pload_salt = 34.2
 ### you made ahead of time?
 ua_ini_restart = False
 
+### Do you want the coupler to adjust the incoming OBCS velocities such that
+### the volume of the domain is approximately conserved on an annual basis?
+### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
+### preserved).
+correct_obcs_online = True
+### Are the OBCS transient (one file per variable per boundary per year)
+### as opposed to a monthly climatology?
+transient_obcs = False
+
 
 ###### 3. MITgcm parameters ######
 
@@ -121,10 +132,17 @@ use_seaice = True
 ### Does your configuration of MITgcm use the calendar package?
 use_cal_pkg = True
 
+### Does your configuration have a different value for deltaTmom
+### (not equal to deltaT) just for the first ocean segment?
+### If so, set this variable to true, and make sure that input/data has
+### deltaTmom set for the first segment. The code will comment it out
+### in later segments so deltaTmom=deltaT implicitly.
+use_ini_deltaTmom = True
+
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
 ### to find what they have been set to by default.
-deltaT = 300
+deltaT = 600
 hFacMin = 0.1
 hFacMinDr = 20.
 readBinaryPrec = 64
@@ -169,9 +187,9 @@ draftFile = 'draft_WSS'
 ### Initial conditions files read by MITgcm:
 ###
 ### Temperature (match hydrogThetaFile in input/data)
-ini_temp_file = 'THETA_MIT.ini'
+ini_temp_file = 'THETA_BSOSE.ini'
 ### Salinity (match hydrogSaltFile in input/data)
-ini_salt_file = 'SALT_MIT.ini'
+ini_salt_file = 'SALT_BSOSE.ini'
 ### Zonal velocity (match uVelInitFile in input/data)
 ### Only needed for restart_type='zero'.
 ### This is assumed not to exist at the beginning,
@@ -187,11 +205,11 @@ ini_eta_file = ''
 ### They will be created if they don't exist and restart_type='zero'.
 ###
 ### Sea ice area (match AreaFile in input/data.seaice)
-ini_area_file = 'SIarea_MIT.ini'
+ini_area_file = 'SIarea_BSOSE.ini'
 ### Sea ice thickness (match HeffFile in input/data.seaice)
-ini_heff_file = 'SIheff_MIT.ini'
+ini_heff_file = 'SIheff_BSOSE.ini'
 ### Snow thickness (match HsnowFile in input/data.seaice)
-ini_hsnow_file = 'SIhsnow_MIT.ini'
+ini_hsnow_file = 'SIhsnow_BSOSE.ini'
 ### Sea ice zonal velocity (match uIceFile in input/data.seaice)
 ini_uice_file = ''
 ### Sea ice meridional velocity (match vIceFile in input/data.seaice)
@@ -211,8 +229,10 @@ pload_file = 'pload_WSS'
 ### (you can have SHIfwFlx on another output stream too if you want
 ### output at a different frequency for analysis)
 ismr_name = 'state2D'
+### Contains ETAN (only needed if correct_obcs_online)
+etan_name = 'state2D'
 ### Any files you want to output at output_freq.
-### Will probably include ismr_name.
+### Will probably include ismr_name and etan_name.
 output_names = ['state2D', 'stateUVEL', 'stateVVEL', 'stateWVEL', 'stateTHETA', 'stateSALT', 'statePSI', 'stateEXF', 'stateICE']
 
 ### Name for NetCDF files converted by xmitgcm
@@ -225,3 +245,16 @@ mit_nc_name = 'output.nc'
 ua_melt_file = 'NewMeltrate.mat'
 ### Ice shelf draft file written by Ua
 ua_draft_file = 'DataForMIT.mat'
+
+### Filenames for OBCS normal velocities (or the beginnings of the filenames,
+### followed by the year, if transient_obcs = True)
+### Only matters if correct_obcs_online = True.
+### For boundaries which are closed, just set to None.
+### Make sure that mitgcm_run/scripts/prepare_run.sh copies these files into
+### mitgcm_run/run/, not just links them, as they will be overwritten!
+obcs_file_w_u = None
+obcs_file_e_u = 'UVEL_BSOSE.OBCS_E'
+obcs_file_s_v = None
+obcs_file_n_v = 'VVEL_BSOSE.OBCS_N'
+
+

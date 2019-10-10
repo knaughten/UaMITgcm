@@ -361,6 +361,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
             check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, check=check)
 
     if use_ini_deltaTmom:
+        print 'Checking deltaTmom in ' + namelist
         # Find the line setting deltaTmom
         # If this line doesn't exist (or is uncommented), don't throw an error, just return None.
         deltaTmom_line = line_that_matters(namelist, 'deltaTmom', throw_error=False)

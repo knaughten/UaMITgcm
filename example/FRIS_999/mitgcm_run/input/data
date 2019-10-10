@@ -254,7 +254,8 @@
  niter0=0,
 # 1979-2016
  endTime=31536000,
- deltaT=300.,
+ deltaT=600.,
+ deltaTmom=60.,
  abEps=0.1,
  forcing_In_AB=.false.,
  pChkptFreq=31536000.,
@@ -387,8 +388,8 @@
 # Input datasets
  &PARM05
  bathyFile='bathy_WSS',
- hydrogThetaFile='THETA_MIT.ini',
- hydrogSaltFile='SALT_MIT.ini',
+ hydrogThetaFile='THETA_BSOSE.ini',
+ hydrogSaltFile='SALT_BSOSE.ini',
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### bathyFile=' ',
