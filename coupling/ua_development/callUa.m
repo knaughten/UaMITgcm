@@ -84,7 +84,7 @@ lonGMIT = rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XG']); % 2d array
 latGMIT = rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YG']); % 2d array
 
 % check if MIT coordinates are latlon or ps.
-if all(lonCMIT(:)>=0) && all(lonCMIT(:)<=360) && all(latCMIT(:)>=-90) && all(latCMIT(:)<=90)
+if all(latCMIT(:)>=-90) && all(latCMIT(:)<=90)
     UserVar.UaMITgcm.MITcoordinates = 'latlon';
     % Convert longitude from 0-360 range to -180-180 range
     index = lonCMIT > 180;
