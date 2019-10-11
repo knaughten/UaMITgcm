@@ -4,7 +4,6 @@
 # Example: python ../coupling/copy_case.py WSFRIS_999 WSFRIS_001
 
 import sys
-from set_parameters import Options
 from coupling_utils import copy_to_dir, line_that_matters, replace_line
 
 old_name = sys.argv[1]
@@ -17,7 +16,8 @@ old_dir = old_name+'/'
 new_dir = new_name+'/'
 
 # Add the existing configuration to the path so we can read config_options.py
-sys.path.insert(0,'./'+old_dir)
+sys.path.insert(0, './'+old_dir)
+from set_parameters import Options
 options = Options()
 
 # Paths to subdirectories
