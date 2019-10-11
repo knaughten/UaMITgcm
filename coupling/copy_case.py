@@ -4,6 +4,8 @@
 # Example: python ../coupling/copy_case.py WSFRIS_999 WSFRIS_001
 
 import sys
+import os
+import shutil
 from coupling_utils import copy_to_dir, line_that_matters, replace_line
 
 old_name = sys.argv[1]
