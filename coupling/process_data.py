@@ -65,10 +65,9 @@ def copy_grid (mit_dir, out_dir):
 # Arguments:
 # mit_dir: MITgcm directory containing SHIfwFlx output
 # ua_out_file: desired path to .mat file for Ua to read melt rates from.
-# grid: Grid object (for the MITgcm segment that just finished)
 # options: Options object
 
-def extract_melt_rates (mit_dir, ua_out_file, grid, options):
+def extract_melt_rates (mit_dir, ua_out_file, options):
 
     # Read the most recent ice shelf melt rate output and convert to m/y,
     # melting is negative as per Ua convention.

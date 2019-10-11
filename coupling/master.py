@@ -30,7 +30,7 @@ if __name__ == "__main__":
             copy_grid(options.mit_run_dir, options.output_dir)
 
             print 'Sending melt rates from MITgcm to Ua'
-            extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, grid, options)
+            extract_melt_rates(options.mit_run_dir, options.output_dir+options.ua_melt_file, options)
 
             # Do we need to change the ice shelf draft in MITgcm?
             if not first_coupled:
