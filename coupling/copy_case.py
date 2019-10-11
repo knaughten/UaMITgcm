@@ -1,11 +1,12 @@
 # Copy a configuration to one with a new name but all the same settings.
-# Call this from within the directory containing all your configurations (such as UaMITgcm/examples).
+# Call this from within the directory containing all your configurations (such as UaMITgcm/example).
 # Give it two arguments: the old experiment name, and the new experiment name.
 # Example: python ../coupling/copy_case.py WSFRIS_999 WSFRIS_001
 
 import sys
 import os
 import shutil
+import subprocess
 from coupling_utils import copy_to_dir, line_that_matters, replace_line
 
 old_name = sys.argv[1]
@@ -27,6 +28,8 @@ old_mit_dir = options.mit_case_dir
 new_mit_dir = old_mit_dir.replace(old_name, new_name)
 old_build_dir = old_mit_dir + 'build/'
 new_build_dir = new_mit_dir + 'build/'
+old_scripts_dir = old_mit_dir + 'scripts/'
+new_scripts_dir = new_dir_dir + 'scripts/'
 old_uapost_dir = old_dir + 'ua_postprocess/'
 new_uapost_dir = new_dir + 'ua_postprocess/'
 old_uaexe_dir = options.ua_exe_dir
@@ -46,7 +49,9 @@ copy_to_dir('mitgcmuv', old_build_dir, new_build_dir)
 copy_to_dir('genmake.log', old_build_dir, new_build_dir)
 shutil.copytree(old_mit_dir+'code/', new_mit_dir+'code/')
 shutil.copytree(old_mit_dir+'input/', new_mit_dir+'input/')
-shutil.copytree(old_mit_dir+'scripts/', new_mit_dir+'scripts/')
+shutil.copytree(old_scripts_dir, new_scripts_dir)
+# Now call the prepare_run.sh script to reset the MITgcm run directory
+subprocess.check_output([new_scripts_dir+'prepare_run.sh', new_scripts_dir])
 
 # Ua custom source code directory
 shutil.copytree(old_dir+'ua_custom/', new_dir+'ua_custom/')
