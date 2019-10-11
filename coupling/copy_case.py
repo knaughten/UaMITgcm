@@ -27,7 +27,7 @@ old_build_dir = old_mit_dir + 'build/'
 new_build_dir = new_mit_dir + 'build/'
 old_uapost_dir = old_dir + 'ua_postprocess/'
 new_uapost_dir = new_dir + 'ua_postprocess/'
-old_uaexe_dir = options.mit_exe_dir
+old_uaexe_dir = options.ua_exe_dir
 new_uaexe_dir = old_uaexe_dir.replace(old_name, new_name)
 
 # Root directory
