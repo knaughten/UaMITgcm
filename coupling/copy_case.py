@@ -7,7 +7,7 @@ import sys
 from coupling_utils import copy_to_dir, line_that_matters, replace_line
 
 old_name = sys.argv[1]
-new_name = sys.arvg[2]
+new_name = sys.argv[2]
 if old_name.endswith('/'):
     old_name = old_name[:-1]
 if new_name.endswith('/'):
