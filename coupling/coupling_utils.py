@@ -260,7 +260,7 @@ def move_to_dir (fname, old_dir, new_dir):
 
 # Copy a file from one directory to another, without changing its name.
 def copy_to_dir (fname, old_dir, new_dir):
-    shutil.copyfile(old_dir+fname, new_dir+fname)    
+    shutil.copy(old_dir+fname, new_dir+fname)    
 
 
 # Convert a list of strings to a single string with elements separated by the given separator character.
@@ -344,7 +344,7 @@ def move_processed_files (directory, tmpdir, prefixes, tstep):
 
 # Make a temporary copy of the given file with the suffix .tmp
 def make_tmp_copy (file_path):
-    shutil.copyfile(file_path, file_path+'.tmp')
+    shutil.copy(file_path, file_path+'.tmp')
 
 
 # Make a list of filenames in the given directory that start with the given string, and return in alphabetical order.
