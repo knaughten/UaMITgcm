@@ -35,7 +35,7 @@ def clean_ua (directory):
             if os.path.isfile(orig_restart):
                 break
             orig_restart = raw_input('That file does not exist. Try again: ')
-        shutil.copyfile(orig_restart, directory+restart_name)
+        shutil.copy(orig_restart, directory+restart_name)
 
 
 # Main processing
