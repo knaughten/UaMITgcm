@@ -34,8 +34,6 @@ SHARED=/work/n02/n02/shared/baspog/MITgcm
 WSFRIS_IN=$SHARED/WS/WSFRIS
 ln -s $WSFRIS_IN/* .
 ln -s $SHARED/UKESM/piControl/* .
-# REPLACE THESE FILES once piControl tas data is available.
-ln -s $WORK/dummy_tas/* .
 
 # Deep copy of some files that will be modified
 rm -f draft_WSFRIS bathy_WSFRIS pload_WSFRIS

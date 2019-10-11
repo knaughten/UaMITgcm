@@ -383,6 +383,12 @@ def convert_mit_output (options):
         if fname.startswith('pickup') and (fname.endswith('.data') or fname.endswith('.meta')):
             move_to_dir(fname, options.mit_run_dir, tmp_dir)
 
+    # Choose calendar type to send to xmitgcm
+    if options.calendar_type == '360-day':
+        calendar = '360_day'
+    else:
+        calendar = options.calendar_type
+
     # Inner function to read MDS files and convert to NetCDF.
     # If dump=True, only read dump files, and only from the given timestep.
     # Then move the original files to a temporary directory so they're hidden
@@ -399,7 +405,7 @@ def convert_mit_output (options):
             iters = 'all'
             prefixes = None
         # Read all the files matching the criteria
-        ds = open_mdsdataset(options.mit_run_dir, iters=iters, prefix=prefixes, delta_t=options.deltaT, ref_date=ref_date, ignore_unknown_vars=True)
+        ds = open_mdsdataset(options.mit_run_dir, iters=iters, prefix=prefixes, delta_t=options.deltaT, ref_date=ref_date, ignore_unknown_vars=True, calendar=calendar)
         # Save to NetCDF file
         ds.to_netcdf(options.mit_run_dir+nc_name, unlimited_dims=['time'])
         if dump:

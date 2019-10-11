@@ -11,7 +11,7 @@
  SHELFICEuseGammaFrict=.true.,
  SHELFICEadvDiffHeatFlux=.true.,
  SHELFICEselectDragQuadr=2,
- shiCdrag=0.003,
+ shiCdrag=0.0097,
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### SHELFICEheatTransCoeff=1.E-4,
