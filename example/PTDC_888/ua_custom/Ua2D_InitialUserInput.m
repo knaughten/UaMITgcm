@@ -12,7 +12,7 @@ CtrlVar.Restart=1;
 CtrlVar.dt = 1e-3;
 CtrlVar.RestartTime=0; 
 CtrlVar.ResetTime=1;
-CtrlVar.ResetTimeStep=0;    % perhaps this has to be reconsidered if model has issues converging
+CtrlVar.ResetTimeStep=1;    % perhaps this has to be reconsidered if model has issues converging
 
 % Parallel options
 %myCluster = parcluster('local') ;  
