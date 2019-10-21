@@ -45,6 +45,8 @@ example/FRIS_old
 example/FRIS_post_spinup
 example/FRIS_300
 example/PTDC_999/Kimura_OceanBC.mat
+example/PTDC_888/Kimura_OceanBC.mat
+example/PTDC_888/ua_custom/RefinedMesh_for_MITmask.mat
 example/WSFRIS_999/Ua
 example/WSFRIS_999/coupler_stdout
 example/WSFRIS_999/jobs.log
