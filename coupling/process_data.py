@@ -8,7 +8,7 @@ import os
 import shutil
 import sys
 
-from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list
+from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list, years_between
 
 from mitgcm_python.utils import convert_ismr, calc_hfac, xy_to_xyz, z_to_xyz, mask_land_ice
 from mitgcm_python.make_domain import do_filling, do_digging, do_zapping
@@ -558,8 +558,16 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    # Figure out time period in years
-    d_t = options.couple_step/12.
+    # Figure out time period (since beginning of simulation) in years
+    year_1 = int(options.startDate[:4])
+    month_1 = int(options.startDate[4:6])
+    f = open(options.output_dir+options.calendar_file, 'r')
+    date_code = f.readline().strip()
+    f.close()
+    year_2 = int(date_code[:4])
+    month_2 = int(date_code[4:6])
+    d_t = years_between(year_1, month_1, year_2, month_2, options.calendar_type)
+    print 'Total simulation time so far: ' + str(d_t) + ' years'
 
     if options.transient_obcs:
         # Figure out the range of years to process
@@ -572,11 +580,8 @@ def correct_next_obcs (grid, options):
             print 'Error (correct_next_obcs): you must set the OBCS file names in at least one of obcs_file_w_u, etc.'
             sys.exit()
         end_year = int(file_list[-1][-4:])
-        # Now choose the start year, based on the start date of the next simulation segment (previously written in calendar file)
-        f = open(options.output_dir+options.calendar_file, 'r')
-        date_code = f.readline().strip()
-        f.close()
-        start_year = int(date_code[:4])        
+        # Now choose the start year, based on the start date of the next simulation segment (previously read from calendar file)
+        start_year = year_2
     else:
         start_year = None
         end_year = None

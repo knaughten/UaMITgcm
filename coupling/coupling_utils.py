@@ -138,6 +138,18 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
             return num_days
 
 
+# As above, but in years (conversion depends on calendar type).
+def years_between (year_1, month_1, year_2, month_2, calendar_type):
+
+    num_days = days_between(year_1, month_1, year_2, month_2, calendar_type)
+    if calendar_type == '360-day':
+        return num_days/360.
+    elif calendar_type == 'noleap':
+        return num_days/365.
+    elif calendar_type == 'standard':
+        return num_days/365.25
+
+
 # Read MITgcm binary output file(s) of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
 # Will either read the most recently modified file (time_option='last') or time-average all available files (time_option='avg').
 # If there is an expected value for the timestep number corresponding to the 'last' output, check that it agrees.
