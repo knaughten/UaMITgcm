@@ -558,6 +558,8 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
+    # Multiply this value by 2 so that the correction will reverse it, not just stabilise it.
+    eta_avg *= 2
     # Figure out time period (since beginning of simulation) in years
     year_1 = int(options.startDate[:4])
     month_1 = int(options.startDate[4:6])
