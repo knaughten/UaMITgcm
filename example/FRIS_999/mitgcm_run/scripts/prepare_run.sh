@@ -34,13 +34,10 @@ SHARED=/work/n02/n02/shared/baspog/MITgcm
 WSS_IN=$SHARED/WS/FRIS
 ln -s $WSS_IN/* .
 ln -s $SHARED/reanalysis/ERA5/* .
-#ln -s $SHARED/reanalysis/ERAI_075/* .
 
 # Deep copy of some files that will be modified
 rm -f draft_WSS bathy_WSS pload_WSS
 cp -f $WSS_IN/draft_WSS $WSS_IN/bathy_WSS $WSS_IN/pload_WSS .
-rm -f UVEL_BSOSE.OBCS_E VVEL_BSOSE.OBCS_N
-cp -f $WSS_IN/UVEL_BSOSE.OBCS_E $WSS_IN/VVEL_BSOSE.OBCS_N
 
 # Link executable
 ln -s ../build/mitgcmuv .

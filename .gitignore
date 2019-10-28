@@ -40,6 +40,7 @@ example/FRIS_999/output
 example/FRIS_999/ua_postprocess/UaPost
 example/FRIS_999/ua_postprocess/matlab*.out
 example/FRIS_999/ini_grid
+example/FRIS_UaMITgcm
 example/old
 example/FRIS_old
 example/FRIS_post_spinup
@@ -67,3 +68,4 @@ example/WSFRIS_999/output
 example/WSFRIS_999/ua_postprocess/UaPost
 example/WSFRIS_999/ua_postprocess/matlab*.out
 example/WSFRIS_999/ini_grid
+example/WSFRIS_0*

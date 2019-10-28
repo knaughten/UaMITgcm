@@ -22,7 +22,7 @@
  OBNuiceFile='SIuice_piControl.OBCS_N',
  OBNviceFile='SIvice_piControl.OBCS_N',
  useOBCSsponge=.true.,
- useSeaiceSponge=.true.,
+ useSeaiceSponge=.false.,
  useOBCSbalance=.false.,
  useOBCStides=.false.,
 ############################################################################

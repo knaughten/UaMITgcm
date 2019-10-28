@@ -173,7 +173,7 @@ C-  Bulk formulae related flags.
 C Note: To use ALLOW_BULKFORMULAE or EXF_READ_EVAP, needs #define ALLOW_ATM_TEMP
 # define ALLOW_BULKFORMULAE
 # undef  ALLOW_BULK_LARGEYEAGER04
-# define  EXF_READ_EVAP
+# undef  EXF_READ_EVAP
 # ifndef ALLOW_BULKFORMULAE
 C  Note: To use ALLOW_READ_TURBFLUXES, ALLOW_ATM_TEMP needs to
 C        be defined but ALLOW_BULKFORMULAE needs to be undef

@@ -8,7 +8,7 @@
  SEAICEuseEVPstar=true,
  SEAICE_evpAlpha=20.,
  SEAICE_evpBeta=20.,
- SEAICEnEVPstarSteps=100,
+ SEAICEnEVPstarSteps=200,
  SEAICEadvScheme=33,
  SEAICE_drag=0.002,
  SEAICEdiffKhHeff=20.,

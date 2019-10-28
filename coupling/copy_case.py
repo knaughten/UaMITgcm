@@ -18,6 +18,13 @@ if new_name.endswith('/'):
 old_dir = old_name+'/'
 new_dir = new_name+'/'
 
+if not os.path.isdir(old_dir):
+    print 'Error (copy_case): ' + old_dir + ' does not exist'
+    sys.exit()
+if os.path.isdir(new_dir):
+    print 'Error (copy_case): ' + new_dir + ' already exists'
+    sys.exit()
+
 # Add the existing configuration to the path so we can read config_options.py
 sys.path.insert(0, './'+old_dir)
 from set_parameters import Options
