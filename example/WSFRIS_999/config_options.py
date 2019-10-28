@@ -121,11 +121,9 @@ ua_ini_restart = False
 ### Do you want the coupler to adjust the incoming OBCS velocities such that
 ### the volume of the domain is approximately conserved on an annual basis?
 ### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
-### preserved).
+### preserved). The OBCS must be transient (one file per year) as opposed to a
+### monthly climatology. 
 correct_obcs_online = True
-### Are the OBCS transient (one file per variable per boundary per year)
-### as opposed to a monthly climatology?
-transient_obcs = True
 
 
 ###### 3. MITgcm parameters ######
@@ -249,8 +247,7 @@ ua_melt_file = 'NewMeltrate.mat'
 ### Ice shelf draft file written by Ua
 ua_draft_file = 'DataForMIT.mat'
 
-### Filenames for OBCS normal velocities (or the beginnings of the filenames,
-### followed by the year, if transient_obcs = True)
+### Beginnings of filenames for OBCS normal velocities (followed by the year)
 ### Only matters if correct_obcs_online = True.
 ### For boundaries which are closed, just set to None.
 ### Make sure that mitgcm_run/scripts/prepare_run.sh copies these files into

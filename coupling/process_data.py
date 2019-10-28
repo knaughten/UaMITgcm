@@ -558,8 +558,6 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    # Multiply this value by 2 so that the correction will reverse it, not just stabilise it.
-    eta_avg *= 2
     # Figure out time period (since beginning of simulation) in years
     year_1 = int(options.startDate[:4])
     month_1 = int(options.startDate[4:6])
@@ -571,26 +569,34 @@ def correct_next_obcs (grid, options):
     d_t = years_between(year_1, month_1, year_2, month_2, options.calendar_type)
     print 'Total simulation time so far: ' + str(d_t) + ' years'
 
-    if options.transient_obcs:
-        # Figure out the range of years to process
-        # First find the last year available, based on the files in the directory
-        for fname in [options.obcs_file_w_u, options.obcs_file_e_u, options.obcs_file_s_v, options.obcs_file_n_v]:
-            if fname is not None:
-                file_list = get_file_list(options.mit_run_dir, fname)
-                break
-        if file_list is None:
-            print 'Error (correct_next_obcs): you must set the OBCS file names in at least one of obcs_file_w_u, etc.'
-            sys.exit()
-        end_year = int(file_list[-1][-4:])
-        # Now choose the start year, based on the start date of the next simulation segment (previously read from calendar file)
-        start_year = year_2
-    else:
-        start_year = None
-        end_year = None
+    # Find the range of years to process for the remainder of the simulation.
+    # First find the last year available, based on the files in the directory
+    for fname in [options.obcs_file_w_u, options.obcs_file_e_u, options.obcs_file_s_v, options.obcs_file_n_v]:
+        if fname is not None:
+            file_list = get_file_list(options.mit_run_dir, fname)
+            break
+    if file_list is None:
+        print 'Error (correct_next_obcs): you must set the OBCS file names in at least one of obcs_file_w_u, etc.'
+        sys.exit()
+    end_year = int(file_list[-1][-4:])
+    # Now choose the start year, based on the start date of the next simulation segment (previously read from calendar file)
+    start_year = year_2
 
-    # Now apply the correction to the relevant files
-    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year, end_year=end_year)        
-    
+    # Apply the correction in 2 stages:
+    # 1. For the next d_t years (round to nearest year), multiply the correction
+    # by 2, so the changes in sea surface height will be reversed.
+    start_year_1 = start_year
+    end_year_1 = min(start_year + int(np.round(d_t)) - 1, end_year)
+    print 'Doubling the correction for years ' + str(start_year_1) + '-' + str(end_year_1)
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=2*eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year_1, end_year=end_year_1)
+
+    if end_year_1 < end_year:
+        # 2. For all following years, apply the correction as-is, so the changes
+        # will be stabilised.
+        start_year_2 = end_year_1 + 1
+        end_year_2 = end_year
+        print 'Applying the basic correction for years ' + str(start_year_2) + '-' + str(end_year_2)
+        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year_2, end_year=end_year_2)
 
 
     
