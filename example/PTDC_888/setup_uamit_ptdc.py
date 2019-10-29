@@ -85,6 +85,25 @@ class OBCSForcingArray:
         else: 
             print 'Error: input data for obcs not found'
 
+        # check to see if year/month is within range of Kimura timestamps.
+        # if not, then it is assumed that we cycle through Kimura data until the correct year/month is reached
+
+        if self.years[-1] >= self.BC['year'][:,-1]:
+            # calculate how many years need adding to the timeseries
+            nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 1])
+            # calculate how many additional full cycles of the Kimura dataset are required to cover the requested simulation times
+            ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,1])))
+
+            self.BC['Theta'] = np.repeat(self.BC['Theta'],ncycles+1,axis=2)
+            self.BC['Salt'] = np.repeat(self.BC['Salt'],ncycles+1,axis=2)
+            self.BC['Ups'] = np.repeat(self.BC['Ups'],ncycles+1,axis=2)
+            self.BC['Vps'] = np.repeat(self.BC['Vps'],ncycles+1,axis=2)
+            monthstoappend = np.mod(np.arange(self.BC['month'].size*ncycles),12)+1
+            self.BC['month'] = np.append(self.BC['month'],monthstoappend)
+            yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(self.BC['year'].size*ncycles)/12) +1 
+            self.BC['year'] = np.append(self.BC['year'],yearstoappend)
+        
+
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
 
@@ -162,7 +181,7 @@ def ts_profile(x,y,z,obcs):
     L = np.sqrt((x-obcs.BC['x'][:,0])**2+(y-obcs.BC['y'][:,0])**2)
     IL = np.nanargmin(L)
     
-    for i in range(0,obcs.nt):
+    for i in range(0,obcs.nt):    
         findtime = np.in1d(obcs.BC['year'],obcs.years[i]) & np.in1d(obcs.BC['month'],obcs.months[i])
         Itime = np.where(findtime)
         Itime = Itime[0][0]
