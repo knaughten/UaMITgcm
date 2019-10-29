@@ -588,7 +588,7 @@ def correct_next_obcs (grid, options):
     start_year_1 = start_year
     end_year_1 = min(start_year + int(np.round(d_t)) - 1, end_year)
     print 'Doubling the correction for years ' + str(start_year_1) + '-' + str(end_year_1)
-    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=2*eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year_1, end_year=end_year_1)
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=2*eta_avg, d_t=d_t, multi_year=True, start_year=start_year_1, end_year=end_year_1)
 
     if end_year_1 < end_year:
         # 2. For all following years, apply the correction as-is, so the changes
@@ -596,7 +596,7 @@ def correct_next_obcs (grid, options):
         start_year_2 = end_year_1 + 1
         end_year_2 = end_year
         print 'Applying the basic correction for years ' + str(start_year_2) + '-' + str(end_year_2)
-        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=options.transient_obcs, start_year=start_year_2, end_year=end_year_2)
+        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=start_year_2, end_year=end_year_2)
 
 
     
