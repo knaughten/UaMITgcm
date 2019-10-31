@@ -558,7 +558,21 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    # Figure out time period (since beginning of simulation) in years
+    # Multiply by 2 so we correct it, and do it over 1 year
+    eta_avg *= 2
+    d_t = 1
+    # Figure out the next year to process
+    f = open(options.output_dir+options.calendar_file, 'r')
+    date_code = f.readline().strip()
+    f.close()
+    year = int(date_code[:4])
+    # Apply the correction
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=year, end_year=year)
+
+    
+
+    
+    '''# Figure out time period (since beginning of simulation) in years
     year_1 = int(options.startDate[:4])
     month_1 = int(options.startDate[4:6])
     f = open(options.output_dir+options.calendar_file, 'r')
@@ -596,7 +610,7 @@ def correct_next_obcs (grid, options):
         start_year_2 = end_year_1 + 1
         end_year_2 = end_year
         print 'Applying the basic correction for years ' + str(start_year_2) + '-' + str(end_year_2)
-        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=start_year_2, end_year=end_year_2)
+        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=start_year_2, end_year=end_year_2)'''
 
 
     
