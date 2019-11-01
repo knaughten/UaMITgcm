@@ -50,6 +50,7 @@ for fname in os.listdir(old_dir):
 
 # MITgcm case directory
 os.mkdir(new_mit_dir)
+copy_to_dir('linux_amd64_archer_ifort', old_mit_dir, new_mit_dir)
 os.mkdir(new_mit_dir+'run/')
 os.mkdir(new_build_dir)
 copy_to_dir('mitgcmuv', old_build_dir, new_build_dir)

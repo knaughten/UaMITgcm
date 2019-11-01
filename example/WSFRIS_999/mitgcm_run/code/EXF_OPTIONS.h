@@ -228,6 +228,9 @@ C   (no pole symmetry, single vector-comp interp, reset to 0 zonal-comp @ N.pole
 # define EXF_IREAD_USE_GLOBAL_POINTER
 #endif
 
+C-  Allows to read-in katabatic wind scaling factors
+#define ALLOW_KATABATIC_SCALING
+
 #endif /* ndef ECCO_CPPOPTIONS_H */
 #endif /* ALLOW_EXF */
 #endif /* EXF_OPTIONS_H */
