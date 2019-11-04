@@ -276,6 +276,10 @@ with open('/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/RunTable.csv', 'rb'
 		print 'Ua restart file '+filename+' not found'
        		sys.exit()
 		 
+print 'Copy RefinedMesh_for_MITmask.mat to ua_run directory'
+shutil.copyfile('/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/RefinedMesh_for_MITmask.mat','./ua_run/RefinedMesh_for_MITmask.mat')
+
+
 
 
     
