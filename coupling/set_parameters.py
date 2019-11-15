@@ -382,9 +382,10 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
     if use_ini_deltaTmom:
         print 'Checking deltaTmom in ' + namelist
         if options.initial:
+            # Make sure it's there and uncommented
             if line_that_matters(namelist, 'deltaTmom', throw_error=False) is None:
-            print 'Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?'
-            sys.exit()
+                print 'Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?'
+                sys.exit()
         else:
             # Comment it out
             find_comment_line(namelist, 'deltaTmom')
