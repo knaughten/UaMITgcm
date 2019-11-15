@@ -548,6 +548,7 @@ def move_repeated_output(options):
                 int(fname)
             except(ValueError):
                 continue
+            print 'Moving ' + fname
             shutil.move(options.output_dir+fname, new_dir)    
 
 
