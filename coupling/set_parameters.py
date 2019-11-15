@@ -493,7 +493,11 @@ def set_calendar (options):
     # Figure out if the simulation is finished
     # Find the year and month after the simulation ends
     end_year, end_month = add_months(ini_year, ini_month, options.total_time)
-    finished = new_year==end_year and new_month==end_month    
+    finished = new_year==end_year and new_month==end_month
+    
+    # Save all the information about this simulation type to the Options object
+    options.save_simulation_type(initial, restart, spinup, first_coupled, finished, init_repeat)
+    
     if finished:
         print 'Simulation has finished'
         # Create the finished file
@@ -551,7 +555,7 @@ def set_calendar (options):
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
         update_namelists(mit_dir, segment_length, simulation_length, options)
 
-    options.save_simulation_type(initial, restart, spinup, first_coupled, finished, init_repeat)
+    
 
         
 
