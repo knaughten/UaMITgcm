@@ -533,7 +533,7 @@ def move_repeated_output(options):
     n = 1
     while True:
         new_dir = options.output_dir + 'repeat_' + str(n).zfill(2) + '/'
-        if not os.path.isdir(dir_name):
+        if not os.path.isdir(new_dir):
             print 'Moving output to ' + new_dir
             os.mkdir(new_dir)
             break
