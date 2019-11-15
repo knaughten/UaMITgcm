@@ -47,6 +47,13 @@ spinup_time = 12*20
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 12
+### Is this the second (or following) repetition of a forcing period?
+### (for example, run the period 1979-2014 twice)
+### Only matters for the segment when you're restarting the period.
+### After this, if you want to extend the run
+### (i.e. finish it, extend total_time, and resubmit run_coupler.sh)
+### you have to set repeat back to False, or it will start from the beginning.
+repeat = True
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.

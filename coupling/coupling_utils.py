@@ -92,6 +92,23 @@ def comment_line (file_name, line):
     replace_line(file_name, line, '#'+line)
 
 
+# Find the active line in the file containing the given substring, and comment it out. If there is more than one, throw an error.
+def find_comment_line (file_name, substring):
+
+    line = line_that_matters(file_name, substring, throw_error=False)
+    if line is not None:
+        comment_line(file_name, line)
+        line_2 = line_that_matters(file_name, substring, throw_error=False)
+        if line_2 is not None:
+            print 'Error (find_comment_line): ' + substring + ' is set multiple times in ' + file_name + '. Choose one so we can comment it out without confusion.'
+            sys.exit()
+    
+
+# Add a new line to a file, right after the given previous line.
+def add_line (file_name, line, previous_line):
+    replace_line(file_name, previous_line, previous_line+line)
+
+
 # Advance the given date (year and month) by num_months
 def add_months (year, month, num_months):
     

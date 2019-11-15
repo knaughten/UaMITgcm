@@ -61,13 +61,10 @@ def copy_grid (mit_dir, out_dir):
         
 
 # Put MITgcm melt rates in the right format for Ua. No need to interpolate.
+def extract_melt_rates (options):
 
-# Arguments:
-# mit_dir: MITgcm directory containing SHIfwFlx output
-# ua_out_file: desired path to .mat file for Ua to read melt rates from.
-# options: Options object
-
-def extract_melt_rates (mit_dir, ua_out_file, options):
+    mit_dir = options.mit_run_dir
+    ua_out_file = options.output_dir+options.ua_melt_file
 
     # Read the most recent ice shelf melt rate output and convert to m/y,
     # melting is negative as per Ua convention.
@@ -90,14 +87,10 @@ def extract_melt_rates (mit_dir, ua_out_file, options):
 #    'draft': dig ice shelf drafts which are too deep
 # In all cases, also remove ice shelf drafts which are too thin.
 # Ua does not see these changes to the geometry.
+def adjust_mit_geom (grid, options):
 
-# Arguments:
-# ua_draft_file: path to .mat ice shelf draft file written by Ua at the end of the last segment
-# mit_dir: path to MITgcm directory containing binary files for bathymetry and ice shelf draft
-# grid: Grid object
-# options: Options object
-
-def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
+    ua_draft_file = options.ua_output_dir+options.ua_draft_file
+    mit_dir = options.mit_run_dir
 
     # Read the bathymetry, ice shelf draft and mask from Ua
     f = loadmat(ua_draft_file)
@@ -176,12 +169,9 @@ def adjust_mit_geom (ua_draft_file, mit_dir, grid, options):
 # Sea ice (if active) will also set to zero area, thickness, snow depth, and velocity in the event of a retreat of the ice shelf front.
 # Also set the new pressure load anomaly.
 
-# Arguments:
-# mit_dir: path to MITgcm directory containing binary files for bathymetry, ice shelf draft, initial conditions, and dump of final state variables
-# grid: Grid object
-# options: Options object
+def adjust_mit_state (grid, options):
 
-def adjust_mit_state (mit_dir, grid, options):
+    mit_dir = options.mit_run_dir
 
     # Read the final state from the last segment (dump or pickup)
     if options.restart_type == 'zero':
@@ -358,8 +348,6 @@ def adjust_mit_state (mit_dir, grid, options):
 
 
 # Convert all the MITgcm binary output files in run/ to NetCDF, using the xmitgcm package.
-# Arguments:
-# options: Options object
 def convert_mit_output (options):
 
     # Wrap import statement inside this function, so that xmitgcm isn't required to be installed unless needed
@@ -430,11 +418,7 @@ def convert_mit_output (options):
 
 
 # Gather all output from MITgcm and Ua, moving it to a common subdirectory of options.output_dir.
-# Arguments:
-# options: Options object
-# spinup: boolean indicating we're in the ocean-only spinup phase, so there is no Ua output to deal with
-# first_coupled: boolean indicating we're about to start the first coupled timestep, so there is still no Ua output to deal with
-def gather_output (options, spinup, first_coupled):
+def gather_output (options):
 
     # Make a subdirectory named after the starting date of the simulation segment
     new_dir = options.output_dir + options.last_start_date + '/'
@@ -504,17 +488,17 @@ def gather_output (options, spinup, first_coupled):
     # Also the calendar file
     copy_tmp_file(options.calendar_file, options.output_dir, new_dir)
     
-    if not spinup:
+    if not options.spinup:
         # Deal with Ua
         # Find name of restart file
         restart_name = None
         for fname in os.listdir(options.ua_exe_dir):
             if fname.endswith('RestartFile.mat'):
                 restart_name = fname
-        if restart_name is None and (options.ua_ini_restart or not first_coupled):
+        if restart_name is None and (options.ua_ini_restart or not options.first_coupled):
             print 'Error (gather_output): there is no Ua restart file.'
             sys.exit()
-        if first_coupled:
+        if options.first_coupled:
             # There is no actual Ua output yet.
             # The only thing to do is make a temporary copy of the restart file, if it exists.
             if options.ua_ini_restart:
@@ -540,6 +524,31 @@ def gather_output (options, spinup, first_coupled):
                 print 'Error gathering output'
                 print 'Ua did not create the draft file '+ua_draft_file
                 sys.exit()
+
+
+# Move output from a previous repeat into a subdirectory so it doesn't get overwritten.
+def move_repeated_output(options):
+
+    # Make the next available subdirectory
+    n = 1
+    while True:
+        new_dir = options.output_dir + 'repeat_' + str(n).zfill(2) + '/'
+        if not os.path.isdir(dir_name):
+            print 'Moving output to ' + new_dir
+            os.mkdir(new_dir)
+            break
+        n += 1
+
+    # Move all the date-stamped subdirectories into it
+    for fname in os.listdir(options.output_dir):
+        # Check if it's a directory with name length 6
+        if os.path.isdir(fname) and len(fname) == 6:
+            # Check if it's all numbers
+            try:
+                int(fname)
+            except(ValueError):
+                continue
+            shutil.move(options.output_dir+fname, new_dir)    
 
 
 # Edit the OBCS normal velocity files (for next and all following years,
@@ -568,52 +577,3 @@ def correct_next_obcs (grid, options):
     year = int(date_code[:4])
     # Apply the correction
     balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=year, end_year=year)
-
-    
-
-    
-    '''# Figure out time period (since beginning of simulation) in years
-    year_1 = int(options.startDate[:4])
-    month_1 = int(options.startDate[4:6])
-    f = open(options.output_dir+options.calendar_file, 'r')
-    date_code = f.readline().strip()
-    f.close()
-    year_2 = int(date_code[:4])
-    month_2 = int(date_code[4:6])
-    d_t = years_between(year_1, month_1, year_2, month_2, options.calendar_type)
-    print 'Total simulation time so far: ' + str(d_t) + ' years'
-
-    # Find the range of years to process for the remainder of the simulation.
-    # First find the last year available, based on the files in the directory
-    for fname in [options.obcs_file_w_u, options.obcs_file_e_u, options.obcs_file_s_v, options.obcs_file_n_v]:
-        if fname is not None:
-            file_list = get_file_list(options.mit_run_dir, fname)
-            break
-    if file_list is None:
-        print 'Error (correct_next_obcs): you must set the OBCS file names in at least one of obcs_file_w_u, etc.'
-        sys.exit()
-    end_year = int(file_list[-1][-4:])
-    # Now choose the start year, based on the start date of the next simulation segment (previously read from calendar file)
-    start_year = year_2
-
-    # Apply the correction in 2 stages:
-    # 1. For the next d_t years (round to nearest year), multiply the correction
-    # by 2, so the changes in sea surface height will be reversed.
-    start_year_1 = start_year
-    end_year_1 = min(start_year + int(np.round(d_t)) - 1, end_year)
-    print 'Doubling the correction for years ' + str(start_year_1) + '-' + str(end_year_1)
-    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=2*eta_avg, d_t=d_t, multi_year=True, start_year=start_year_1, end_year=end_year_1)
-
-    if end_year_1 < end_year:
-        # 2. For all following years, apply the correction as-is, so the changes
-        # will be stabilised.
-        start_year_2 = end_year_1 + 1
-        end_year_2 = end_year
-        print 'Applying the basic correction for years ' + str(start_year_2) + '-' + str(end_year_2)
-        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=start_year_2, end_year=end_year_2)'''
-
-
-    
-    
-
-    

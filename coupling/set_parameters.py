@@ -8,7 +8,7 @@ import os
 import sys
 
 from config_options import *
-from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between, make_tmp_copy, comment_line
+from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between, make_tmp_copy, comment_line, add_line, find_comment_line
 
 from mitgcm_python.utils import real_dir, days_per_month
 
@@ -94,6 +94,11 @@ class Options:
         if self.spinup_time > self.total_time:
             throw_error('spinup_time should not be larger than total_time')
         self.couple_step = check_value('couple_step', couple_step, type='int')
+        # Set default value for repeat
+        try:
+            self.repeat = check_value('repeat', repeat, type='bool')
+        except(NameError):
+            self.repeat = False
         # Make sure couple_step evenly divides total_time and spinup_time
         if self.total_time % self.couple_step != 0:
             throw_error('couple_step must evenly divide total_time')
@@ -247,11 +252,21 @@ class Options:
         f.write(self.ua_output_format+'\n')
 
 
-    # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the final timestep number in the simulation (useful for reading output).
+    # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the initial/final timestep numbers in the simulation (useful for reading output).
     def save_last_calendar (self, start_date, ndays_old, ndays_new):
         self.last_start_date = start_date
         self.first_timestep = ndays_old*sec_per_day/self.deltaT
         self.last_timestep = ndays_new*sec_per_day/self.deltaT
+
+        
+    # Class function to set the simulation type (initial, restart, spinup, first_coupled, finished, and/or init_repeat).
+    def save_simulation_type (self, initial, restart, spinup, first_coupled, finished, init_repeat):
+        self.initial = initial
+        self.restart = restart
+        self.spinup = spinup
+        self.first_coupled = first_coupled
+        self.finished = finished
+        self.init_repeat = init_repeat
         
 
 # end class Options
@@ -259,12 +274,12 @@ class Options:
 
 # Update the "data" and "data.diagnostics" namelists for the next simulation segment. For restart_type 'pickup', we need to check/update niter0 (last timestep of previous segment), endTime and pckptFreq (length of the simulation up until the end of the next segment). For restart_type 'zero', we need to check/update endTime (length of the next segment). This is necessary because the number of days per month is not constant for calendar types 'standard' and 'noleap'. For calendar type '360-day', just check that the values already there agree with what we'd expect.
 # Also set the frequency of user-specified diganostic filetypes in data.diagnostics (options.output_names), to agree with options.output_freq.
-def update_namelists (mit_dir, segment_length, simulation_length, options, initial=False, first_coupled=False):
+def update_namelists (mit_dir, segment_length, simulation_length, options):
 
     # Set file paths
     namelist = mit_dir + 'data'
     namelist_diag = mit_dir + 'data.diagnostics'
-    if not initial:
+    if not options.initial:
         # Make backup copies
         make_tmp_copy(namelist)
         make_tmp_copy(namelist_diag)
@@ -332,9 +347,48 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
         # Update niter0
         # No need to check this, as it will change every time
         print 'Updating niter0 in ' + namelist
+        if options.init_repeat:
+            niter0_new = 0
+        else:
+            niter0_new = options.last_timestep
         niter0_line = line_that_matters(namelist, 'niter0')
-        replace_line(namelist, niter0_line, ' niter0='+str(options.last_timestep)+',\n')
+        replace_line(namelist, niter0_line, ' niter0='+str(niter0_new)+',\n')
+        if options.init_repeat:
+            # Rename pickup files so simulation uses them as initial conditions
+            file_heads = ['pickup.']
+            if options.use_seaice:
+                file_heads += ['pickup_seaice.']
+            file_tails = ['.data', '.meta']
+            tstep_string = str(options.last_timestep).zfill(10)
+            for head in file_heads:
+                for tail in file_tails:
+                    start_name = mit_dir + head + tstep_string + tail
+                    end_name = mit_dir + head + 'ckptA' + tail
+                    print 'Moving ' + start_name + ' to ' + end_name
+                    os.rename(start_name, end_name)
+            # Now update namelist to use these files
+            # First make sure pickupSuff is not already defined
+            pickupSuff_line = line_that_matters(namelist, 'pickupSuff', throw_error=False)
+            if pickupSuff_line is not None:
+                print 'Error (update_namelists): pickupSuff is already defined. Remove or comment it out so we can set pickupSuff without confusion.'
+                sys.exit()
+            # Now add the new line, right after niter0
+            niter0_line = line_that_matters(namelist, 'niter0')
+            add_line(namelist, " pickupSuff='ckptA',\n", niter0_line)
+        else:
+            # Make sure pickupSuff is commented out
+            find_comment_line(namelist, 'pickupSuff')
 
+    if use_ini_deltaTmom:
+        print 'Checking deltaTmom in ' + namelist
+        if options.initial:
+            if line_that_matters(namelist, 'deltaTmom', throw_error=False) is None:
+            print 'Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?'
+            sys.exit()
+        else:
+            # Comment it out
+            find_comment_line(namelist, 'deltaTmom')
+                
     # Now set/check diagnostic frequencies. If it's not an initial run and the existing frequencies don't match what we expect, throw an error.
     if len(options.output_names) > 0:
 
@@ -350,40 +404,20 @@ def update_namelists (mit_dir, segment_length, simulation_length, options, initi
         # Loop over diagnostic filetypes
         for fname in options.output_names:
             curr_freq, curr_line, curr_index = get_diag_freq(fname)
-            if initial:
+            if options.initial:
                 check = 'none'
             else:
                 check = 'all'
             check_and_change(curr_freq, freq, curr_line, ' frequency('+str(curr_index)+') = '+str(freq)+'.,\n', namelist_diag, 'diagnostic frequency of '+fname, check=check)
-
-    if use_ini_deltaTmom:
-        print 'Checking deltaTmom in ' + namelist
-        # Find the line setting deltaTmom
-        # If this line doesn't exist (or is uncommented), don't throw an error, just return None.
-        deltaTmom_line = line_that_matters(namelist, 'deltaTmom', throw_error=False)
-        if initial and deltaTmom_line is None:
-            print 'Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?'
-            sys.exit()
-        if not initial and deltaTmom_line is not None:
-            # Need to comment it out
-            comment_line(namelist, deltaTmom_line)
-            # Make sure there isn't another one
-            deltaTmom_line_2 = line_that_matters(namelist, 'deltaTmom', throw_error=False)
-            if deltaTmom_line_2 is not None:
-                print 'Error (update_namelists): deltaTmom is set multiple times in ' + namelist + '. Choose one so we can comment it out without confusion.'
-                sys.exit()
             
 # end function update_namelists
 
 
-# Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir).
-# Return five booleans:
-# initial: indicates whether the next segment is the very first segment
-# restart: indicates whether the previous segment was the very end of a run which finished successfully
-# spinup: indicates whether the next segment is part of the ocean-only spinup period
-# first_coupled: indicates whether this is the first coupled timestep
-# finished: indicates whether the entire simulation is finished, so no more segments need to run.
-def set_calendar (directory, mit_dir, options):
+# Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir). Determine whether the run is an initial, restart, spinup, first_coupled, finished, and/or init_repeat run.
+def set_calendar (options):
+
+    directory = options.output_dir
+    mit_dir = options.mit_run_dir
 
     # Figure out if this the very first segment, based on whether the calendar file already exists
     calfile = directory + options.calendar_file    
@@ -395,10 +429,14 @@ def set_calendar (directory, mit_dir, options):
     # Figure out if this is restarting from a previously-finished segment, based on whether the finished-file already exists
     finifile = directory + options.finished_file
     restart = os.path.isfile(finifile)
+    init_repeat = restart and options.repeat
     if restart:
         # Remove it
         os.remove(finifile)
-        print 'This is a restart from a previously-finished simulation that was extended'
+        if init_repeat:
+            print 'This is a restart which repeats the forcing period from the beginning'
+        else:
+            print 'This is a restart from a previously-finished simulation that was extended'
 
     # Get the start year and month for the whole simulation
     ini_year = int(options.startDate[:4])
@@ -435,6 +473,11 @@ def set_calendar (directory, mit_dir, options):
         elif options.restart_type == 'pickup':
             # First and last timestep will be based on number of days in the simulation since the very beginning
             options.save_last_calendar(date_code, days_between(ini_year, ini_month, old_year, old_month, options.calendar_type), days_between(ini_year, ini_month, new_year, new_month, options.calendar_type))
+
+        if init_repeat:
+            print 'Resetting calendar to beginning'
+            new_year = ini_year
+            new_month = ini_month
 
     # Figure out if we're in the ocean-only spinup period
     # Find the year and month when coupling begins
@@ -505,9 +548,9 @@ def set_calendar (directory, mit_dir, options):
         # Calculate simulation length (up to the end of the next segment) in seconds
         simulation_length = days_between(ini_year, ini_month, newer_year, newer_month, options.calendar_type)*sec_per_day
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
-        update_namelists(mit_dir, segment_length, simulation_length, options, initial=initial, first_coupled=first_coupled)
+        update_namelists(mit_dir, segment_length, simulation_length, options)
 
-    return initial, restart, spinup, first_coupled, finished
+    options.save_last_calendar(initial, restart, spinup, first_coupled, finished, init_repeat)
 
         
 
