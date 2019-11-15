@@ -541,14 +541,11 @@ def move_repeated_output(options):
 
     # Move all the date-stamped subdirectories into it
     for fname in os.listdir(options.output_dir):
-        print fname
         # Check if it's a directory with name length 6
-        if os.path.isdir(fname) and len(fname) == 6:
-            print fname + ' passed first check'
+        if os.path.isdir(options.output_dir+fname) and len(fname) == 6:
             # Check if it's all numbers
             try:
                 int(fname)
-                print fname + ' passed second check'
             except(ValueError):
                 continue
             shutil.move(options.output_dir+fname, new_dir)    
