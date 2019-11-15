@@ -551,7 +551,7 @@ def set_calendar (options):
         # Update/check endTime for next MITgcm segment, and diagnostic frequencies
         update_namelists(mit_dir, segment_length, simulation_length, options)
 
-    options.save_last_calendar(initial, restart, spinup, first_coupled, finished, init_repeat)
+    options.save_simulation_type(initial, restart, spinup, first_coupled, finished, init_repeat)
 
         
 
