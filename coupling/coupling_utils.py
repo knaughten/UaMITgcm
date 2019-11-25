@@ -312,6 +312,15 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
     command = 'qsub'
     # Specify budget
     command += ' -A ' + options.budget_code
+    # Specify job name
+    jobname = options.expt_name
+    if 'mitgcm' in pbs_script:
+        jobname += 'o'
+    elif 'ua' in pbs_script:
+        jobname += 'i'
+    elif 'coupler' in pbs_script:
+        jobname += 'c'
+    command += ' -N ' + jobname
     if input_var is not None:
         # Add variable definitions
         command += ' -v '
