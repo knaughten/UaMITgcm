@@ -69,3 +69,6 @@ example/WSFRIS_999/ua_postprocess/UaPost
 example/WSFRIS_999/ua_postprocess/matlab*.out
 example/WSFRIS_999/ini_grid
 example/WSFRIS_0*
+example/FRIS_UaMITgcm_backup
+example/MISOMIP_full
+example/MISOMIP_zero

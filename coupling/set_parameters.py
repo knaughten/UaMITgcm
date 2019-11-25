@@ -379,7 +379,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
             # Make sure pickupSuff is commented out
             find_comment_line(namelist, 'pickupSuff')
 
-    if use_ini_deltaTmom:
+    if options.use_ini_deltaTmom:
         print 'Checking deltaTmom in ' + namelist
         if options.initial:
             # Make sure it's there and uncommented

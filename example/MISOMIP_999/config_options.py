@@ -41,7 +41,7 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 1224
+total_time = 24
 ### Length of ocean spinup period (months)
 spinup_time = 24
 ### Length of coupling timestep (months)
@@ -141,7 +141,7 @@ seaice_nz = 7
 
 ### Starting date of simulation
 ### Should match startDate_1 in data.cal
-startDate = '19790101'
+startDate = '00010101'
 
 
 
