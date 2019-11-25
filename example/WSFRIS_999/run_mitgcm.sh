@@ -25,6 +25,11 @@ OUT=$?
 cd $PBS_O_WORKDIR
 if [ $OUT == 0 ]; then
     echo 'MITgcm ends '`date` >> jobs.log
+    touch mitgcm_finished
+    if [ -e ua_finished ]; then
+        # MITgcm was the last one to finish
+	qsub -A $ACC run_coupler.sh
+    fi
     exit 0
 else
     echo 'Error in MITgcm '`date` >> jobs.log

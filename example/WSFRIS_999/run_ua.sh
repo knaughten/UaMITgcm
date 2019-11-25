@@ -32,6 +32,11 @@ OUT=$?
 cd $PBS_O_WORKDIR
 if [ $OUT == 0 ]; then
     echo 'Ua ends '`date` >> jobs.log
+    touch ua_finished
+    if [ -e mitgcm_finished ] ; then
+        # Ua was the last one to finish
+	qsub -A $ACC run_coupler.sh
+    fi
     exit 0
 else
     echo 'Error in Ua '`date` >> jobs.log

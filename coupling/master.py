@@ -1,16 +1,19 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
 from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output
-from coupling_utils import submit_job
+from coupling_utils import submit_job, reset_finished_files
 
 # Top-level coupling function.
-if __name__ == "__main__":
+if __name__ == "__main__":            
 
     print 'Reading parameters'
     options = Options()
 
     print 'Checking calendar'
     set_calendar(options)
+
+    # Delete finished files from last run
+    reset_finished_files(options)
 
     if options.initial and options.restart_type=='zero':
         print 'Creating dummy initial conditions files where needed'
@@ -70,7 +73,7 @@ if __name__ == "__main__":
     if not options.finished:
 
         print 'Submitting next MITgcm segment'
-        mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
+        mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir,'ACC='+options.budget_code])
         afterok = [mit_id]
         print 'Submitted with job ID ' + str(mit_id)
 
@@ -78,16 +81,11 @@ if __name__ == "__main__":
         if not options.spinup:
             print 'Submitting next Ua segment'
             if options.ua_option == 'compiled':
-                ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
+                ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir,'ACC='+options.budget_code])
             elif options.ua_option == 'matlab':
                 # TODO
                 pass
             afterok.append(ua_id)
             print 'Submitted with job ID ' + str(ua_id)
-
-        print 'Submitting next coupler job to start after segment is finished'
-        coupler_id = submit_job(options, 'run_coupler.sh', afterok=afterok)
-        print 'Submitted with job ID ' + str(coupler_id)
-
 
     print 'Coupling successfully completed'
