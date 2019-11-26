@@ -1,13 +1,15 @@
 #!/bin/bash --login
 #PBS -l select=1
-#PBS -l walltime=24:00:00
+#PBS -l walltime=03:00:00
 #PBS -j oe
 #PBS -m n
 #PBS -r n
 ####################################################################
 # Run Ua.
-# Must pass the argument -v UA_DIR=<path to Ua executable directory>
-# and -A <Archer budget>
+# Must pass the arguments
+# -v UA_DIR=<path to Ua executable directory>,ACC=<Archer budget>
+# and
+# -A <Archer budget>
 ####################################################################
 
 # USER VARIABLE
@@ -32,6 +34,13 @@ OUT=$?
 cd $PBS_O_WORKDIR
 if [ $OUT == 0 ]; then
     echo 'Ua ends '`date` >> jobs.log
+    touch ua_finished
+    if [ -e mitgcm_finished ] ; then
+        # Ua was the last one to finish
+	qsub -A $ACC run_coupler.sh
+    fi
+    exit 0
 else
     echo 'Error in Ua '`date` >> jobs.log
+    exit 1
 fi

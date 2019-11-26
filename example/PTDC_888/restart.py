@@ -129,5 +129,3 @@ if __name__ == "__main__":
         print 'Submitting next Ua segment'
         ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
         afterok.append(ua_id)
-    print 'Submitting next coupler job to start after segment is finished'
-    submit_job(options, 'run_coupler.sh', afterok=afterok)

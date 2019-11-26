@@ -60,7 +60,16 @@ end
 % based on the OutputTimes we set the ATStimeStepTarget to be the minimum
 % gap between successive output times. This should prevent Ua from
 % 'overstepping'. 
-UserVar.UaMITgcm.ATStimeStepTarget = min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
+if numel(UaOutputTimes)==1
+	% allows for a single Ua output interval equal to the coupling timestep,
+	% e.g. monthly output and a 1 month coupling timestep
+	UserVar.UaMITgcm.ATStimeStepTarget=UaOutputTimes(1);
+elseif numel(UaOutputTimes)>1
+	% this covers multiple Ua outputs within a single coupling timestep
+	UserVar.UaMITgcm.ATStimeStepTarget=min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
+else
+	error('Not enough input values in UaOutputTimes');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Read MITgcm melt rates %%
