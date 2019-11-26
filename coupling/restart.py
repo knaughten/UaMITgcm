@@ -122,11 +122,11 @@ if __name__ == "__main__":
 
     # Submit the next jobs
     print 'Submitting next MITgcm segment'
-    mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
+    mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir, 'ACC='+options.budget_code])
     afterok = [mit_id]
+    print 'Submitted with job ID ' + str(mid_id)
     if not spinup:
         print 'Submitting next Ua segment'
-        ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
+        ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir, 'ACC='+options.budget_code])
         afterok.append(ua_id)
-    print 'Submitting next coupler job to start after segment is finished'
-    submit_job(options, 'run_coupler.sh', afterok=afterok)
+        print 'Submitted with job ID ' + str(ua_id)
