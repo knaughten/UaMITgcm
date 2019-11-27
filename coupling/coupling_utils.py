@@ -398,7 +398,7 @@ def get_file_list (directory, prefix):
 # Delete the mitgcm_finished and ua_finished files from the last run, if they exist. If it's the spinup, create the ua_finished file so it doesn't stop the run from progressing.
 def reset_finished_files (options):
 
-    if not options.initial:
+    if not options.initial and not options.restart:
         os.remove('mitgcm_finished')
         if not options.spinup and not options.first_coupled:
             os.remove('ua_finished')
