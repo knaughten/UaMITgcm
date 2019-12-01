@@ -62,6 +62,9 @@ CtrlVar.NameOfFileForReadingAGlenEstimate=UserVar.NameOfFileForReadingAGlenEstim
 CtrlVar.NameOfFileForSavingSlipperinessEstimate='';
 CtrlVar.NameOfFileForSavingAGlenEstimate='';
 
+CtrlVar.Cmin=1e-100;  
+CtrlVar.Cmax=1e100;      
+
 CtrlVar.GeometricalVarsDefinedEachTransienRunStepByDefineGeometry='SB';
 
 CtrlVar.doplots=0;
