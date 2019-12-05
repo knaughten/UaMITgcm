@@ -188,14 +188,14 @@ bathyFile = 'bathy'
 ### Should match SHELFICEtopoFile in input/data.shelfice.
 draftFile = 'draft'
 
-### Initial conditions files read by MITgcm:
+### Initial conditions files read by MITgcm
+### Only needed for restart_type='zero'
 ###
 ### Temperature (match hydrogThetaFile in input/data)
 ini_temp_file = 'THETA.ini'
 ### Salinity (match hydrogSaltFile in input/data)
 ini_salt_file = 'SALT.ini'
 ### Zonal velocity (match uVelInitFile in input/data)
-### Only needed for restart_type='zero'.
 ### This is assumed not to exist at the beginning,
 ### it will be created with all zeros.
 ini_u_file = 'UVEL.ini'
@@ -205,7 +205,7 @@ ini_v_file = 'VVEL.ini'
 ini_eta_file = 'ETAN.ini'
 
 ### Sea ice initial conditions files read by MITgcm
-### (only matters if use_seaice=True)
+### (only matters if use_seaice=True and restart_type='zero')
 ### They will be created if they don't exist and restart_type='zero'.
 ###
 ### Sea ice area (match AreaFile in input/data.seaice)
