@@ -98,11 +98,11 @@ C- Note: should check all siob{N,S,E,W}repCycle (not just default repeatPeriod)
       ENDIF
 
 #ifdef ALLOW_KATABATIC_SCALING
-      IF ( useKatabScl .AND.
-     &     (katabSclFileU .EQ. ' ' .OR.
-     &      katabSclFileV .EQ. ' ' ) ) THEN
-       WRITE(msgBuf,'(2A)') 'EXF_CHECK: useKatabScl ',
-     &      'requires that katabSclFileU and katabSclFileV are set'
+      IF ( useKatabCorr .AND.
+     &     (katabSclFile .EQ. ' ' .OR.
+     &      katabRtFile .EQ. ' ' ) ) THEN
+       WRITE(msgBuf,'(2A)') 'EXF_CHECK: useKatabCorr ',
+     &      'requires that katabSclFile and katabRtFile are set'
        CALL PRINT_ERROR( msgBuf, myThid )
        errCount = errCount + 1
       ENDIF

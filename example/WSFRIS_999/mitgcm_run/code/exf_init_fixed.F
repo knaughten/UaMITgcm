@@ -624,14 +624,14 @@ C--   Summarize the External forcing setup.
 #endif
 
 #ifdef ALLOW_KATABATIC_SCALING
-      IF ( useKatabScl ) THEN
+      IF ( useKatabCorr ) THEN
        _BARRIER
-C      Read the scaling factors for katabatic winds
-       CALL READ_REC_XY_RS( katabSclFileU, katabSclU, 1, 0, myThid)
-       CALL READ_REC_XY_RS( katabSclFileV, katabSclV, 1, 0, myThid)
+C      Read the scaling and correction for katabatic winds
+       CALL READ_REC_XY_RS( katabSclFile, katabScl, 1, 0, myThid)
+       CALL READ_REC_XY_RS( katabRtFile, katabRt, 1, 0, myThid)
 C      Fill in the overlaps
-       _EXCH_XY_RS( katabSclU, myThid )
-       _EXCH_XY_RS( katabSclV, myThid )
+       _EXCH_XY_RS( katabScl, myThid )
+       _EXCH_XY_RS( katabRt, myThid )
       ENDIF
 #endif /* ALLOW_KATABATIC_SCALING */
 

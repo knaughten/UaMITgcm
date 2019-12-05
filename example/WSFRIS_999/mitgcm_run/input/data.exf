@@ -7,6 +7,9 @@
  exf_scal_BulkCdn=1.015,
  useExfYearlyFields=.true.,
  useExfCheckRange=.false.,
+ useKatabCorr=.true.,
+ katabSclFile='katabatic_scale',
+ katabRtFile='katabatic_rotate',
 ##############################################################################
 ### All the available parameters and their defaults, just for your information
 ### windstressmax=2.,

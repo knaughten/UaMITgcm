@@ -54,6 +54,9 @@ C     == routine arguments ==
 
 C     == local variables ==
       INTEGER i, j, bi, bj
+#ifdef ALLOW_KATABATIC_SCALING
+      _RL     wind_mag, wind_angle
+#endif
 #ifdef ALLOW_ROTATE_UV_CONTROLS
       _RL     tmpUE(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
       _RL     tmpVN(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
@@ -139,14 +142,19 @@ C-    Zonal and meridional wind.
      I     myTime, myIter, myThid )
 
 #ifdef ALLOW_KATABATIC_SCALING
-       IF (useKatabScl) THEN
-C     Scale uwind and vwind by given scaling factors.
+       IF (useKatabCorr) THEN
+C     Scale and rotate winds.
         DO bj = myByLo(myThid),myByHi(myThid)
          DO bi = myBxLo(myThid),mybxhi(myThid)
           DO j = 1,sNy
            DO i = 1,sNx
-            uwind(i,j,bi,bj) = uwind(i,j,bi,bj)*katabSclU(i,j,bi,bj)
-            vwind(i,j,bi,bj) = vwind(i,j,bi,bj)*katabSclV(i,j,bi,bj)
+            wind_mag = sqrt(uwind(i,j,bi,bj)**2 + 
+     &                      vwind(i,j,bi,bj)**2)
+            wind_angle = atan2(vwind(i,j,bi,bj), uwind(i,j,bi,bj))
+            uwind(i,j,bi,bj) = wind_mag*katabScl(i,j,bi,bj)*
+     &                         cos(wind_angle+katabRt(i,j,bi,bj))
+            vwind(i,j,bi,bj) = wind_mag*katabScl(i,j,bi,bj)*
+     &                         sin(wind_angle+katabRt(i,j,bi,bj))
            ENDDO
           ENDDO
          ENDDO

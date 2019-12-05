@@ -91,7 +91,7 @@ C     Surface flux data.
      & flamb, flami, zolmin, zref,
      & cvapor_fac, cvapor_exp, cvapor_fac_ice, cvapor_exp_ice,
      & humid_fac, gamma_blk, saltsat, sstExtrapol, psim_fac,
-     & useKatabScl, katabSclFileU, katabSclFileV
+     & useKatabCorr, katabSclFile, katabRtFile
 
       NAMELIST /EXF_NML_02/
      &          hfluxfile,     hfluxstartdate1,     hfluxstartdate2,
@@ -332,7 +332,7 @@ c     exf_verbose        = debugMode
       noNegativeEvap     = .FALSE.
       useStabilityFct_overIce = .FALSE.
       diags_opOceWeighted= .TRUE.
-      useKatabScl        = .FALSE.
+      useKatabCorr        = .FALSE.
 
 C-  default value should be set to main model parameter:
 c     cen2kel     =  celsius2K
@@ -639,8 +639,8 @@ C     Data files.
       climsssfile        = ' '
       climustrfile       = ' '
       climvstrfile       = ' '
-      katabSclFileU      = ' '
-      katabSclFileV      = ' '
+      katabSclFile      = ' '
+      katabRtFile      = ' '
 
 C     Start Time.
       hfluxStartTime     = UNSET_RL

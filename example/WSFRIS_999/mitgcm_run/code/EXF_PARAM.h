@@ -67,9 +67,9 @@ C                        :: 3 use daily variable albedo
 C     useExfZenIncoming  :: compute incoming solar radiation along with zenith angle
 C     exf_debugLev       :: select message printing to STDOUT (e.g., when read rec)
 C     exf_monFreq        :: Monitor Frequency (s) for EXF
-C     useKatabScl        :: Scale winds by katabatic correction factors
-C     katabSclFileU      :: file with scaling factors for uwind
-C     katabSclFileV      :: file with scaling factors for vwind
+C     useKatabCorr       :: Correct winds with scaling and rotation
+C     katabSclFile       :: file with scaling factors
+C     katabRtFile        :: file with rotation angles
 
       LOGICAL useExfCheckRange
       LOGICAL useExfYearlyFields, twoDigitYear
@@ -91,7 +91,7 @@ C     katabSclFileV      :: file with scaling factors for vwind
       INTEGER exf_debugLev
       _RL     exf_monFreq
 
-      LOGICAL useKatabScl
+      LOGICAL useKatabCorr
       
 
 C     Drag coefficient scaling factor
@@ -477,8 +477,8 @@ C-    File names.
       CHARACTER*(128) climsssfile
       CHARACTER*(128) climustrfile
       CHARACTER*(128) climvstrfile
-      CHARACTER*(128) katabSclFileU
-      CHARACTER*(128) katabSclFileV
+      CHARACTER*(128) katabSclFile
+      CHARACTER*(128) katabRtFile
 
       COMMON /EXF_PARAM_L/
      &       useExfCheckRange,
@@ -489,7 +489,7 @@ C-    File names.
      &       stressIsOnCgrid, rotateStressOnAgrid,
      &       useAtmWind, useRelativeWind, noNegativeEvap,
      &       useStabilityFct_overIce, diags_opOceWeighted,
-     &       useKatabScl
+     &       useKatabCorr
 		       
 
       COMMON /EXF_PARAM_I/
@@ -660,7 +660,7 @@ C-    File names.
      &       apressurefile, apressuremask,
      &       tidePotFile,   tidePotMask,
      &       areamaskfile,  areamaskmask,
-     &       katabSclFileU, katabSclFileV
+     &       katabSclFile, katabRtFile
 
       COMMON /EXF_CLIM_I/
      &       climsststartdate1,  climsststartdate2,

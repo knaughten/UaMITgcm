@@ -342,9 +342,9 @@ C     zen_fsol_daily     :: incoming solar radiation (daily mean)
 
 #ifdef ALLOW_KATABATIC_SCALING
       COMMON /exf_katabatic_r/
-     &                      katabSclU, katabSclV
-      _RL katabSclU      (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
-      _RL katabSclV      (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+     &                      katabScl, katabRt
+      _RL katabScl       (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL katabRt        (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
 #endif
 				    
 
