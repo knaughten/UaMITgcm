@@ -41,9 +41,9 @@ budget_code = 'n02-FISSA'
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 12*10
+total_time = 12*30
 ### Length of ocean spinup period (months)
-spinup_time = 12*5
+spinup_time = 12*10
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
 couple_step = 12
@@ -122,8 +122,8 @@ ua_ini_restart = False
 ### the volume of the domain is approximately conserved on an annual basis?
 ### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
 ### preserved). The OBCS must be transient (one file per year) as opposed to a
-### monthly climatology. 
-correct_obcs_online = True
+### monthly climatology.
+correct_obcs_online = False
 
 
 ###### 3. MITgcm parameters ######
@@ -218,7 +218,7 @@ ini_vice_file = ''
 
 ### Pressure load anomaly file read by MITgcm.
 ### Should match SHELFICEloadAnomalyFile in input/data.shelfice.
-pload_file = 'pload_WSFRIS'
+pload_file = 'pload_piControl_WSFRIS'
 
 ### Beginnings of the filenames of various output diagnostic files
 ### containing the given variables.
