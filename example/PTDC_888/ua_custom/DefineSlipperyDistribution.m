@@ -8,7 +8,7 @@ else
     if isempty(FC)
         load(CtrlVar.NameOfFileForReadingSlipperinessEstimate,'xC','yC','C');
         FC = scatteredInterpolant(xC,yC,C,'linear');
-        fprintf('\n Read slipperiness from file \n');
+        fprintf(['\n Read slipperiness from file ',CtrlVar.NameOfFileForReadingSlipperinessEstimate,' \n']);
     end
 
     load(CtrlVar.NameOfFileForReadingSlipperinessEstimate,'m');
