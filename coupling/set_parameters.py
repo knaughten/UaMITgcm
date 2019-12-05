@@ -7,7 +7,10 @@
 import os
 import sys
 
+# Import default options, then overwrite with any user-defined options
+from default_config_options import *
 from config_options import *
+
 from coupling_utils import extract_first_int, active_line_contains, line_that_matters, replace_line, add_months, days_between, make_tmp_copy, comment_line, add_line, find_comment_line
 
 from mitgcm_python.utils import real_dir, days_per_month
@@ -94,38 +97,23 @@ class Options:
         if self.spinup_time > self.total_time:
             throw_error('spinup_time should not be larger than total_time')
         self.couple_step = check_value('couple_step', couple_step, type='int')
-        # Set default value for repeat
-        try:
-            self.repeat = check_value('repeat', repeat, type='bool')
-        except(NameError):
-            self.repeat = False
         # Make sure couple_step evenly divides total_time and spinup_time
         if self.total_time % self.couple_step != 0:
             throw_error('couple_step must evenly divide total_time')
         if self.spinup_time % self.couple_step != 0:
             throw_error('couple_step must evenly divide spinup_time')
+        self.repeat = check_value('repeat', repeat, type='bool')
         self.restart_type = check_value('restart_type', restart_type, legal=['zero', 'pickup'])
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
         if self.calendar_type=='noleap' and self.output_freq=='monthly':
             throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
-        # Set default value for filling
-        try:
-            self.filling = check_value('filling', filling, type='bool')
-        except(NameError):
-            self.filling = False
+        self.filling = check_value('filling', filling, type='bool')
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
-        # Set default values for preserve_ocean_mask and preserve_static_ice, until we roll it out to all config_options.py
-        try:
-            self.preserve_ocean_mask = check_value('preserve_ocean_mask', preserve_ocean_mask, type='bool')
-        except(NameError):
-            self.preserve_ocean_mask = False
-        try:
-            self.preserve_static_ice = check_value('preserve_static_ice', preserve_static_ice, type='bool')
-        except(NameError):
-            self.preserve_static_ice = False
+        self.preserve_ocean_mask = check_value('preserve_ocean_mask', preserve_ocean_mask, type='bool')
+        self.preserve_static_ice = check_value('preserve_static_ice', preserve_static_ice, type='bool')
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])
         if self.pload_option == 'constant':
             self.pload_temp = check_value('pload_temp', pload_temp, type='float')
@@ -135,22 +123,14 @@ class Options:
             self.pload_temp = 0.
             self.pload_salt = 0.
         self.ua_ini_restart = check_value('ua_ini_restart', ua_ini_restart, type='bool')
-        # Default value for correct_obcs_online
-        try:
-            self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
-        except(NameError):
-            self.correct_obcs_online = False
+        self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
         # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.couple_step % 12 != 0:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')            
             
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
         self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')
-        # Default value for use_ini_deltaTmom
-        try:
-            self.use_ini_deltaTmom = check_value('use_ini_deltaTmom', use_ini_deltaTmom, type='bool')
-        except(NameError):
-            self.use_ini_deltaTmom = False
+        self.use_ini_deltaTmom = check_value('use_ini_deltaTmom', use_ini_deltaTmom, type='bool')
         self.deltaT = check_value('deltaT', deltaT, type='int')
         # Make sure ocean timestep evenly divides 1 day
         if sec_per_day % self.deltaT != 0:
