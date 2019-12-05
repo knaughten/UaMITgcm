@@ -38,6 +38,8 @@ pload_option = 'nearest'
 
 ###### 3. MITgcm parameters ######
 
+coordinates = 'latlon'
+
 use_seaice = True
 use_cal_pkg = True
 
