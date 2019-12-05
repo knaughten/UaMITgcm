@@ -127,7 +127,8 @@ class Options:
         # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.couple_step % 12 != 0:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')            
-            
+
+        self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
         self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')
         self.use_ini_deltaTmom = check_value('use_ini_deltaTmom', use_ini_deltaTmom, type='bool')
@@ -230,6 +231,8 @@ class Options:
         f.write(self.ua_melt_file+'\n')
         f.write(self.ua_draft_file+'\n')
         f.write(self.ua_output_format+'\n')
+        f.write(self.coordinates+'\n')
+        f.close()
 
 
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the initial/final timestep numbers in the simulation (useful for reading output).

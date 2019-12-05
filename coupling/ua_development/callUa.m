@@ -22,6 +22,7 @@ UserVar.UaMITgcm.CalendarFileName = UserOptions{3};
 UserVar.UaMITgcm.MeltFileName = UserOptions{4};
 UserVar.UaMITgcm.UaDraftFileName = UserOptions{5}; 
 UserVar.UaMITgcm.UaOutputFormat = UserOptions{6};
+UserVar.UaMITgcm.MITcoordinates = UserOptions{7};
 
 UserVar.UaMITgcm.UaOutputDirectory = './ResultsFiles';
 
@@ -93,8 +94,7 @@ lonGMIT = rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/XG']); % 2d array
 latGMIT = rdmds([UserVar.UaMITgcm.CentralOutputDirectory,'/YG']); % 2d array
 
 % check if MIT coordinates are latlon or ps.
-if all(latCMIT(:)>=-90) && all(latCMIT(:)<=90)
-    UserVar.UaMITgcm.MITcoordinates = 'latlon';
+if strcmp(UserVar.UaMITgcm.MITcoordinates,'latlon')
     % Convert longitude from 0-360 range to -180-180 range
     index = lonCMIT > 180;
     lonCMIT(index) = lonCMIT(index) - 360;
@@ -109,8 +109,7 @@ if all(latCMIT(:)>=-90) && all(latCMIT(:)<=90)
     UserVar.UaMITgcm.MITgcmGGridlon = lonGMIT;
     UserVar.UaMITgcm.MITgcmGGridlat = latGMIT;
     
-else
-    UserVar.UaMITgcm.MITcoordinates = 'psxy';
+elseif strcmp(UserVar.UaMITgcm.MITcoordinates,'xy')
     UserVar.UaMITgcm.MITgcmCGridX = lonCMIT;
     UserVar.UaMITgcm.MITgcmCGridY = latCMIT;
     UserVar.UaMITgcm.MITgcmGGridX = lonGMIT;

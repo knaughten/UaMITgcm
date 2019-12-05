@@ -133,6 +133,9 @@ correct_obcs_online = False
 
 ###### 3. MITgcm parameters ######
 
+### Are the MITgcm coordinates 'xy' or 'latlon'?
+coordinates = 'xy'
+
 ### Does your configuration of MITgcm include sea ice?
 use_seaice = False
 ### Does your configuration of MITgcm use the calendar package?
