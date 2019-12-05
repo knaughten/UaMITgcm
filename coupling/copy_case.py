@@ -7,8 +7,7 @@ import sys
 import os
 import shutil
 import subprocess
-from coupling_utils import copy_to_dir, line_that_matters, replace_line
-from clean import copy_ua_restart
+from coupling_utils import copy_to_dir, line_that_matters, replace_line, copy_ua_restart
 
 old_name = sys.argv[1]
 new_name = sys.argv[2]

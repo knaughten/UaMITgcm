@@ -404,6 +404,16 @@ def reset_finished_files (options):
     if options.spinup:
         f = open('ua_finished', 'w')
         f.close()        
-    
+
+
+# Function to copy the Ua restart file when a simulation is being duplicated or cleaned.
+def copy_ua_restart (directory, restart_name):
+    orig_restart = raw_input('Enter path to desired Ua restart file, or press enter if you want Ua to start from scratch: ')
+    if len(orig_restart) > 0:
+        while True:
+            if os.path.isfile(orig_restart):
+                break
+            orig_restart = raw_input('That file does not exist. Try again: ')
+        shutil.copy(orig_restart, directory+restart_name)
                 
                 
