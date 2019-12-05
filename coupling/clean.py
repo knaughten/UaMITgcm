@@ -8,8 +8,17 @@ import subprocess
 
 from set_parameters import Options
 
+# Function to copy the Ua restart file
+def copy_ua_restart (directory, restart_name):
+    orig_restart = raw_input('Enter path to desired Ua restart file, or press enter if you want Ua to start from scratch: ')
+    if len(orig_restart) > 0:
+        while True:
+            if os.path.isfile(orig_restart):
+                break
+            orig_restart = raw_input('That file does not exist. Try again: ')
+        shutil.copy(orig_restart, directory+restart_name)
+
 # Function to clean the given Ua executable directory
-# This is also called by restart.py in some circumstances, so encapsulate it.
 def clean_ua (directory):
     # Look at everything in the Ua executable directory
     for fname in os.listdir(directory):
@@ -29,13 +38,7 @@ def clean_ua (directory):
         elif os.path.isdir(path):
             shutil.rmtree(path)
     # Copy in the original restart with the correct name
-    orig_restart = raw_input('Enter path to original Ua restart file, or press enter if this is not a restart run: ')
-    if len(orig_restart) > 0:
-        while True:
-            if os.path.isfile(orig_restart):
-                break
-            orig_restart = raw_input('That file does not exist. Try again: ')
-        shutil.copy(orig_restart, directory+restart_name)
+    copy_ua_restart(directory, restart_name)
 
 
 # Main processing

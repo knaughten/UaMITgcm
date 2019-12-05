@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 from coupling_utils import copy_to_dir, line_that_matters, replace_line
+from clean import copy_ua_restart
 
 old_name = sys.argv[1]
 new_name = sys.argv[2]
@@ -73,9 +74,16 @@ if os.path.isdir(old_uapost_dir):
 
 # Ua executable directory
 os.mkdir(new_uaexe_dir)
+new_restart_name = None
 for fname in os.listdir(old_uaexe_dir):
+    if fname.endswith('RestartFile.mat'):
+        # Save the name of the restart file, with the experiment name updated
+        new_restart_name = fname.replace(old_name, new_name)
     if fname in ['Ua', 'Ua_MCR.sh'] or (fname.endswith('.mat') and (not fname.endswith('RestartFile.mat')) and fname not in ['NewMeshFile.mat', 'AdaptMesh.mat']):
         copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
+if new_restart_name is not None:
+    # The old simulation had a restart, so the new one might need one too
+    copy_ua_restart(new_uaexe_dir, new_restart_name)
 
 # Change experiment name in config_options.py
 options_file = new_dir + 'config_options.py'
