@@ -11,6 +11,7 @@ from coupling_utils import copy_ua_restart
 
 # Function to clean the given Ua executable directory
 def clean_ua (directory):
+    restart_name = None
     # Look at everything in the Ua executable directory
     for fname in os.listdir(directory):
         if fname.endswith('RestartFile.mat'):
@@ -28,8 +29,9 @@ def clean_ua (directory):
             os.remove(path)
         elif os.path.isdir(path):
             shutil.rmtree(path)
-    # Copy in the original restart with the correct name
-    copy_ua_restart(directory, restart_name)
+    if restart_name is not None:
+        # Copy in the original restart with the correct name
+        copy_ua_restart(directory, restart_name)
 
 
 # Main processing
