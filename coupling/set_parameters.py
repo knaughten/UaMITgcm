@@ -397,6 +397,48 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
 # end function update_namelists
 
 
+# Helper function to set_calendar (also used in change_coupling_step.py)
+def update_calendar_file (new_year, new_month, couple_step, options, calfile):
+
+    # Get the date at the beginning of the simulation after next
+    newer_year, newer_month = add_months(new_year, new_month, couple_step)
+    # Calculate number of days in the next simulation
+    ndays_new = days_between(new_year, new_month, newer_year, newer_month, options.calendar_type)    
+    # Create the new date_code
+    date_code_new = str(new_year) + str(new_month).zfill(2)
+
+    # Now decide what to write about the output intervals
+    if options.output_freq == 'daily':
+        # One line with a flag to tell Ua to output daily
+        output_intervals = [-1]
+    elif options.output_freq == 'monthly':
+        # One line for each month in the simulation, containing the number of days in that month
+        if options.calendar_type == '360-day':
+            # 30 days in every month
+            output_intervals = couple_step*[30]
+        elif options.calendar_type == 'standard':
+            # Loop through the months to find the number of days in each
+            curr_year = new_year
+            curr_month = new_month
+            output_intervals = []
+            for t in range(couple_step):
+                output_intervals.append(days_per_month(curr_month, curr_year))
+                curr_year, curr_month = add_months(curr_year, curr_month, 1)
+    elif options.output_freq == 'end':
+        # One line with the number of days in the simulation
+        output_intervals = [ndays_new]
+
+    print 'Updating ' + calfile
+    f = open(calfile, 'w')
+    f.write(date_code_new + '\n')
+    f.write(str(ndays_new) + '\n')
+    for interval in output_intervals:
+        f.write(str(interval) + '\n')
+    f.close()
+
+    return newer_year, newer_month, ndays_new, date_code_new
+
+
 # Read and update the plain-text file in "directory" that keeps track of the calendar (starting date of last simulation segment, and number of days in that simulation). Update any parameters that depend on the calendar (including namelists in mit_dir). Determine whether the run is an initial, restart, spinup, first_coupled, finished, and/or init_repeat run.
 def set_calendar (options):
 
@@ -487,41 +529,7 @@ def set_calendar (options):
         open(finifile, 'a').close()
     else:
         print 'Setting output intervals'
-        # Get the date at the beginning of the simulation after next
-        newer_year, newer_month = add_months(new_year, new_month, options.couple_step)
-        # Calculate number of days in the next simulation
-        ndays_new = days_between(new_year, new_month, newer_year, newer_month, options.calendar_type)    
-        # Create the new date_code
-        date_code_new = str(new_year) + str(new_month).zfill(2)
-
-        # Now decide what to write about the output intervals
-        if options.output_freq == 'daily':
-            # One line with a flag to tell Ua to output daily
-            output_intervals = [-1]
-        elif options.output_freq == 'monthly':
-            # One line for each month in the simulation, containing the number of days in that month
-            if options.calendar_type == '360-day':
-                # 30 days in every month
-                output_intervals = options.couple_step*[30]
-            elif options.calendar_type == 'standard':
-                # Loop through the months to find the number of days in each
-                curr_year = new_year
-                curr_month = new_month
-                output_intervals = []
-                for t in range(options.couple_step):
-                    output_intervals.append(days_per_month(curr_month, curr_year))
-                    curr_year, curr_month = add_months(curr_year, curr_month, 1)
-        elif options.output_freq == 'end':
-            # One line with the number of days in the simulation
-            output_intervals = [ndays_new]
-
-        print 'Updating ' + calfile
-        f = open(calfile, 'w')
-        f.write(date_code_new + '\n')
-        f.write(str(ndays_new) + '\n')
-        for interval in output_intervals:
-            f.write(str(interval) + '\n')
-        f.close()
+        newer_year, newer_month, ndays_new, date_code_new = update_calendar_file(new_year, new_month, options.couple_step, options. calfile)
 
         if options.use_cal_pkg and options.restart_type=='zero':
             print 'Updating start date for calendar package'

@@ -119,6 +119,16 @@ def add_months (year, month, num_months):
     return year, month
 
 
+# Rewind the given date (year and month) by num_months
+def subtract_months (year, month, num_months):
+
+    month -= num_months
+    while month < 1:
+        month += 12
+        year -= 1
+    return year, month
+
+
 # Calculate the number of days between the given dates (assuming 1st of the month), depending on the calendar type
 def days_between (year_1, month_1, year_2, month_2, calendar_type):
     
