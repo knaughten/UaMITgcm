@@ -39,7 +39,7 @@ update_calendar_file(old_year, old_month, new_couple_step, options, calfile)
 # Now update couple_step in config_options.py
 options_file = 'config_options.py'
 old_line = line_that_matters(options_file, 'couple_step')
-replace_line(options_file, old_line, old_line.replace(str(old_couple_step), str(new_couple_step))
+replace_line(options_file, old_line, old_line.replace(str(old_couple_step), str(new_couple_step)))
 
 
 
