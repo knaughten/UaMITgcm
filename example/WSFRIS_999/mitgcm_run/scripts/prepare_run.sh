@@ -36,10 +36,20 @@ ln -s $WSFRIS_IN/* .
 ln -s $SHARED/UKESM/piControl/* .
 
 # Deep copy of some files that will be modified
-rm -f draft_WSFRIS bathy_WSFRIS pload_WSFRIS
-cp -f $WSFRIS_IN/draft_WSFRIS $WSFRIS_IN/bathy_WSFRIS $WSFRIS_IN/pload_WSFRIS .
-rm -f UVEL*.OBCS_E* VVEL*.OBCS_N*
-cp -f $WSFRIS_IN/UVEL*.OBCS_E* $WSFRIS_IN/VVEL*.OBCS_N* .
+rm -f draft_WSFRIS bathy_WSFRIS pload_piControl_WSFRIS
+cp -f $WSFRIS_IN/draft_WSFRIS $WSFRIS_IN/bathy_WSFRIS $WSFRIS_IN/pload_piControl_WSFRIS .
+
+# Link copies of OBCS for the first and last years of simulation, so there is something to interpolate on either side.
+for string in *OBCS*2880;
+do
+  substring=${string%????}
+  cp -P $substring"$((2880))" $substring"$((2879))"
+done
+for string in *OBCS*3059;
+do
+  substring=${string%????}
+  cp -P $substring"$((3059))" $substring"$((3060))"
+done
 
 # Link executable
 ln -s ../build/mitgcmuv .

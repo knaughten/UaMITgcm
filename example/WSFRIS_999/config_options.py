@@ -53,7 +53,7 @@ rhoConst = 1035.
 eosType = 'MDJWF'
 seaice_nz = 7
 
-startDate = '26800101'
+startDate = '28800101'
 
 
 
