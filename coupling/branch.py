@@ -35,8 +35,8 @@ if not os.path.isfile(old_output_dir + options.finished_file):
     print 'Error (branch.py): experiment ' + old_name + ' is not finished. Branching will not work properly.'
     sys.exit()
 
-# Copy the case as usual
-do_copy_case(old_name, new_name)
+# Copy the case as usual, but ignore the Ua restart file
+do_copy_case(old_name, new_name, check_restart=False)
 # Also need an output directory
 os.mkdir(new_output_dir)
 

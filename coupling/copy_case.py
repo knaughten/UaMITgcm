@@ -19,7 +19,7 @@ def parse_name (expt_name):
 
 
 # Function to encapsulate most of this so we can call it from within branch.py
-def do_copy_case (old_name, new_name):
+def do_copy_case (old_name, new_name, check_restart=True):
 
     old_name, old_dir = parse_name(old_name)
     new_name, new_dir = parse_name(new_name)
@@ -88,7 +88,12 @@ def do_copy_case (old_name, new_name):
             copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
     if new_restart_name is not None:
         # The old simulation had a restart, so the new one might need one too
-        copy_ua_restart(new_uaexe_dir, new_restart_name)
+        if check_restart:
+            # See what the user thinks
+            copy_ua_restart(new_uaexe_dir, new_restart_name)
+        else:
+            # Don't do anything yet - the restart will be copied by another script
+            pass
 
     # Change experiment name in config_options.py
     options_file = new_dir + 'config_options.py'
