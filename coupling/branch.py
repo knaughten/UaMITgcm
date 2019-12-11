@@ -45,17 +45,34 @@ os.mkdir(new_output_dir)
 copy_to_dir(options.calendar_file, old_output_dir, new_output_dir)
 # Finished file
 copy_to_dir(options.finished_file, old_output_dir, new_output_dir)
+# Melt rate file for Ua
+copy_to_dir(options.ua_melt_file, old_output_dir, new_output_dir)
 # MITgcm namelist
 copy_to_dir('data', old_mit_rundir, new_mit_rundir)
 # MITgcm pickup files
 for fname in os.listdir(old_mit_rundir):
     if fname.startswith('pickup'):
         copy_to_dir(fname, old_mit_rundir, new_mit_rundir)
+# MITgcm grid files for Ua
+for fname in os.listdir(old_output_dir):
+    if fname.endswith('.data') or fname.endswith('.meta'):
+        copy_to_dir(fname, old_output_dir, new_output_dir)
 
-# Copy contents of Ua directory, except for subdirectories (which will catch ResultsFiles/). Also rename any files which include the experiment name.
+# Copy contents of Ua directory, except for output files we don't care about (i.e. contents of subdirectories that aren't the ua_draft_file). Also rename any files which include the experiment name.
 for fname in os.listdir(old_uaexe_dir):
-    if old_name in fname:
+    if os.path.isdir(old_uaexe_dir+fname):
+        # Make a new subdirectory
+        old_subdir = old_uaexe_dir+fname+'/'
+        new_subdir = new_uaexe_dir+fname+'/'
+        os.mkdir(new_subdir)
+        # Just copy the draft file, if it's there
+        for fname2 in os.listdir(old_subdir):
+            if fname2 == options.ua_draft_file:
+                copy_to_dir(fname2, old_subdir, new_subdir)
+    elif old_name in fname:
+        # Rename with new experiment name
         new_fname = fname.replace(old_name, new_name)
         shutil.copy(old_uaexe_dir+fname, new_uaexe_dir+new_fname)
-    elif not os.path.isdir(old_uaexe_dir+fname):
+    else:
+        # Copy as normal
         copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
