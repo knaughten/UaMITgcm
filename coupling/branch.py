@@ -37,6 +37,8 @@ if not os.path.isfile(old_output_dir + options.finished_file):
 
 # Copy the case as usual
 do_copy_case(old_name, new_name)
+# Also need an output directory
+os.mkdir(new_output_dir)
 
 # Copy the correct files so the case will restart at the right place
 # Calendar file
