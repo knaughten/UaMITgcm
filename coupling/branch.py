@@ -28,7 +28,7 @@ new_output_dir = old_output_dir.replace(old_name, new_name)
 old_mit_rundir = options.mit_run_dir
 new_mit_rundir = old_mit_rundir.replace(old_name, new_name)
 old_uaexe_dir = options.ua_exe_dir
-new_uaexe_dir = old_uaexedir.replace(old_name, new_name)
+new_uaexe_dir = old_uaexe_dir.replace(old_name, new_name)
 
 # Make sure the old simulation is finished
 if not os.path.isfile(old_output_dir + options.finished_file):
