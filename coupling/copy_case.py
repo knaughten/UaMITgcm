@@ -9,82 +9,94 @@ import shutil
 import subprocess
 from coupling_utils import copy_to_dir, line_that_matters, replace_line, copy_ua_restart
 
-old_name = sys.argv[1]
-new_name = sys.argv[2]
-if old_name.endswith('/'):
-    old_name = old_name[:-1]
-if new_name.endswith('/'):
-    new_name = new_name[:-1]
-old_dir = old_name+'/'
-new_dir = new_name+'/'
+# Helper function to get the experiment name (no slash) and the directory (slash)
+def parse_name (expt_name):
 
-if not os.path.isdir(old_dir):
-    print 'Error (copy_case): ' + old_dir + ' does not exist'
-    sys.exit()
-if os.path.isdir(new_dir):
-    print 'Error (copy_case): ' + new_dir + ' already exists'
-    sys.exit()
+    if expt_name.endswith('/'):
+        expt_name = expt_name[:-1]
+    expt_dir = expt_name + '/'
+    return expt_name, expt_dir
 
-# Add the existing configuration to the path so we can read config_options.py
-sys.path.insert(0, './'+old_dir)
-from set_parameters import Options
-options = Options()
 
-# Paths to subdirectories
-old_mit_dir = options.mit_case_dir
-new_mit_dir = old_mit_dir.replace(old_name, new_name)
-old_build_dir = old_mit_dir + 'build/'
-new_build_dir = new_mit_dir + 'build/'
-old_scripts_dir = old_mit_dir + 'scripts/'
-new_scripts_dir = new_mit_dir + 'scripts/'
-old_uapost_dir = old_dir + 'ua_postprocess/'
-new_uapost_dir = new_dir + 'ua_postprocess/'
-old_uaexe_dir = options.ua_exe_dir
-new_uaexe_dir = old_uaexe_dir.replace(old_name, new_name)
+# Function to encapsulate most of this so we can call it from within branch.py
+def do_copy_case (old_name, new_name):
 
-# Root directory
-os.mkdir(new_dir)
-for fname in os.listdir(old_dir):
-    if fname.endswith('.sh') or fname.endswith('.py') or fname=='README':
-        copy_to_dir(fname, old_dir, new_dir)
+    old_name, old_dir = parse_name(old_name)
+    new_name, new_dir = parse_name(new_name)
 
-# MITgcm case directory
-os.mkdir(new_mit_dir)
-copy_to_dir('linux_amd64_archer_ifort', old_mit_dir, new_mit_dir)
-os.mkdir(new_mit_dir+'run/')
-os.mkdir(new_build_dir)
-copy_to_dir('mitgcmuv', old_build_dir, new_build_dir)
-copy_to_dir('genmake.log', old_build_dir, new_build_dir)
-shutil.copytree(old_mit_dir+'code/', new_mit_dir+'code/')
-shutil.copytree(old_mit_dir+'input/', new_mit_dir+'input/')
-shutil.copytree(old_scripts_dir, new_scripts_dir)
-# Now call the prepare_run.sh script to reset the MITgcm run directory
-subprocess.check_output([new_scripts_dir+'prepare_run.sh', new_scripts_dir])
+    if not os.path.isdir(old_dir):
+        print 'Error (copy_case): ' + old_dir + ' does not exist'
+        sys.exit()
+    if os.path.isdir(new_dir):
+        print 'Error (copy_case): ' + new_dir + ' already exists'
+        sys.exit()
 
-# Ua custom source code directory
-shutil.copytree(old_dir+'ua_custom/', new_dir+'ua_custom/')
+    # Add the existing configuration to the path so we can read config_options.py
+    sys.path.insert(0, './'+old_dir)
+    from set_parameters import Options
+    options = Options()
 
-# Ua postprocessing directory, if it exists
-if os.path.isdir(old_uapost_dir):
-    os.mkdir(new_uapost_dir)
-    for fname in os.listdir(old_uapost_dir):
-        if not (fname.startswith('matlab') and fname.endswith('.out')) and not fname.startswith('run_postprocess.o'):
-            copy_to_dir(fname, old_uapost_dir, new_uapost_dir)
+    # Paths to subdirectories
+    old_mit_dir = options.mit_case_dir
+    new_mit_dir = old_mit_dir.replace(old_name, new_name)
+    old_build_dir = old_mit_dir + 'build/'
+    new_build_dir = new_mit_dir + 'build/'
+    old_scripts_dir = old_mit_dir + 'scripts/'
+    new_scripts_dir = new_mit_dir + 'scripts/'
+    old_uapost_dir = old_dir + 'ua_postprocess/'
+    new_uapost_dir = new_dir + 'ua_postprocess/'
+    old_uaexe_dir = options.ua_exe_dir
+    new_uaexe_dir = old_uaexe_dir.replace(old_name, new_name)
 
-# Ua executable directory
-os.mkdir(new_uaexe_dir)
-new_restart_name = None
-for fname in os.listdir(old_uaexe_dir):
-    if fname.endswith('RestartFile.mat'):
-        # Save the name of the restart file, with the experiment name updated
-        new_restart_name = fname.replace(old_name, new_name)
-    if fname in ['Ua', 'Ua_MCR.sh'] or (fname.endswith('.mat') and (not fname.endswith('RestartFile.mat')) and fname not in ['NewMeshFile.mat', 'AdaptMesh.mat']):
-        copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
-if new_restart_name is not None:
-    # The old simulation had a restart, so the new one might need one too
-    copy_ua_restart(new_uaexe_dir, new_restart_name)
+    # Root directory
+    os.mkdir(new_dir)
+    for fname in os.listdir(old_dir):
+        if fname.endswith('.sh') or fname.endswith('.py') or fname=='README':
+            copy_to_dir(fname, old_dir, new_dir)
 
-# Change experiment name in config_options.py
-options_file = new_dir + 'config_options.py'
-old_line = line_that_matters(options_file, old_name, ignore_case=False)
-replace_line(options_file, old_line, old_line.replace(old_name, new_name))
+    # MITgcm case directory
+    os.mkdir(new_mit_dir)
+    copy_to_dir('linux_amd64_archer_ifort', old_mit_dir, new_mit_dir)
+    os.mkdir(new_mit_dir+'run/')
+    os.mkdir(new_build_dir)
+    copy_to_dir('mitgcmuv', old_build_dir, new_build_dir)
+    copy_to_dir('genmake.log', old_build_dir, new_build_dir)
+    shutil.copytree(old_mit_dir+'code/', new_mit_dir+'code/')
+    shutil.copytree(old_mit_dir+'input/', new_mit_dir+'input/')
+    shutil.copytree(old_scripts_dir, new_scripts_dir)
+    # Now call the prepare_run.sh script to reset the MITgcm run directory
+    subprocess.check_output([new_scripts_dir+'prepare_run.sh', new_scripts_dir])
+
+    # Ua custom source code directory
+    shutil.copytree(old_dir+'ua_custom/', new_dir+'ua_custom/')
+
+    # Ua postprocessing directory, if it exists
+    if os.path.isdir(old_uapost_dir):
+        os.mkdir(new_uapost_dir)
+        for fname in os.listdir(old_uapost_dir):
+            if not (fname.startswith('matlab') and fname.endswith('.out')) and not fname.startswith('run_postprocess.o'):
+                copy_to_dir(fname, old_uapost_dir, new_uapost_dir)
+
+    # Ua executable directory
+    os.mkdir(new_uaexe_dir)
+    new_restart_name = None
+    for fname in os.listdir(old_uaexe_dir):
+        if fname.endswith('RestartFile.mat'):
+            # Save the name of the restart file, with the experiment name updated
+            new_restart_name = fname.replace(old_name, new_name)
+        if fname in ['Ua', 'Ua_MCR.sh'] or (fname.endswith('.mat') and (not fname.endswith('RestartFile.mat')) and fname not in ['NewMeshFile.mat', 'AdaptMesh.mat']):
+            copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
+    if new_restart_name is not None:
+        # The old simulation had a restart, so the new one might need one too
+        copy_ua_restart(new_uaexe_dir, new_restart_name)
+
+    # Change experiment name in config_options.py
+    options_file = new_dir + 'config_options.py'
+    old_line = line_that_matters(options_file, old_name, ignore_case=False)
+    replace_line(options_file, old_line, old_line.replace(old_name, new_name))
+
+
+if __name__ == "__main__":
+
+    # Parse input arguments
+    do_copy_case(sys.argv[1], sys.argv[2])
