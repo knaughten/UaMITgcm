@@ -435,14 +435,15 @@ def gather_output (options):
     def check_and_move (directory, fname):
         if not os.path.isfile(directory+fname):
             print 'Error gathering output'
-            print file_path + ' does not exist'
+            print directory+fname + ' does not exist'
             sys.exit()
         move_to_dir(fname, directory, new_mit_dir)
 
     if options.use_xmitgcm:
         # Move the NetCDF files created by convert_mit_output into the new folder
-        check_and_move(options.mit_run_dir, options.dump_start_nc_name)
-        check_and_move(options.mit_run_dir, options.dump_end_nc_name)
+        if options.save_dumps:
+            check_and_move(options.mit_run_dir, options.dump_start_nc_name)
+            check_and_move(options.mit_run_dir, options.dump_end_nc_name)
         check_and_move(options.mit_run_dir, options.mit_nc_name)
             
     # Deal with MITgcm binary output files
