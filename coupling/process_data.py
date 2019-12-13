@@ -589,12 +589,8 @@ def correct_next_obcs (grid, options):
         d_t = 1
         correct = True
     elif options.correct_obcs_option == 'threshold':
-        if eta_avg < -eta_threshold:
-            d_eta = -eta_threshold
-            d_t = 1
-            correct = True
-        elif eta_avg > eta_threshold:
-            d_eta = eta_threshold
+        if eta_avg < -eta_threshold or eta_avg > eta_threshold:
+            d_eta = eta_avg
             d_t = 1
             correct = True
         else:
