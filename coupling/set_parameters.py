@@ -126,7 +126,12 @@ class Options:
         self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
         # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.couple_step % 12 != 0:
-            throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')            
+            throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')
+        self.correct_obcs_option = check_value('correct_obcs_option', correct_obcs_option, legal=['gradient', 'threshold'])
+        self.eta_threshold = check_value('eta_threshold', eta_threshold, type='float')
+        # Make sure positive
+        if self.eta_threshold <= 0:
+            throw_error('eta_threshold must be positive')
 
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
