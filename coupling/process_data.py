@@ -392,10 +392,12 @@ def convert_mit_output (options):
         else:
             iters = 'all'
             prefixes = None
-        # Read all the files matching the criteria
-        ds = open_mdsdataset(options.mit_run_dir, iters=iters, prefix=prefixes, delta_t=options.deltaT, ref_date=ref_date, ignore_unknown_vars=True, calendar=calendar)
-        # Save to NetCDF file
-        ds.to_netcdf(options.mit_run_dir+nc_name, unlimited_dims=['time'])
+        # Only convert dumps if the user wants them saved
+        if (not dump) or options.save_dumps:
+            # Read all the files matching the criteria
+            ds = open_mdsdataset(options.mit_run_dir, iters=iters, prefix=prefixes, delta_t=options.deltaT, ref_date=ref_date, ignore_unknown_vars=True, calendar=calendar)
+            # Save to NetCDF file
+            ds.to_netcdf(options.mit_run_dir+nc_name, unlimited_dims=['time'])
         if dump:
             # Move to temporary directory
             move_processed_files(options.mit_run_dir, tmp_dir, prefixes, tstep)

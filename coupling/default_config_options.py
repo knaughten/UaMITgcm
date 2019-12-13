@@ -19,6 +19,11 @@ ua_option = 'compiled'
 # Whether to convert MITgcm binary output to NetCDF using xmitgcm
 # (Even if this is False, the MNC package in MITgcm is not supported.)
 use_xmitgcm = False
+# Whether to save initial and final dumps for each timestep
+# Only valid if use_xmitgcm is True.
+# If use_xmitgcm is False, you can just switch off dumpInitAndLast instead,
+# unless you have restart_type='zero'.
+save_dumps = True
 
 # Format for Ua output
 # For now the only option is 'matlab', later 'netcdf' will be added
