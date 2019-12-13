@@ -529,7 +529,7 @@ def set_calendar (options):
         open(finifile, 'a').close()
     else:
         print 'Setting output intervals'
-        newer_year, newer_month, ndays_new, date_code_new = update_calendar_file(new_year, new_month, options.couple_step, options. calfile)
+        newer_year, newer_month, ndays_new, date_code_new = update_calendar_file(new_year, new_month, options.couple_step, options, calfile)
 
         if options.use_cal_pkg and options.restart_type=='zero':
             print 'Updating start date for calendar package'
