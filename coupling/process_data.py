@@ -567,8 +567,21 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    # Multiply by 2 so we correct it, and do it over 1 year
-    eta_avg *= 2
+    # Read what the value was last coupling step
+    eta_file = options.output_dir + 'eta_avg'
+    if not os.path.isfile(eta_file):
+        # This is the first step
+        eta_avg_old = 0
+    else:
+        f = open(eta_file, 'r')
+        eta_avg_old = float(f.readline())
+        f.close()
+    # Now overwrite that file
+    f = open(eta_file, 'w')
+    f.write(str(eta_avg))
+    f.close()
+    # Correct with double the difference between them, over 1 year
+    d_eta = 2*(eta_avg - eta_avg_old)
     d_t = 1
     # Figure out the next year to process
     f = open(options.output_dir+options.calendar_file, 'r')
