@@ -41,7 +41,7 @@ if int(niter0_new) != niter0_new:
     print 'Error (change_ocean_timestep): This combination of timesteps does not work as niter0 is not evenly divided.'
     sys.exit()
 niter0_new = int(niter0_new)
-print 'Updating niter0 in ' + namelist
+print 'Updating niter0 in ' + namelist + ' from ' + str(niter0_old) + ' to ' + str(niter0_new)
 replace_line(namelist, niter0_line, ' niter0='+str(niter0_new)+',\n')
 
 # Get timestep number in pickup file (will be 1 simulation segment ahead of niter0)
