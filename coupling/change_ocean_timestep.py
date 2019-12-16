@@ -13,7 +13,7 @@ from coupling_utils import line_that_matters, replace_line
 
 old_deltaT = int(sys.argv[1])
 new_deltaT = int(sys.argv[1])
-options = Options
+options = Options()
 namelist = options.mit_run_dir + 'data'
 
 # Update deltaT in config_options.py and mitgcm_run/run/data
