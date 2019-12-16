@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0,'./')
 import os
 from set_parameters import Options
-from coupling_utils import line_that_matters, replace_line
+from coupling_utils import line_that_matters, replace_line, extract_first_int
 
 old_deltaT = int(sys.argv[1])
 new_deltaT = int(sys.argv[1])
