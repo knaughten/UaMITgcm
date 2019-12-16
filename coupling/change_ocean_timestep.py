@@ -12,7 +12,7 @@ from set_parameters import Options
 from coupling_utils import line_that_matters, replace_line, extract_first_int
 
 old_deltaT = int(sys.argv[1])
-new_deltaT = int(sys.argv[1])
+new_deltaT = int(sys.argv[2])
 options = Options()
 namelist = options.mit_run_dir + 'data'
 
