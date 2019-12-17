@@ -60,7 +60,7 @@ if __name__ == "__main__":
         print 'Gathering output'
         gather_output(options)
 
-        if not options.finished and options.correct_obcs_online:
+        if options.correct_obcs_online:
             print 'Balancing OBCS based on last changes in sea surface height'
             correct_next_obcs(grid, options)
 
