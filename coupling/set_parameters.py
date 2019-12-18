@@ -128,7 +128,7 @@ class Options:
         # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.couple_step % 12 != 0:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')
-        self.correct_obcs_option = check_value('correct_obcs_option', correct_obcs_option, legal=['gradient', 'threshold'])
+        self.correct_obcs_option = check_value('correct_obcs_option', correct_obcs_option, legal=['gradient', 'threshold', 'combined'])
         self.eta_threshold = check_value('eta_threshold', eta_threshold, type='float')
         # Make sure positive
         if self.eta_threshold <= 0:

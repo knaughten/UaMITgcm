@@ -134,7 +134,7 @@ ua_ini_restart = False
 ### preserved). The OBCS must be transient (one file per year) as opposed to a
 ### monthly climatology.
 correct_obcs_online = False
-### Which approach to use? "gradient" (default) or "threshold"? (in testing)
+### Which approach to use? "gradient" (default), "threshold", or "combined"?
 correct_obcs_option = 'gradient'
 ### What is the threshold for area-averaged eta to trigger corrections?
 eta_threshold = 2
