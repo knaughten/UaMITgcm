@@ -594,6 +594,7 @@ def correct_next_obcs (grid, options):
             d_t = 1
             correct = True
         else:
+            print 'OBCS are acceptable as-is'
             correct = False
 
     if correct:
