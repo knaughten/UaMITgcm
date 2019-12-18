@@ -133,6 +133,7 @@ class Options:
         # Make sure positive
         if self.eta_threshold <= 0:
             throw_error('eta_threshold must be positive')
+        self.threshold_coeff = check_value('threshold_coeff', threshold_coeff, type='float')
 
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')

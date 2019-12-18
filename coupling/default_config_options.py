@@ -138,6 +138,8 @@ correct_obcs_online = False
 correct_obcs_option = 'gradient'
 ### What is the threshold for area-averaged eta to trigger corrections?
 eta_threshold = 2
+### What is the coefficient for corrections on threshold?
+threshold_coeff = 2
 
 ###### 3. MITgcm parameters ######
 
