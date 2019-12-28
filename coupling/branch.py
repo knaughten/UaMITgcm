@@ -53,6 +53,10 @@ copy_to_dir('data', old_mit_rundir, new_mit_rundir)
 for fname in os.listdir(old_mit_rundir):
     if fname.startswith('pickup'):
         copy_to_dir(fname, old_mit_rundir, new_mit_rundir)
+# MITgcm topography and pressure load files
+copy_to_dir(options.bathyFile, old_mit_rundir, new_mit_rundir)
+copy_to_dir(options.draftFile, old_mit_rundir, new_mit_rundir)
+copy_to_dir(options.pload_file, old_mit_rundir, new_mit_rundir)
 # MITgcm grid files for Ua
 for fname in os.listdir(old_output_dir):
     if fname.endswith('.data') or fname.endswith('.meta'):
