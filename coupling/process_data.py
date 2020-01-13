@@ -151,8 +151,8 @@ def adjust_mit_geom (grid, options):
         print 'Greatest thinning of ice shelf draft is ' + str(np.abs(np.amin(ddraft))) + ' m'
     if np.amax(ddraft) > 0:
         print 'Greatest thickening of ice shelf draft is ' + str(np.amax(ddraft)) + ' m'
-    print str(np.count_nonzero((grid.ice_mask)*(mask==2))) + ' cells grounded'
-    print str(np.count_nonzero((grid.land_mask)*(mask==1))) + ' cells ungrounded'
+    print str(np.count_nonzero((grid.ice_mask)*(bathy==0))) + ' cells grounded'
+    print str(np.count_nonzero((grid.land_mask)*(bathy!=0))) + ' cells ungrounded'
 
     # Make a copy of the original bathymetry and ice shelf draft
     make_tmp_copy(mit_dir+options.draftFile)
