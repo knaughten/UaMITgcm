@@ -570,41 +570,11 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    if options.correct_obcs_option in ['gradient', 'combined']:
-        # Read what the value was last coupling step
-        eta_file = options.output_dir + 'eta_avg'
-        if not os.path.isfile(eta_file):
-            # This is the first step
-            eta_avg_old = 0
-        else:
-            f = open(eta_file, 'r')
-            eta_avg_old = float(f.readline())
-            f.close()
-        # Now overwrite that file
-        f = open(eta_file, 'w')
-        f.write(str(eta_avg))
-        f.close()
-        # Correct with double the difference between them, over 1 year
-        d_eta = 2*(eta_avg - eta_avg_old)
-        d_t = 1
-    elif options.correct_obcs_option == 'threshold':
-        # Correct with double the absolute sea surface height, over 1 year
-        d_eta = options.threshold_coeff*eta_avg
-        d_t = 1
-    if options.correct_obcs_option in ['threshold', 'combined']:
-        # Only correct if exceeds threshold
-        correct = (eta_avg < -1*options.eta_threshold or eta_avg > options.eta_threshold)
-    else:
-        # Always correct
-        correct = True
 
-    if correct:
-        # Figure out the next year to process
-        f = open(options.output_dir+options.calendar_file, 'r')
-        date_code = f.readline().strip()
-        f.close()
-        year = int(date_code[:4])
-        # Apply the correction
-        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=True, start_year=year, end_year=year)
-    else:
-        print 'OBCS are acceptable as-is'
+    # Figure out the next year to process
+    f = open(options.output_dir+options.calendar_file, 'r')
+    date_code = f.readline().strip()
+    f.close()
+    year = int(date_code[:4])
+    # Apply the correction
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=1, multi_year=True, start_year=year, end_year=year)
