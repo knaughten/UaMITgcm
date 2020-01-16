@@ -90,9 +90,9 @@ class OBCSForcingArray:
 
         if self.years[-1] >= self.BC['year'][:,-1]:
             # calculate how many years need adding to the timeseries
-            nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 1])
+            nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 0])
             # calculate how many additional full cycles of the Kimura dataset are required to cover the requested simulation times
-            ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,1])))
+            ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,0])))
 
             self.BC['Theta'] = np.repeat(self.BC['Theta'],ncycles+1,axis=2)
             self.BC['Salt'] = np.repeat(self.BC['Salt'],ncycles+1,axis=2)
@@ -102,7 +102,9 @@ class OBCSForcingArray:
             self.BC['month'] = np.append(self.BC['month'],monthstoappend)
             yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(self.BC['year'].size*ncycles)/12) +1 
             self.BC['year'] = np.append(self.BC['year'],yearstoappend)
-        
+      
+	###print self.months[0],self.years[0],' to ',self.months[-1],self.years[-1] 
+	###print self.BC['month'],self.BC['year']  
 
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
@@ -197,10 +199,10 @@ def make_ics_obcs (grid, obcs, ini_temp_file, ini_salt_file, obcs_temp_file_S, o
     
     sizetzx = (obcs.nt,np.sum(nz),nx)
     sizetzy = (obcs.nt,np.sum(nz),ny)
-    OBS_t, OBS_s, OBS_u, OBS_v = np.zeros(sizetzx), np.zeros(sizetzx), np.zeros(sizetzx), np.zeros(sizetzx)
-    OBW_t, OBW_s, OBW_u, OBW_v = np.zeros(sizetzy), np.zeros(sizetzy), np.zeros(sizetzy), np.zeros(sizetzy)
 
-    # southern boundary
+    ## Southern boundary
+    OBS_t, OBS_s, OBS_u, OBS_v = np.zeros(sizetzx), np.zeros(sizetzx), np.zeros(sizetzx), np.zeros(sizetzx)
+    
     for i in xrange(0,nx):
         x = grid.x[i]
         y = grid.y[0]-dy/2
@@ -209,8 +211,20 @@ def make_ics_obcs (grid, obcs, ini_temp_file, ini_salt_file, obcs_temp_file_S, o
         OBS_s[:,:,i] = s_profile
         OBS_u[:,:,i] = u_profile
         OBS_v[:,:,i] = v_profile
-	
-    # western boundary
+
+    # Write the files
+    # No need to mask out the land because MITgcm will do that for us
+    write_binary(OBS_t, obcs_temp_file_S, prec=32)
+    write_binary(OBS_s, obcs_salt_file_S, prec=32)
+    write_binary(OBS_u, obcs_uvel_file_S, prec=32)
+    write_binary(OBS_v, obcs_vvel_file_S, prec=32)
+
+    # Remove variables from workspace
+    OBS_t, OBS_s, OBS_u, OBS_v = None, None, None, None
+
+    ## Western boundary
+    OBW_t, OBW_s, OBW_u, OBW_v = np.zeros(sizetzy), np.zeros(sizetzy), np.zeros(sizetzy), np.zeros(sizetzy)
+    
     for i in xrange(0,ny):
         x = grid.x[0]-dx/2
         y = grid.y[i]
@@ -219,7 +233,16 @@ def make_ics_obcs (grid, obcs, ini_temp_file, ini_salt_file, obcs_temp_file_S, o
         OBW_s[:,:,i] = s_profile
         OBW_u[:,:,i] = u_profile
         OBW_v[:,:,i] = v_profile
-   
+
+    # Write the files
+    write_binary(OBW_t, obcs_temp_file_W, prec=32)
+    write_binary(OBW_s, obcs_salt_file_W, prec=32)
+    write_binary(OBW_u, obcs_uvel_file_W, prec=32)
+    write_binary(OBW_v, obcs_vvel_file_W, prec=32)
+
+    # Remove variable from workspace
+    OBW_u, OBW_v = None, None
+ 
     # initial conditions
     t_profile_av, s_profile_av = np.zeros(np.sum(nz)), np.zeros(np.sum(nz))
     for i in xrange(0,np.sum(nz)):
@@ -228,20 +251,13 @@ def make_ics_obcs (grid, obcs, ini_temp_file, ini_salt_file, obcs_temp_file_S, o
 
     INI_t = z_to_xyz(t_profile_av, [nx, ny])
     INI_s = z_to_xyz(s_profile_av, [nx, ny])
-                    
-    # Write the files
-    # No need to mask out the land because MITgcm will do that for us
-    write_binary(OBS_t, obcs_temp_file_S, prec=32)
-    write_binary(OBS_s, obcs_salt_file_S, prec=32)
-    write_binary(OBS_u, obcs_uvel_file_S, prec=32)
-    write_binary(OBS_v, obcs_vvel_file_S, prec=32)
-    write_binary(OBW_t, obcs_temp_file_W, prec=32)
-    write_binary(OBW_s, obcs_salt_file_W, prec=32)
-    write_binary(OBW_u, obcs_uvel_file_W, prec=32)
-    write_binary(OBW_v, obcs_vvel_file_W, prec=32)
     
+    # Write the files
     write_binary(INI_t, ini_temp_file, prec=prec)
     write_binary(INI_s, ini_salt_file, prec=prec)
+
+    # Remove variables from workspace
+    OBW_t, OBW_s, INI_t, INI_s = None, None, None, None
 
     # Calculate the pressure load anomaly
     calc_load_anomaly(grid, pload_file, option='precomputed', ini_temp_file=ini_temp_file, ini_salt_file=ini_salt_file, eosType=eosType, rhoConst=rhoConst, prec=prec, check_grid=False)
