@@ -244,9 +244,9 @@ def adjust_mit_state (grid, options):
             fill = newly_open
             mask = mask_new
         else:
-            discard = grid.hfac[0,:]==0
-            fill = newly_open[0,:]
-            mask = mask_new[0,:]
+            discard = np.sum(grid.hfac, axis=0)==0
+            fill = (np.sum(hFacC_new, axis=0)!=0)*discard
+            mask = (np.sum(mask_new, axis=0)!=0).astype(int)
         data_filled = discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical', missing_val=-9999)*mask
         if np.count_nonzero(data_filled==-9999) != 0:
             print 'Error (extrapolate_into_new): something went wrong with the masking.'
