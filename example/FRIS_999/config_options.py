@@ -15,14 +15,14 @@ mit_case_dir = work_dir+'mitgcm_run/'
 ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
-budget_code = 'n02-FISSA'
+budget_code = 'n02-NES011994'
 
 
 ###### 2. Coupling options ######
 
 total_time = 12*20  # Update to 12*40 after spinup
 spinup_time = 12*20  # Update to 0 after spinup
-couple_step = 6
+couple_step = 12
 repeat = False   # Update to True after spinup
 
 calendar_type = 'standard'
@@ -45,7 +45,7 @@ use_cal_pkg = True
 
 use_ini_deltaTmom = True
 
-deltaT = 450
+deltaT = 600
 hFacMin = 0.1
 hFacMinDr = 20.
 readBinaryPrec = 64

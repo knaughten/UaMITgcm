@@ -8,6 +8,7 @@
 expt_name = 'WSFRIS_999'
 
 use_xmitgcm = True
+save_dumps = False
 
 # Base directory to simplify definition of directories below
 work_dir = '/work/n02/n02/kaight/UaMITgcm/example/'+expt_name+'/'
@@ -15,12 +16,12 @@ mit_case_dir = work_dir+'mitgcm_run/'
 ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
-budget_code = 'n02-FISSA'
+budget_code = 'n02-NES011994'
 
 
 ###### 2. Coupling options ######
 
-total_time = 12*30
+total_time = 12*10
 spinup_time = 12*10
 couple_step = 12
 
@@ -34,6 +35,8 @@ preserve_ocean_mask = True
 preserve_static_ice = True
 
 pload_option = 'nearest'
+
+correct_obcs_online = True
 
 
 ###### 3. MITgcm parameters ######
@@ -67,3 +70,6 @@ pload_file = 'pload_piControl_WSFRIS'
 ismr_name = 'state2D'
 etan_name = 'state2D'
 output_names = ['state2D', 'stateUVEL', 'stateVVEL', 'stateWVEL', 'stateTHETA', 'stateSALT', 'statePSI', 'stateEXF', 'stateICE']
+
+obcs_file_e_u = 'UVEL_piControl.OBCS_E_'
+obcs_file_n_v = 'VVEL_piControl.OBCS_N_'
