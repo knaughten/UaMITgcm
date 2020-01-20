@@ -230,6 +230,7 @@ def adjust_mit_state (grid, options):
     hFacS_new = calc_hfac(bathy, draft, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, gtype='v')
     # Also get the new 3D masks
     mask_new = (hFacC_new!=0).astype(int)
+    mask_new_2d = (np.sum(mask_new, axis=0)!=0).astype(int)
     mask_new_u = (hFacW_new!=0).astype(int)
     mask_new_v = (hFacS_new!=0).astype(int)
     # Find all the (t-grid) cells which are newly open
@@ -246,7 +247,7 @@ def adjust_mit_state (grid, options):
         else:
             discard = np.sum(grid.hfac, axis=0)==0
             fill = (np.sum(hFacC_new, axis=0)!=0)*discard
-            mask = (np.sum(mask_new, axis=0)!=0).astype(int)
+            mask = mask_new_2d
         data_filled = discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical', missing_val=-9999)*mask
         if np.count_nonzero(data_filled==-9999) != 0:
             print 'Error (extrapolate_into_new): something went wrong with the masking.'
@@ -303,7 +304,7 @@ def adjust_mit_state (grid, options):
     if options.restart_type == 'pickup':
         gunm1 *= mask_new_u
         gvnm1 *= mask_new_v
-        detahdt *= mask_new[0,:]
+        detahdt *= mask_new_2d
         if options.use_seaice:
             temp_ice *= xy_to_xyz(mask_new[0,:], [grid.nx, grid.ny, options.seaice_nz])
             sigm1_ice *= mask_new[0,:]
