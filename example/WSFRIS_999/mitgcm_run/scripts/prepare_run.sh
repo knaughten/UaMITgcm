@@ -31,9 +31,9 @@ cp ../input/* .
 
 # Link input files stored elsewhere
 SHARED=/work/n02/n02/shared/baspog/MITgcm
-WSFRIS_IN=$SHARED/WS/WSFRIS
-ln -s $WSFRIS_IN/* .
+WSFRIS_IN=$SHARED/WS/WSFRIS/piControl/
 ln -s $SHARED/UKESM/piControl/* .
+ln -s $WSFRIS_IN/* .
 
 # Deep copy of some files that will be modified
 rm -f draft_WSFRIS bathy_WSFRIS pload_piControl_WSFRIS
@@ -46,6 +46,13 @@ do
   cp -P $substring"$((2880))" $substring"$((2879))"
 done
 for string in *OBCS*3059;
+do
+  substring=${string%????}
+  cp -P $substring"$((3059))" $substring"$((3060))"
+done
+
+# Link atmoshperic forcing for last year of simulation
+for string in piControl_*_3059;
 do
   substring=${string%????}
   cp -P $substring"$((3059))" $substring"$((3060))"

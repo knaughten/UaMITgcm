@@ -16,7 +16,7 @@ mit_case_dir = work_dir+'mitgcm_run/'
 ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
-budget_code = 'n02-NES011994'
+budget_code = 'n02-FISSA'
 
 
 ###### 2. Coupling options ######
