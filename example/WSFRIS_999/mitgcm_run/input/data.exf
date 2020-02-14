@@ -661,16 +661,16 @@
  &
 
  &EXF_NML_OBCS
- obcsNstartdate1=28800101,   
+ obcsNstartdate1=28800116,   
  obcsNstartdate2=0,   
  obcsNperiod=2592000.,
- obcsEstartdate1=28800101,   
+ obcsEstartdate1=28800116,   
  obcsEstartdate2=0,   
  obcsEperiod=2592000.,
- siobNstartdate1=28800101,
+ siobNstartdate1=28800116,
  siobNstartdate2=0,   
  siobNperiod=2592000.,
- siobEstartdate1=28800101,
+ siobEstartdate1=28800116,
  siobEstartdate2=0,   
  siobEperiod=2592000.,  
  useOBCSYearlyFields=.true., 
