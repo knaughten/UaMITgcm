@@ -38,6 +38,8 @@ ln -s $WSFRIS_IN/* .
 # Deep copy of some files that will be modified
 rm -f draft_WSFRIS bathy_WSFRIS pload_piControl_WSFRIS
 cp -f $WSFRIS_IN/draft_WSFRIS $WSFRIS_IN/bathy_WSFRIS $WSFRIS_IN/pload_piControl_WSFRIS .
+rm -f UVEL_*.OBCS_E_* VVEL_*.OBCS_N_*
+cp -r $WSFRIS_IN/UVEL_*.OBCS_E_* $WSFRIS_IN/VVEL_*.OBCS_N_* .
 
 # Link copies of OBCS for the first and last years of simulation, so there is something to interpolate on either side.
 for string in *OBCS*2880;
