@@ -20,7 +20,7 @@ else
 fi
 
 # Generate a Makefile
-$MIT_SOURCE/tools/genmake2 -ieee -mods=../code -of=$BUILD_OPTIONS -mpi
+$MIT_SOURCE/tools/genmake2 -ieee -mods=../code -of=$BUILD_OPTIONS -mpi -rootdir=$MIT_SOURCE
 
 # Run the Makefile
 make depend
