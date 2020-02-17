@@ -142,7 +142,7 @@ def adjust_mit_geom (grid, options):
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft')
 
     print 'Fixing ice shelf drafts which are too thin'
-    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr, only_grow=options.expt_name=='FRIS_999')[0]
+    draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr, only_grow=True)[0]
 
     # Figure out largest changes in ice shelf draft, not counting grounding/ungrounding
     draft_old = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
