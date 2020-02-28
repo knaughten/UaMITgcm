@@ -106,11 +106,11 @@ end
 
 % Get user-defined parameter values
 %  CtrlVar,UsrVar,Info,UaOuts
-if nargin("Ua2D_InitialUserInput.m")>2
-    [UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar,varargin{:});
-else
-    [UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar);
-end
+% if nargin("Ua2D_InitialUserInput.m")>2
+%     [UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar,varargin{:});
+% else
+[UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar);
+%end
 
 CtrlVar.MeshBoundaryCoordinates=MeshBoundaryCoordinates;
 clearvars MeshBoundaryCoordinates;
