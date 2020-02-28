@@ -402,7 +402,8 @@ while 1
     
     %% -adapt time step   automated time stepping 
     if CtrlVar.TimeDependentRun
-        [RunInfo,CtrlVar.dt,CtrlVar.dtRatio]=AdaptiveTimeStepping(UserVar,RunInfo,CtrlVar,MUA,F);
+        %[RunInfo,CtrlVar.dt,CtrlVar.dtRatio]=AdaptiveTimeStepping(UserVar,RunInfo,CtrlVar,MUA,F);
+        [RunInfo,CtrlVar.dt,CtrlVar.dtRatio]=AdaptiveTimeStepping(RunInfo,CtrlVar,CtrlVar.time,CtrlVar.dt);
     end
     
     
