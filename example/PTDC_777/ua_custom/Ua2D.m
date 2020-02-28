@@ -638,7 +638,7 @@ while 1
     
     % UaOutputs
     
-    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
+    if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter+1))<1e-5)
         CtrlVar.UaOutputsInfostring='inside transient loop and inside run-step loop';
         CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
         
@@ -672,8 +672,8 @@ while 1
 end
 
 RunInfo.CPU.Total=duration(0,0,cputime);
-RunInfo.Message="Calculations done. Creating outputs. ";
-CtrlVar.RunInfoMessage=RunInfo.Message;
+RunInfo.Message(numel(RunInfo.Message)+1)="Calculations done. Creating outputs. ";
+CtrlVar.RunInfoMessage=RunInfo.Message(end);
 
 if CtrlVar.PlotWaitBar
     multiWaitbar('Run steps','Value',(CtrlVar.CurrentRunStepNumber-CtrlVar.CurrentRunStepNumber0)/CtrlVar.TotalNumberOfForwardRunSteps);
@@ -681,12 +681,14 @@ if CtrlVar.PlotWaitBar
 end
 
 
-%% Final call to UaOutputs
+%% plotting results
 
+%[etaInt,xint,yint,exx,eyy,exy,Eint,e,txx,tyy,txy]=calcStrainRatesEtaInt(CtrlVar,MUA,ub,vb,AGlen,n);
+%[wSurf,wSurfInt,wBedInt,wBed]=calcVerticalSurfaceVelocity(rho,rhow,h,S,B,b,ub,vb,as,ab,exx,eyy,xint,yint,MUA.coordinates,MUA.connectivity,MUA.nip,CtrlVar);
 
-if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputsDt==0 )
+if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt(CtrlVar.UaOutputsCounter))<1e-5)
     CtrlVar.UaOutputsInfostring='Last call';
-    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
+%    CtrlVar.UaOutputsCounter=CtrlVar.UaOutputsCounter+1;
     if CtrlVar.MassBalanceGeometryFeedback>0
         CtrlVar.time=CtrlVar.time+CtrlVar.dt;
         [UserVar,F]=GetMassBalance(UserVar,CtrlVar,MUA,F);
@@ -696,15 +698,13 @@ if (ReminderFraction(CtrlVar.time,CtrlVar.UaOutputsDt)<1e-5 || CtrlVar.UaOutputs
     
     fprintf(' Calling UaOutputs. UaOutputsInfostring=%s , UaOutputsCounter=%i \n ',CtrlVar.UaOutputsInfostring,CtrlVar.UaOutputsCounter)
     UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-    
+    %UserVar=CreateUaOutputs(UserVar,CtrlVar,MUA,s,b,S,B,h,ub,vb,ud,vd,uo,vo,dhdt,dsdt,dbdt,C,AGlen,m,n,rho,rhow,g,as,ab,dasdh,dabdh,GF,BCs,l);
     if CtrlVar.UaOutputsCounter>=CtrlVar.UaOutputsMaxNrOfCalls
         fprintf(' Exiting because number of calls to UaOutputs (%i) >= CtrlVar.UaOutputsMaxNrOfCalls (%i) /n',...
             CtrlVar.UaOutputsCounter,CtrlVar.UaOutputsMaxNrOfCalls)
         return
     end
 end
-
-
 
 %% saving outputs
 
@@ -720,10 +720,9 @@ fprintf(CtrlVar.fidlog,' Wall-clock time : %s (hh:mm:ss) \n',RunInfo.CPU.WallTim
 
 if CtrlVar.fidlog~= 1 ; fclose(CtrlVar.fidlog); end
 
+fclose(RunInfo.File.fid);
 
-UserVar=DefineFinalReturnedValueOfUserVar(UserVar,CtrlVar,MUA,BCs,F,l,InvStartValues,InvFinalValues,Priors,Meas,BCsAdjoint,RunInfo);
-
-SayGoodbye(CtrlVar,RunInfo)
+SayGoodbye(CtrlVar)
 
 
 end
