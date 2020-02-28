@@ -40,7 +40,7 @@ if ~CtrlVar.LinFEbasis
          % decomposition function. The solution remains unchanged, but the
          % code might be slower
          %MUA.dM=decomposition(MUA.M);
-        MUA.dM = M;
+        MUA.dM = MUA.M;
     end
    
 end
