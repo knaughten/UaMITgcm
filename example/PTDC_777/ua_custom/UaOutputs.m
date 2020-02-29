@@ -80,7 +80,7 @@ else
     load('RefinedMesh_for_MITmask.mat');
 end
 
-[~,~,F_new,~,~]=MapFbetweenMeshes(UserVar,[],CtrlVar,MUA_old,MUA_new,F_old,BCs_old,l_old);
+[~,~,F_new,~,~]=MapFbetweenMeshes(UserVar,[],CtrlVar,MUA_old,MUA_new,F_old,BCs_old,l_old,[]);
 GF_new = GL2d(F_new.B,F_new.S,F_new.h,F_new.rhow,F_new.rho,MUA_new.connectivity,CtrlVar);
 
 %    [MUA_new.coordinates,MUA_new.connectivity]=FE2dRefineMesh(MUA_old.coordinates,MUA_old.connectivity);
@@ -120,7 +120,7 @@ GF_new = GL2d(F_new.B,F_new.S,F_new.h,F_new.rhow,F_new.rho,MUA_new.connectivity,
     % Assign ice shelf mask
     % criterion: every MIT cell that countains melt nodes is given mask value 1
     % (ice shelf)
-    [MeltNodesNew,~]=SpecifyMeltNodes(CtrlVar,MUA_new,GF_new);
+    [MeltNodesNew,~] = SpecifyMeltNodes(CtrlVar,MUA_new,GF_new);
     [Nmeltnodes,~,~] = histcounts2(lonUa_new(MeltNodesNew),latUa_new(MeltNodesNew),MITXedges,MITYedges);
     Mask(Nmeltnodes>0)=1;
 
