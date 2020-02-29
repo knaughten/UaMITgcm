@@ -100,7 +100,7 @@ GF_new = GL2d(F_new.B,F_new.S,F_new.h,F_new.rhow,F_new.rho,MUA_new.connectivity,
         latGMIT = UserVar.UaMITgcm.MITgcmGGridlat;
         [latUa_new,lonUa_new] = psxy2ll(xUa_new,yUa_new,-71,0);
         
-    elseif strcmp(UserVar.UaMITgcm.MITcoordinates,'psxy')
+    elseif strcmp(UserVar.UaMITgcm.MITcoordinates,'xy')
         lonCMIT = UserVar.UaMITgcm.MITgcmCGridX; % 2d arrays
         latCMIT = UserVar.UaMITgcm.MITgcmCGridY;
         lonGMIT = UserVar.UaMITgcm.MITgcmGGridX; % 2d arrays
