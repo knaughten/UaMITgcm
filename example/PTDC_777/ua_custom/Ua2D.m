@@ -722,7 +722,7 @@ if CtrlVar.fidlog~= 1 ; fclose(CtrlVar.fidlog); end
 
 fclose(RunInfo.File.fid);
 
-SayGoodbye(CtrlVar)
+SayGoodbye(CtrlVar,RunInfo);
 
 
 end
