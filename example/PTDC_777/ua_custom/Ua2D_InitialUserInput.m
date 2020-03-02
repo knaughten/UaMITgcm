@@ -40,8 +40,8 @@ CtrlVar.ATSTargetIterations=3;
 CtrlVar.InitialDiagnosticStep=1;
 CtrlVar.TestUserInputs=0;
 CtrlVar.InitialDiagnosticStepAfterRemeshing=0;
-CtrlVar.Implicituvh=1;
-CtrlVar.TG3=0 ; CtrlVar.Gamma=1;
+CtrlVar.Implicituvh=0;
+CtrlVar.TG3=0 ; %CtrlVar.Gamma=1;
 CtrlVar.uvhTimeSteppingMethod='supg';
 
 %CtrlVar.MITgcmDataDirectory=['/data/dataphy/janryd69/Ua_MITgcm/',Experiment,'/MIT_data'];
