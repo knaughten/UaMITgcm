@@ -39,8 +39,8 @@ CtrlVar.ATSTargetIterations=3;
 
 CtrlVar.InitialDiagnosticStep=1;
 CtrlVar.TestUserInputs=0;
-CtrlVar.InitialDiagnosticStepAfterRemeshing=0;
-CtrlVar.Implicituvh=0;
+CtrlVar.InitialDiagnosticStepAfterRemeshing=1;
+CtrlVar.Implicituvh=1;
 CtrlVar.TG3=0 ; %CtrlVar.Gamma=1;
 CtrlVar.uvhTimeSteppingMethod='supg';
 
@@ -67,8 +67,6 @@ CtrlVar.Cmax=1e100;
 CtrlVar.NameOfFileForReadingAGlenEstimate=UserVar.NameOfFileForReadingAGlenEstimate;
 CtrlVar.NameOfFileForSavingAGlenEstimate='';
 
-      
-
 CtrlVar.GeometricalVarsDefinedEachTransienRunStepByDefineGeometry='SB';
 
 CtrlVar.doplots=0;
@@ -79,7 +77,7 @@ CtrlVar.PlotMesh=0;  CtrlVar.PlotBCs=0;
 CtrlVar.MeltNodesDefinition='edge-wise';
 CtrlVar.MassBalanceGeometryFeedback = 0;
 CtrlVar.MeltRateFactor=1;
-CtrlVar.MeltReductionTime=Inf;
+%CtrlVar.MeltReductionTime=Inf;
 
 CtrlVar.MeshSizeMax=20e3;
 CtrlVar.MeshSize=20e3;
@@ -162,7 +160,7 @@ CtrlVar.AdaptMeshAndThenStop=0;    % if true, then mesh will be adapted but no f
 CtrlVar.AdaptMeshMaxIterations=5;
 CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan = 20;
 CtrlVar.SaveAdaptMeshFileName='MeshFileAdapt';    %  file name for saving adapt mesh. If left empty, no file is written
-CtrlVar.AdaptMeshRunStepInterval=20 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
+CtrlVar.AdaptMeshRunStepInterval=50 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0
 CtrlVar.doAdaptMeshPlots=0; 
 
 %%
