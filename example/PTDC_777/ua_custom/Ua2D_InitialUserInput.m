@@ -34,7 +34,7 @@ CtrlVar.AdaptMesh=1;
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget; 
 CtrlVar.dtmin = 1e-10;
 CtrlVar.ATStimeStepFactorUp=2 ;
-CtrlVar.ATStimeStepFactorDown=1e2 ;
+CtrlVar.ATStimeStepFactorDown=5 ;
 CtrlVar.ATSTargetIterations=3;
 
 CtrlVar.InitialDiagnosticStep=1;
