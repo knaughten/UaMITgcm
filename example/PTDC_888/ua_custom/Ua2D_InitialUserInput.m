@@ -25,6 +25,7 @@ CtrlVar.Parallel.uvhAssembly.spmd.nWorkers=[];
 
 % Grid options
 CtrlVar.TriNodes=3;
+CtrlVar.kH=100;
 CtrlVar.kH=1;
 CtrlVar.nip=6;
 CtrlVar.niph=6;
@@ -40,7 +41,7 @@ CtrlVar.ATSTargetIterations=3;
 CtrlVar.InitialDiagnosticStep=1;
 CtrlVar.InitialDiagnosticStepAfterRemeshing=0;
 CtrlVar.Implicituvh=1;
-CtrlVar.TG3=0 ; CtrlVar.Gamma=1;
+CtrlVar.TG3=0 ; %CtrlVar.Gamma=1;
 CtrlVar.uvhTimeSteppingMethod='supg';
 
 %CtrlVar.MITgcmDataDirectory=['/data/dataphy/janryd69/Ua_MITgcm/',Experiment,'/MIT_data'];
@@ -79,7 +80,7 @@ CtrlVar.MeltReductionTime=Inf;
 
 CtrlVar.MeshSizeMax=20e3;
 CtrlVar.MeshSize=20e3;
-CtrlVar.MeshSizeMin=CtrlVar.MeshSize/20;
+CtrlVar.MeshSizeMin=CtrlVar.MeshSize/40;
 %CtrlVar.MeshSizeFastFlow=CtrlVar.MeshSizeMax/10;
 %CtrlVar.MeshSizeIceShelves=CtrlVar.MeshSizeMax/10;
 CtrlVar.MeshSizeBoundary=CtrlVar.MeshSize;
@@ -148,7 +149,7 @@ CtrlVar.MeshRefinementMethod='explicit:local:newest vertex bisection';
 % CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
 % CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
                                                    
-CtrlVar.MeshAdapt.GLrange=[2000 CtrlVar.MeshSizeMin];
+CtrlVar.MeshAdapt.GLrange=[2500 CtrlVar.MeshSizeMin];
 
 CtrlVar.RefineMeshOnStart=0;
 CtrlVar.InfoLevelAdaptiveMeshing=1;                                            

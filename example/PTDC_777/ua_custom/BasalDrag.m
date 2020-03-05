@@ -3,8 +3,6 @@ function [taubx,tauby,dtaubxdu,dtaubxdv,dtaubydu,dtaubydv,dtaubxdh,dtaubydh,taub
     
     narginchk(24,24)
     
-    CtrlVar.SlidingLaw
-    
     %%
     % Returns basal drag and the directional derivatives of basal drag with respect to u,
     % v and h.
@@ -41,10 +39,7 @@ function [taubx,tauby,dtaubxdu,dtaubxdv,dtaubydu,dtaubydv,dtaubxdh,dtaubydh,taub
     %       H = S-B
     %
     %%
-    
- 
-    
-    
+
     %% Basal drag term : ice
     % this drag term is zero if the velocities are zero.
     
@@ -146,15 +141,13 @@ function [taubx,tauby,dtaubxdu,dtaubxdv,dtaubydu,dtaubydv,dtaubxdh,dtaubydh,taub
         taubx=dFuvdC;
         return
     end
-    
-    disp(['---------------',CtrlVar.SlidingLaw,'------------------'])
-    
+        
     switch CtrlVar.SlidingLaw
         
         case {"Weertman","W"}
             
           [taubxi,taubyi,dtaubxdui,dtaubxdvi,dtaubydui,dtaubydvi,dtaubxdhi,dtaubydhi] = Weertman(CtrlVar,He,delta,ub,vb,beta2i,Dbeta2i) ;
-          disp(['---------------Using Weertman------------------']);
+          
           % Weertman2 is done using symbolic toolbox, just did this out of curiosity, the
           % results are exactly the same.
           % [taubxi,taubyi,dtaubxdui,dtaubydvi,dtaubxdvi,dtaubydui,dtaubxdhi,dtaubydhi] = Weertman2(C,CtrlVar.Czero,He,delta,m,ub,vb,CtrlVar.SpeedZero) ;
@@ -192,10 +185,6 @@ function [taubx,tauby,dtaubxdu,dtaubxdv,dtaubydu,dtaubydv,dtaubxdh,dtaubydh,taub
             % decide where to use Weertman and where Coulomb
             isCoulomb=TauCoulomb2 <  TauWeertman2 ;
             
-            mask = 0*MUA.coordinates(:,1); mask(isCoulomb)=1;
-            figure; PlotNodalBasedQuantities(MUA.connectivity,MUA.coordinates,mask,CtrlVar);
-            figure; PlotNodalBasedQuantities(MUA.connectivity,MUA.coordinates,(TauCoulomb2-TauWeertman2).*mask,CtrlVar);
-            return
             
             % and now replace where needed
             taubxi(isCoulomb)=taubxiC(isCoulomb) ;
@@ -217,7 +206,6 @@ function [taubx,tauby,dtaubxdu,dtaubxdv,dtaubydu,dtaubydv,dtaubxdh,dtaubydh,taub
             
             [N,dNdh]=N0(CtrlVar,h,H,rho,rhow,g) ;
             [taubxi,taubyi,dtaubxdui,dtaubydvi,dtaubxdvi,dtaubydui,dtaubxdhi,dtaubydhi] =  rCWN0(C,CtrlVar.Czero,N,dNdh,He,delta,m,muk,ub,vb,CtrlVar.SpeedZero) ;
-            disp(['---------------Using Umbi------------------']);
             
         otherwise
             
