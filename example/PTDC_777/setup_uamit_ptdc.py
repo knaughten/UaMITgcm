@@ -93,19 +93,45 @@ class OBCSForcingArray:
             nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 0])
             # calculate how many additional full cycles of the Kimura dataset are required to cover the requested simulation times
             ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,0])))
+ 
+	    n=0
+	    Theta = self.BC['Theta']
+	    while n < ncycles:
+	  	n += 1
+		Theta = np.append(Theta,self.BC['Theta'],axis=2)
+	    self.BC['Theta'] = Theta
+	    Theta = None
 
-            self.BC['Theta'] = np.repeat(self.BC['Theta'],ncycles+1,axis=2)
-            self.BC['Salt'] = np.repeat(self.BC['Salt'],ncycles+1,axis=2)
-            self.BC['Ups'] = np.repeat(self.BC['Ups'],ncycles+1,axis=2)
-            self.BC['Vps'] = np.repeat(self.BC['Vps'],ncycles+1,axis=2)
+	    n=0
+            Salt = self.BC['Salt']
+            while n < ncycles:
+                n += 1
+                Salt = np.append(Salt,self.BC['Salt'],axis=2)
+            self.BC['Salt'] = Salt
+            Salt = None
+
+	    n=0
+            Ups = self.BC['Ups']
+            while n < ncycles:
+                n += 1
+                Ups = np.append(Ups,self.BC['Ups'],axis=2)
+            self.BC['Ups'] = Ups
+            Ups = None
+
+	    n=0
+            Vps = self.BC['Vps']
+            while n < ncycles:
+                n += 1
+                Vps = np.append(Vps,self.BC['Vps'],axis=2)
+		print Vps.shape
+            self.BC['Vps'] = Vps
+            Vps = None
+
             monthstoappend = np.mod(np.arange(self.BC['month'].size*ncycles),12)+1
             self.BC['month'] = np.append(self.BC['month'],monthstoappend)
             yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(self.BC['year'].size*ncycles)/12) +1 
             self.BC['year'] = np.append(self.BC['year'],yearstoappend)
       
-	###print self.months[0],self.years[0],' to ',self.months[-1],self.years[-1] 
-	###print self.BC['month'],self.BC['year']  
-
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
 
