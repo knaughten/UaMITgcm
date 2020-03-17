@@ -40,6 +40,7 @@ function [taubx,tauby,dtaubxdu,dtaubxdv,dtaubydu,dtaubydv,dtaubxdh,dtaubydh,taub
     %
     %%
 
+    fprintf("This code uses a slightly modified version of the basal drag to make sure it doesn't default to Weertman. \n")
     %% Basal drag term : ice
     % this drag term is zero if the velocities are zero.
     
