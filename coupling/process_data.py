@@ -216,7 +216,7 @@ def adjust_mit_state (grid, options):
 
         if options.use_ptracers:
             # This assumes there is only one tracer: read_mit_output will throw an error if there's more.
-            var_names_ptracers = ['TRAC01']
+            var_names_ptracers = ['pTr01']
             fields_ptracers = read_mit_output('last', mit_dir, 'pickup_ptracers', var_names_ptracers, timestep=options.last_timestep, nz=grid.nz)
             [tracer] = fields_ptracers
 
