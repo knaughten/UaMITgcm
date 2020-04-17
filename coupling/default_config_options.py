@@ -142,6 +142,8 @@ coordinates = 'xy'
 
 ### Does your configuration of MITgcm include sea ice?
 use_seaice = False
+### Does your configuration of MITgcm use the ptracers package?
+use_ptracers = False
 ### Does your configuration of MITgcm use the calendar package?
 use_cal_pkg = False
 

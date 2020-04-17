@@ -214,11 +214,11 @@ def adjust_mit_state (grid, options):
             fields_seaice = read_mit_output('last', mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
             temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = fields_seaice
 
-        # Make sure there are no ptracers in this simulation
-        for fname in os.listdir(mit_dir):
-            if fname.startswith('pickup_ptracers'):
-                print 'Error (adjust_mit_pickup): this run uses the ptracers package. You will need to customise the code to decide what you want to do with the ptracers at each restart.'
-                sys.exit()
+        if options.use_ptracers:
+            # This assumes there is only one tracer: read_mit_output will throw an error if there's more.
+            var_names_ptracers = ['TRAC01']
+            fields_ptracers = read_mit_output('last', mit_dir, 'pickup_ptracers', var_names_ptracers, timestep=options.last_timestep, nz=grid.nz)
+            [tracer] = fields_ptracers
 
     print 'Selecting newly opened cells'
     # Read the new ice shelf draft, and also the bathymetry
@@ -266,6 +266,8 @@ def adjust_mit_state (grid, options):
     else:
         # Free surface is just one variable
         eta = extrapolate_into_new('free surface', eta, is_2d=True)
+    if options.use_ptracers:
+        tracer = extrapolate_into_new('custom tracer', tracer)
     # Any remaining variables (velocity etc) want newly opened cells to be set to zero. This is done implicitly as the mask was already zero.
 
     # Inner function to adjust velocity (u or v) to preserve barotropic transport after coupling. Pass correct dh and hfac depending on the direction: for u pass dy_w and hFacW, for v pass dx_s and hFacS.
@@ -337,11 +339,17 @@ def adjust_mit_state (grid, options):
             fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt]
         else:
             fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt, phihyd]
+        if options.use_seaice:
+            fields_seaice = [temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice]
+        if options.use_ptracers:
+            fields_ptracers = [tracer]
 
         # Overwrite pickup file
         overwrite_pickup(mit_dir, 'pickup', options.last_timestep, fields, var_names, grid.nz)
         if options.use_seaice:
             overwrite_pickup(mit_dir, 'pickup_seaice', options.last_timestep, fields_seaice, var_names_seaice, options.seaice_nz)
+        if options.use_ptracers:
+            overwrite_pickup(mit_dir, 'pickup_ptracers', options.last_timestep, fields_ptracers, var_names_ptracers, grid.nz)
 
     print 'Calculating pressure load anomaly'
     make_tmp_copy(mit_dir+options.pload_file)

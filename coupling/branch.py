@@ -3,7 +3,7 @@
 # by multiple different transient runs.
 # Call this from within the directory containing all your configurations (such as UaMITgcm/example).
 # Give it two arguments: the old experiment name, and the new experiment name.
-# Example: python ../coupling/copy_case.py WSFRIS_001 WSFRIS_002
+# Example: python ../coupling/branch.py WSFRIS_001 WSFRIS_002
 # After running this script, extend the simulation in the new experiment,
 # make any configuration changes, and restart by submitting run_coupler.sh.
 

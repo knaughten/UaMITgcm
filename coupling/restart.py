@@ -77,6 +77,8 @@ if __name__ == "__main__":
         mit_file_names += ['pickup.'+niter0_stamp+'.data', 'pickup.'+niter0_stamp+'.meta']
         if options.use_seaice:
             mit_file_names += ['pickup_seaice.'+niter0_stamp+'.data', 'pickup_seaice.'+niter0_stamp+'.meta']
+        if options.use_ptracers:
+            mit_file_names += ['pickup_ptracers.'+niter0_stamp+'.data', 'pickup_ptracers.'+niter0_stamp+'.meta']
     # Now copy all the files
     for fname in mit_file_names:
         copy_to_dir(fname, output_date_dir+'MITgcm/', options.mit_run_dir)
@@ -123,10 +125,8 @@ if __name__ == "__main__":
     # Submit the next jobs
     print 'Submitting next MITgcm segment'
     mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir, 'ACC='+options.budget_code])
-    afterok = [mit_id]
-    print 'Submitted with job ID ' + str(mid_id)
+    print 'Submitted with job ID ' + str(mit_id)
     if not spinup:
         print 'Submitting next Ua segment'
         ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir, 'ACC='+options.budget_code])
-        afterok.append(ua_id)
         print 'Submitted with job ID ' + str(ua_id)

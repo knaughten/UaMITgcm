@@ -131,6 +131,9 @@ class Options:
             
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
+        self.use_ptracers = check_value('use_ptracers', use_ptracers, type='bool')
+        if self.use_ptracers and self.restart_type != 'pickup':
+            throw_error('ptracers package only works with pickup-restarts')
         self.use_cal_pkg = check_value('use_cal_pkg', use_cal_pkg, type='bool')
         self.use_ini_deltaTmom = check_value('use_ini_deltaTmom', use_ini_deltaTmom, type='bool')
         self.deltaT = check_value('deltaT', deltaT, type='int')
@@ -342,6 +345,8 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
             file_heads = ['pickup.']
             if options.use_seaice:
                 file_heads += ['pickup_seaice.']
+            if options.use_ptracers:
+                file_heads += ['pickup_ptracers.']
             file_tails = ['.data', '.meta']
             tstep_string = str(options.last_timestep).zfill(10)
             for head in file_heads:
