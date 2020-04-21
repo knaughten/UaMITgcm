@@ -218,7 +218,7 @@ def adjust_mit_state (grid, options):
             # This assumes there is only one tracer: read_mit_output will throw an error if there's more.
             var_names_ptracers = ['pTr01']
             fields_ptracers = read_mit_output('last', mit_dir, 'pickup_ptracers', var_names_ptracers, timestep=options.last_timestep, nz=grid.nz)
-            [tracer] = fields_ptracers
+            tracer = fields_ptracers
 
     print 'Selecting newly opened cells'
     # Read the new ice shelf draft, and also the bathymetry
