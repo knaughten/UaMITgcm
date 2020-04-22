@@ -70,6 +70,14 @@ example/WSFRIS_999/ua_postprocess/UaPost
 example/WSFRIS_999/ua_postprocess/matlab*.out
 example/WSFRIS_999/ini_grid
 example/WSFRIS_0*
+example/WSFRIS_1*
+example/WSFRIS_S*
+example/WSFRIS_a*
+example/WSFRIS_b*
+example/WSFRIS_c*
+example/make_timeseries.sh
+example/precompute_animation.sh
+example/cmip_config
 example/FRIS_UaMITgcm_backup
 example/MISOMIP_full
 example/MISOMIP_zero

@@ -63,5 +63,5 @@ if __name__ == "__main__":
 
     # Delete some log files if they exist
     for fname in os.listdir('./'):
-        if fname in ['coupler_stdout', 'jobs.log'] or (fname.startswith('run_') and '.sh.o' in fname):
+        if fname in ['coupler_stdout', 'jobs.log'] or (fname.startswith('run_') and '.sh.o' in fname) or fname.startswith(options.expt_name+'o.o') or fname.startswith(options.expt_name+'i.o'):
             os.remove(fname)
