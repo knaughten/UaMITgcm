@@ -108,7 +108,7 @@ class Options:
         if self.mirror and self.spinup_time != self.total_time:
             throw_error('spinup_time must equal total_time for mirrored simulations, so only the ocean component runs')
         self.mirror_path = check_value('mirror_path', mirror_path)
-        if not os.path.isdir(self.mirror_path):
+        if self.mirror and not os.path.isdir(self.mirror_path):
             throw_error('mirror_path ' + mirror_path + ' does not exist')
         self.restart_type = check_value('restart_type', restart_type, legal=['zero', 'pickup'])
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
