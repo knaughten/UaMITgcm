@@ -1,6 +1,6 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output
+from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output, mirror_geometry
 from coupling_utils import submit_job, reset_finished_files
 
 # Top-level coupling function.
@@ -42,7 +42,11 @@ if __name__ == "__main__":
                 print 'Adjusting MITgcm topography'
                 adjust_mit_geom(grid, options)
 
-        if options.restart_type=='zero' or (not options.spinup and not options.first_coupled):
+        if options.mirror:
+            # Copy geometry files from a mirrored simulation
+            mirror_geometry(options)
+
+        if options.restart_type=='zero' or (not options.spinup and not options.first_coupled) or options.mirror:
             if options.restart_type == 'zero':
                 print 'Setting new initial conditions for MITgcm'
             elif options.restart_type=='pickup':

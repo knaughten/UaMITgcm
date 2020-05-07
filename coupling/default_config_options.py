@@ -57,6 +57,16 @@ couple_step = 6
 ### you have to set repeat back to False, or it will start from the beginning.
 repeat = False
 
+### Option to "mirror": re-run the ocean segments of a coupled simulation,
+### pulling the geometry files from a previously finished simulation each segment.
+### This is useful if you want to re-run with extra ocean diagnostics,
+### because Ua is not bit-reproducible and so the results will slightly change
+### if you just rerun the coupled ice-ocean setup.
+### You must set total_time=spinup_time for this to work.
+mirror = False
+### Path to the output directory of the mirrored experiment.
+mirror_path = ''
+
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
 ###         Initial conditions for temperature, salinity, u, v,

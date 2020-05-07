@@ -587,3 +587,22 @@ def correct_next_obcs (grid, options):
     year = int(date_code[:4])
     # Apply the correction
     balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=1, multi_year=True, start_year=year, end_year=year)
+
+
+# Copy the geometry files from a mirrored simulation.
+def mirror_geometry (options):
+
+    # Get the start date of the next segment by reading the calendar file
+    f = open(options.output_dir + options.calendar_file, 'r')
+    date_code = f.readline().strip()
+    f.close()
+
+    source_dir = options.mirror_path+'/'+date_code+'/MITgcm/'
+    if not os.path.isdir(source_dir):
+        print 'Error (mirror_geometry): ' + source_dir + ' does not exist'
+        sys.exit()
+    print 'Copying geometry files from ' + source_dir
+
+    # Copy the geometry files to the run directory
+    for fname in [options.bathyFile, options.draftFile]:
+        copy_to_dir(fname, source_dir, options.mit_run_dir)

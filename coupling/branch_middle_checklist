@@ -1,0 +1,14 @@
+All this assumes it's an ocean-only run!
+
+Run copy_case for original
+Replace code/, build/mitgcmuv, build/genmake.log, input/available_diagnostics.log, input/data.diagnostics from new diagnostics setup
+Edit prepare_run.sh so it copies the right years of forcing
+Rerun prepare_run.sh
+Make the output directory
+From the old output/date_code directory to restart from, copy:
+     calendar file to new output/
+     draft, bathy, pload, data to new run/
+     pickup files corresponding to niter0 in data
+Change simulation length, budget, output types in config.py
+Touch ua_finished
+Resubmit MITgcm segment
