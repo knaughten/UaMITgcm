@@ -597,7 +597,7 @@ def mirror_geometry (options):
     date_code = f.readline().strip()
     f.close()
 
-    source_dir = options.mirror_path+'/'+date_code+'/MITgcm/'
+    source_dir = options.mirror_path+date_code+'/MITgcm/'
     if not os.path.isdir(source_dir):
         print 'Error (mirror_geometry): ' + source_dir + ' does not exist'
         sys.exit()
