@@ -592,17 +592,25 @@ def correct_next_obcs (grid, options):
 # Copy the geometry files from a mirrored simulation.
 def mirror_geometry (options):
 
-    # Get the start date of the next segment by reading the calendar file
-    f = open(options.output_dir + options.calendar_file, 'r')
-    date_code = f.readline().strip()
-    f.close()
+    if options.finished:
+        # Special case
+        if len(options.mirror_path_final) > 0:
+            source_dir = options.mirror_path_final + '/MITgcm/'
+        else:
+            source_dir = None
+    else:         
+        # Get the start date of the next segment by reading the calendar file
+        f = open(options.output_dir + options.calendar_file, 'r')
+        date_code = f.readline().strip()
+        f.close()
+        source_dir = options.mirror_path+date_code+'/MITgcm/'
 
-    source_dir = options.mirror_path+date_code+'/MITgcm/'
-    if not os.path.isdir(source_dir):
-        print 'Error (mirror_geometry): ' + source_dir + ' does not exist'
-        sys.exit()
-    print 'Copying geometry files from ' + source_dir
+    if source_dir is not None:
+        if not os.path.isdir(source_dir):
+            print 'Error (mirror_geometry): ' + source_dir + ' does not exist'
+            sys.exit()
+        print 'Copying geometry files from ' + source_dir
 
-    # Copy the geometry files to the run directory
-    for fname in [options.bathyFile, options.draftFile]:
-        copy_to_dir(fname, source_dir, options.mit_run_dir)
+        # Copy the geometry files to the run directory
+        for fname in [options.bathyFile, options.draftFile]:
+            copy_to_dir(fname, source_dir, options.mit_run_dir)

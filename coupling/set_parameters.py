@@ -110,6 +110,7 @@ class Options:
         self.mirror_path = check_value('mirror_path', mirror_path)
         if self.mirror and not os.path.isdir(self.mirror_path):
             throw_error('mirror_path ' + mirror_path + ' does not exist')
+        self.mirror_path_final = check_value('mirror_path_final', mirror_path_final)
         self.restart_type = check_value('restart_type', restart_type, legal=['zero', 'pickup'])
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])

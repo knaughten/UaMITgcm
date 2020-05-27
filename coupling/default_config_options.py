@@ -66,6 +66,8 @@ repeat = False
 mirror = False
 ### Path to the output directory of the mirrored experiment.
 mirror_path = ''
+### Path to the simulation segment output to mirror the final geometry to - only do this if the mirrored run will be branched into something else.
+mirror_path_final = ''
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
