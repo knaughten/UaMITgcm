@@ -19,10 +19,6 @@ if __name__ == "__main__":
         print 'Creating dummy initial conditions files where needed'
         zero_ini_files(options)
 
-    if options.mirror:
-        # Copy geometry files from a mirrored simulation
-        mirror_geometry(options)
-
     # Do we need to do any processing for the next run?
     if not options.initial and not options.restart:
 
@@ -44,6 +40,10 @@ if __name__ == "__main__":
 
                 print 'Adjusting MITgcm topography'
                 adjust_mit_geom(grid, options)
+
+        if options.mirror:
+            # Copy geometry files from a mirrored simulation
+            mirror_geometry(options)
 
         if options.restart_type=='zero' or (not options.spinup and not options.first_coupled) or options.mirror:
             if options.restart_type == 'zero':
