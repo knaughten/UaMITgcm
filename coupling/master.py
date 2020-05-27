@@ -46,12 +46,12 @@ if __name__ == "__main__":
             # Copy geometry files from a mirrored simulation
             mirror_geometry(options)
 
-        if options.restart_type=='zero' or (not options.spinup and not options.first_coupled) or options.mirror:
-            if options.restart_type == 'zero':
-                print 'Setting new initial conditions for MITgcm'
-            elif options.restart_type=='pickup':
-                print 'Adjusting MITgcm pickup file'
-            adjust_mit_state(grid, options)
+    if (not options.initial and not options.restart and (options.restart_type=='zero' or (not options.spinup and not options.first_coupled))) or options.mirror:
+        if options.restart_type == 'zero':
+            print 'Setting new initial conditions for MITgcm'
+        elif options.restart_type=='pickup':
+            print 'Adjusting MITgcm pickup file'
+        adjust_mit_state(grid, options)
 
 
     # Is there any output we need to deal with?

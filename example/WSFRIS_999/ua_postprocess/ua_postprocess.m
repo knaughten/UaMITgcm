@@ -47,7 +47,7 @@ for i=1:length(segment_dir)
         groundedArea_ts(end+1) = groundedArea.Total;
         % Calculate grounding line coordinates and save
         GLgeo = GLgeometry(MUA.connectivity,MUA.coordinates,GF,CtrlVar);
-        [xGL, yGL] = ArrangeGroundingLinePos(CtrlVar,GLgeo,1);
+        [xGL, yGL] = ArrangeGroundingLinePos(CtrlVar,GLgeo);
         xGL_all{end+1} = xGL;
         yGL_all{end+1} = yGL;
     end
