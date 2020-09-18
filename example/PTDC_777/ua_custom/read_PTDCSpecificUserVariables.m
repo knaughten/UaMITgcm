@@ -38,6 +38,14 @@ switch RunTable{I(1),'GeometryInterpolants'}{:}
         UserVar.Geometry = 'Bedmachine_Bamber2009_modifiedThwaites';
         UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine_Bamber2009_modifiedThwaites'];
         UserVar.FirnInterpolants = [InputDataDirectory,'/GriddedInterpolants_Firn_RACMO.mat'];
+    case 'Bedmachine20190905_Bamber2009'
+	UserVar.Geometry = 'Bedmachine_Bamber2009';
+        UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine2019-09-05_Bamber2009.mat'];
+        UserVar.FirnInterpolants = [InputDataDirectory,'/GriddedInterpolants_Firn_RACMO.mat'];
+    case 'Bedmachine20200715_Bamber2009'
+        UserVar.Geometry = 'Bedmachine_Bamber2009';
+        UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine2020-07-15_Bamber2009.mat'];
+        UserVar.FirnInterpolants = [InputDataDirectory,'/GriddedInterpolants_Firn_RACMO.mat'];
     otherwise
         error('Geometry unknown');    
 end
