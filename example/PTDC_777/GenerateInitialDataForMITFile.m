@@ -1,26 +1,37 @@
-function generate_initial_DataForMIT_file(RestartFile)
+function GenerateInitialDataForMITFile
 
-if nargin==0
-    RestartFile='./Bedmachine_Bamber2009--uv-dhdt-Measures1996-0melt--logAGlen-logC-ga1-gs100000-errdhdt0.1-5000It_meshv2_InverseRestartFile.mat';
-end
+runID = 'PTDC_702';
 
 %% read restartfile with geometry
-load(RestartFile);
-
+restartfile = dir('./*RestartFile.mat');
+load([restartfile.folder,'/',restartfile.name]);
 CtrlVar = CtrlVarInRestartFile;
 
 load UserVar_MIT.mat;
 
-froot = '/home/UNN/wchm8/Documents/UaMITgcm/Ua_InputData/';
-UserVar.NameOfFileForReadingSlipperinessEstimate = [froot,'Bedmachine_Bamber2009--uv-dhdt-Measures1996-0melt--logAGlen-logC-ga1-gs100000-errdhdt0.1-5000It_meshv2_C-Estimate.mat'];
-UserVar.NameOfFileForReadingAGlenEstimate = [froot,'Bedmachine_Bamber2009--uv-dhdt-Measures1996-0melt--logAGlen-logC-ga1-gs100000-errdhdt0.1-5000It_meshv2_AGlen-Estimate.mat'];
+froot = '/Volumes/mainJDeRydt/UaMITgcm_v2/Ua_InputData/';
+
+RunTable=readtable([froot,'/RunTable.csv']); 
+I=find(strcmp({RunTable{:,'ID'}{:}},runID));
+ 
+UserVar.NameOfFileForReadingSlipperinessEstimate = [froot,RunTable{I,'Row'}{:},'_C-Estimate.mat'];
+UserVar.NameOfFileForReadingAGlenEstimate = [froot,RunTable{I,'Row'}{:},'_AGlen-Estimate.mat'];
 CtrlVar.NameOfFileForReadingSlipperinessEstimate = UserVar.NameOfFileForReadingSlipperinessEstimate;
 CtrlVar.NameOfFileForReadingAGlenEstimate = UserVar.NameOfFileForReadingAGlenEstimate;
-UserVar.GeometryInterpolants = [froot,'GriddedInterpolants_sBh_Bedmachine_Bamber2009.mat'];
+switch RunTable{I,'GeometryInterpolants'}{:}
+    case 'Bedmachine20200715_Bamber2009'
+        UserVar.GeometryInterpolants = [froot,'GriddedInterpolants_sBh_Bedmachine2020-07-15_Bamber2009.mat'];
+    case 'Bedmachine20190905_Bamber2009'
+        UserVar.GeometryInterpolants = [froot,'GriddedInterpolants_sBh_Bedmachine2019-09-05_Bamber2009.mat'];
+    case 'Bedmachine_Bamber2009'
+        UserVar.GeometryInterpolants = [froot,'GriddedInterpolants_sBh_Bedmachine_Bamber2009.mat'];
+    otherwise
+        error('Geometry does not exist');
+end
 UserVar.FirnInterpolants = [froot,'GriddedInterpolants_Firn_RACMO.mat'];
 UserVar.RACMO_SMB = [froot,'SMB_RACMO_1979_2013.mat'];
 
-UserVar.UaMITgcm.Experiment = 'PTDC_888';
+UserVar.UaMITgcm.Experiment = runID;
 UserVar.UaMITgcm.CentralOutputDirectory = './';
  
 %% Generate mask
@@ -53,6 +64,7 @@ else
     load('RefinedMesh_for_MITmask.mat');
 end
 
+CtrlVar.Report_if_b_less_than_B=1;
 [~,~,F_new,~,~]=MapFbetweenMeshes(UserVar,[],CtrlVar,MUA_old,MUA_new,F_old,BCs_old,l_old);
 GF_new = GL2d(F_new.B,F_new.S,F_new.h,F_new.rhow,F_new.rho,MUA_new.connectivity,CtrlVar);
 
@@ -67,7 +79,7 @@ if strcmp(UserVar.UaMITgcm.MITcoordinates,'latlon')
     latGMIT = UserVar.UaMITgcm.MITgcmGGridlat;
     [latUa_new,lonUa_new] = psxy2ll(xUa_new,yUa_new,-71,0);
 
-elseif strcmp(UserVar.UaMITgcm.MITcoordinates,'psxy')
+elseif strcmp(UserVar.UaMITgcm.MITcoordinates,'xy')
     lonCMIT = UserVar.UaMITgcm.MITgcmCGridX; % 2d arrays
     latCMIT = UserVar.UaMITgcm.MITgcmCGridY;
     lonGMIT = UserVar.UaMITgcm.MITgcmGGridX; % 2d arrays
@@ -104,7 +116,7 @@ I = find(isnan(MUA_new.Boundary.x));
 I = [I;length(MUA_new.Boundary.x)+1];
 
 for ii=1:length(I)-1
-    J = inpoly([lonCMIT(:) latCMIT(:)],[MUA_new.Boundary.x(I(ii)+1:I(ii+1)-1) MUA_new.Boundary.y(I(ii)+1:I(ii+1)-1)]);
+    J = inpoly2([lonCMIT(:) latCMIT(:)],[MUA_new.Boundary.x(I(ii)+1:I(ii+1)-1) MUA_new.Boundary.y(I(ii)+1:I(ii+1)-1)]);
     Mask(J) = 0;
 end
 
