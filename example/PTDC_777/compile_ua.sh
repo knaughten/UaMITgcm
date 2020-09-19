@@ -3,11 +3,14 @@
 # USER VARIABLES
 # Path to correct version of Matlab
 # For running executable on Archer, need 2017a
-MATLAB_PATH=/usr/share/modules/apps/MATLAB/R2017a
+##MATLAB_PATH=/usr/share/modules/apps/MATLAB/R2017a
+MATLAB_PATH=/home/janryd69/matlab/R2017a
 # Path to UaMITgcm repository
-REPO_DIR=$HOME/Documents/UaMITgcm_v2/UaMITgcm_git
+##REPO_DIR=$HOME/Documents/UaMITgcm_v2/UaMITgcm_git
+REPO_DIR=/media/janryd69/mainJDeRydt/UaMITgcm_v2/UaMITgcm_git
 # Path to Ua build directory (will be created if it doesn't exist)
-UA_BUILD=$HOME/Documents/UaMITgcm_v2/UaMITgcm_git/example/PTDC_777/UaBuild
+##UA_BUILD=$HOME/Documents/UaMITgcm_v2/UaMITgcm_git/example/PTDC_777/UaBuild
+UA_BUILD=/media/janryd69/mainJDeRydt/UaMITgcm_v2/UaMITgcm_git/example/PTDC_777/UaBuild
 # Path to configuration-specific Ua files to overwrite
 UA_CASE_UPDATES=$PWD/ua_custom
 # Path to Ua source directory (default use the one inside UaMITgcm)
