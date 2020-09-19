@@ -13,3 +13,7 @@
 [submodule "UaSource_22Nov2018"]
 	path = UaSource_22Nov2018
 	url = git@github.com:GHilmarG/UaSource.git
+[submodule "UaSource_beta_25Mar2020"]
+	path = UaSource_beta_25Mar2020
+	url = git@github.com:GHilmarG/UaSource.git
+	branch = beta
