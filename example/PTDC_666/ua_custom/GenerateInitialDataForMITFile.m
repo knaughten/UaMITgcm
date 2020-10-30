@@ -1,6 +1,6 @@
 function GenerateInitialDataForMITFile
 
-runID = 'PTDC_801';
+runID = 'PTDC_702';
 
 %% read restartfile with geometry
 restartfile = dir('./*RestartFile.mat');
@@ -9,9 +9,9 @@ CtrlVar = CtrlVarInRestartFile;
 
 load UserVar_MIT.mat;
 
-froot = '/media/janryd69/mainJDeRydt/UaMITgcm_v2/Ua_InputData/';
+froot = '/Volumes/mainJDeRydt/UaMITgcm_v2/Ua_InputData/';
 
-RunTable=readtable([froot,'RunTable.csv']); 
+RunTable=readtable([froot,'/RunTable.csv']); 
 I=find(strcmp({RunTable{:,'ID'}{:}},runID));
  
 UserVar.NameOfFileForReadingSlipperinessEstimate = [froot,RunTable{I,'Row'}{:},'_C-Estimate.mat'];
@@ -37,7 +37,7 @@ UserVar.UaMITgcm.CentralOutputDirectory = './';
 %% Generate mask
 MUA_old = MUA; F_old = F; l_old = l; BCs_old = BCs; GF_old = GF;
 
-if ~exist('RefinedMesh_for_MITmask_666.mat')
+if ~exist('RefinedMesh_for_MITmask.mat')
     %% Refine mesh for definition of the mask: maximum spacing between Ua nodes should be less than the MITgcm grid resolution
     % MIT grid resolution:
     dX_MIT = UserVar.UaMITgcm.MITgcmCGridX(2,1)-UserVar.UaMITgcm.MITgcmCGridX(1,1);
@@ -59,13 +59,12 @@ if ~exist('RefinedMesh_for_MITmask_666.mat')
 
     [~,~,F_old,l_old,~,Ruv_old,Lubvb]= uv(UserVar,RunInfo,CtrlVar,MUA_old,BCs_old,F_old,l_old);
     [~,~,MUA_new,BCs_New,F_new,l_new]=AdaptMesh(UserVar,RunInfo,CtrlVar,MUA_old,BCs_old,F_old,l_old,Ruv_old,Lubvb);
-    save('RefinedMesh_for_MITmask_666.mat','MUA_new');
+    save('RefinedMesh_for_MITmask.mat','MUA_new');
 else
-    load('RefinedMesh_for_MITmask_666.mat');
+    load('RefinedMesh_for_MITmask.mat');
 end
 
 CtrlVar.Report_if_b_less_than_B=1;
-UserVar.UaMITgcm.MITgcmMelt = UserVar.UaMITgcm.MITgcmCGridX*0;
 [~,~,F_new,~,~]=MapFbetweenMeshes(UserVar,[],CtrlVar,MUA_old,MUA_new,F_old,BCs_old,l_old);
 GF_new = GL2d(F_new.B,F_new.S,F_new.h,F_new.rhow,F_new.rho,MUA_new.connectivity,CtrlVar);
 
