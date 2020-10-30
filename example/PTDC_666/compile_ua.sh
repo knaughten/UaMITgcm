@@ -42,4 +42,4 @@ $MATLAB_PATH/bin/mcc -m $UA_BUILD/callUa.m -o Ua -d $UA_BUILD
 # Copy just the executable (not the auto-generated run script as we have a custom one) to the current directory
 cp $UA_BUILD/Ua ./ua_run
 echo 'Now copy "Ua" to the Ua executable directory on the server where you will run the model.'
-rm -rf $UA_BUILD
+#rm -rf $UA_BUILD
