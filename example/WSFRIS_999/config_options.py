@@ -37,6 +37,7 @@ preserve_static_ice = True
 pload_option = 'nearest'
 
 correct_obcs_online = True
+obcs_transient = True
 
 
 ###### 3. MITgcm parameters ######

@@ -114,8 +114,8 @@ class Options:
         self.restart_type = check_value('restart_type', restart_type, legal=['zero', 'pickup'])
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
-        if self.calendar_type=='noleap' and self.output_freq=='monthly':
-            throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
+        #if self.calendar_type=='noleap' and self.output_freq=='monthly':
+            #throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.filling = check_value('filling', filling, type='bool')
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
@@ -392,7 +392,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
 
         # Figure out what the frequency should be
         if options.output_freq == 'monthly':
-            # Set to 30 days. For 360-day calendars, every month is 30 days; for standard calendars, the MITgcm calendar package will update to make this a real month; we've already checked that noleap calendars don't use this option.
+            # Set to 30 days. For 360-day calendars, every month is 30 days; for standard and noleap calendars, the MITgcm calendar package will update to make this a real month.
             freq = 30*sec_per_day
         elif options.output_freq == 'daily':
             freq = sec_per_day

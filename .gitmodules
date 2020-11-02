@@ -17,3 +17,6 @@
 	path = UaSource_beta_25Mar2020
 	url = git@github.com:GHilmarG/UaSource.git
 	branch = beta
+[submodule "MITgcm_67s"]
+	path = MITgcm_67s
+	url = git@github.com:MITgcm/MITgcm.git

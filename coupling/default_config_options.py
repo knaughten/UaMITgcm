@@ -94,7 +94,6 @@ restart_type = 'pickup'
 calendar_type = '360-day'
 ### How often to do time-averaged diagnostic output?
 ### 'monthly', 'daily', or 'end' (at the end of the segment)
-### Note 'monthly' does not work with calendar_type='noleap'.
 ### Set output_names in part 4 so MITgcm uses this frequency.
 output_freq = 'monthly'
 
