@@ -75,6 +75,7 @@ example/WSFRIS_S*
 example/WSFRIS_a*
 example/WSFRIS_b*
 example/WSFRIS_c*
+example/WSFRIS_d*
 example/make_timeseries.sh
 example/precompute_animation.sh
 example/cmip_config
