@@ -143,9 +143,11 @@ ua_ini_restart = False
 ### Do you want the coupler to adjust the incoming OBCS velocities such that
 ### the volume of the domain is approximately conserved on an annual basis?
 ### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
-### preserved). The OBCS must be transient (one file per year) as opposed to a
-### monthly climatology.
+### preserved).
 correct_obcs_online = False
+### Are the OBCS transient (one file per year) or a monthly climatology
+### (the same yearly file over and over)?
+obcs_transient = True
 
 ###### 3. MITgcm parameters ######
 

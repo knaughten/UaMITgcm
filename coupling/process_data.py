@@ -580,13 +580,18 @@ def correct_next_obcs (grid, options):
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
 
-    # Figure out the next year to process
-    f = open(options.output_dir+options.calendar_file, 'r')
-    date_code = f.readline().strip()
-    f.close()
-    year = int(date_code[:4])
+    if options.obcs_transient:
+        # Figure out the next year to process
+        f = open(options.output_dir+options.calendar_file, 'r')
+        date_code = f.readline().strip()
+        f.close()
+        year = int(date_code[:4])
+        multi_year = True
+    else:
+        multi_year = False
+        year = None
     # Apply the correction
-    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=1, multi_year=True, start_year=year, end_year=year)
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=1, multi_year=multi_year, start_year=year, end_year=year)
 
 
 # Copy the geometry files from a mirrored simulation.

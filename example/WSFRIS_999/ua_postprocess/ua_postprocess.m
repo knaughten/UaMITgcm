@@ -46,43 +46,43 @@ for i=1:length(segment_dir)
         iceVolume_ts(end+1) = iceVolume.Total;
         groundedArea_ts(end+1) = groundedArea.Total;
         % Calculate grounding line coordinates and save
-        GLgeo = GLgeometry(MUA.connectivity,MUA.coordinates,GF,CtrlVar);
-        [xGL, yGL] = ArrangeGroundingLinePos(CtrlVar,GLgeo);
-        xGL_all{end+1} = xGL;
-        yGL_all{end+1} = yGL;
+        %GLgeo = GLgeometry(MUA.connectivity,MUA.coordinates,GF,CtrlVar);
+        %[xGL, yGL] = ArrangeGroundingLinePos(CtrlVar,GLgeo);
+        %xGL_all{end+1} = xGL;
+        %yGL_all{end+1} = yGL;
     end
 end       
 
 % Have to pad grounding line coordinates with NaNs so they're regular 2D
 % arrays
-disp(['Preparing GL coordinates for writing'])
-num_GL = max(cellfun('size',xGL_all,1));
+%disp(['Preparing GL coordinates for writing'])
+%num_GL = max(cellfun('size',xGL_all,1));
 num_time = length(time_ts);
-xGL_new = NaN*ones(num_GL,num_time);
-yGL_new = NaN*ones(num_GL,num_time);
-for t=1:num_time
-    m_t = length(xGL_all{t});
-    xGL_new(1:m_t,t) = xGL_all{t};
-    yGL_new(1:m_t,t) = yGL_all{t};
-end
+%xGL_new = NaN*ones(num_GL,num_time);
+%yGL_new = NaN*ones(num_GL,num_time);
+%for t=1:num_time
+%    m_t = length(xGL_all{t});
+%    xGL_new(1:m_t,t) = xGL_all{t};
+%    yGL_new(1:m_t,t) = yGL_all{t};
+%end
 
 % Write NetCDF file
 disp(['Writing ', out_file])
 ts_vars = {'time', 'iceVAF', 'iceVolume', 'groundedArea'};
-ts_units = {'s', 'm^3', 'm^3', 'm^2'};
+ts_units = {'y', 'm^3', 'm^3', 'm^2'};
 ts_data = {time_ts, iceVAF_ts, iceVolume_ts, groundedArea_ts};
 for i=1:length(ts_vars)
     nccreate(out_file, ts_vars{i}, 'Dimensions', {'time', num_time}, 'Format', 'netcdf4');
     ncwriteatt(out_file, ts_vars{i}, 'units', ts_units{i});
     ncwrite(out_file, ts_vars{i}, ts_data{i});
 end
-gl_vars = {'xGL', 'yGL'};
-gl_data = {xGL_new, yGL_new};
-for i=1:length(gl_vars)
-    nccreate(out_file, gl_vars{i}, 'Dimensions', {'i', Inf, 'time', num_time}, 'Format', 'netcdf4', 'FillValue', NaN)
-    ncwriteatt(out_file, gl_vars{i}, 'units', 'm');
-    ncwrite(out_file, gl_vars{i}, gl_data{i});
-end
+%gl_vars = {'xGL', 'yGL'};
+%gl_data = {xGL_new, yGL_new};
+%for i=1:length(gl_vars)
+%    nccreate(out_file, gl_vars{i}, 'Dimensions', {'i', Inf, 'time', num_time}, 'Format', 'netcdf4', 'FillValue', NaN)
+%    ncwriteatt(out_file, gl_vars{i}, 'units', 'm');
+%    ncwrite(out_file, gl_vars{i}, gl_data{i});
+%end
 
 end
     

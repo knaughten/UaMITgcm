@@ -132,6 +132,7 @@ class Options:
             self.pload_salt = 0.
         self.ua_ini_restart = check_value('ua_ini_restart', ua_ini_restart, type='bool')
         self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
+        self.obcs_transient = check_value('obcs_transient', obcs_transient, type='bool')
         # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.couple_step % 12 != 0:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')
