@@ -590,6 +590,8 @@ def correct_next_obcs (grid, options):
     else:
         multi_year = False
         year = None
+        # Also dampen the correction by a factor of 0.5 to prevent instabilities (repeated year is more prone to resonance)
+        eta_avg *= 0.5
     # Apply the correction
     balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=1, multi_year=multi_year, start_year=year, end_year=year)
 
