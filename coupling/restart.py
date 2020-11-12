@@ -52,6 +52,9 @@ if __name__ == "__main__":
 
     # Copy the calendar file
     copy_to_dir(options.calendar_file, output_date_dir, options.output_dir)
+    if os.path.isfile(output_date_dir+options.eta_file):
+        # Also the eta log file
+        copy_to_dir(options.eta_file, output_date_dir, options.output_dir)
 
     # Remove any MITgcm binary output files which are in the run directory (for example if a simulation died prior to this restart and gather_output was never called)
     for fname in os.listdir(options.mit_run_dir):

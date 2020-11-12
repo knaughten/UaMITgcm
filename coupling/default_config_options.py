@@ -142,11 +142,13 @@ ua_ini_restart = False
 ### Do you want the coupler to adjust the incoming OBCS velocities such that
 ### the volume of the domain is approximately conserved on an annual basis?
 ### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
-### preserved).
+### preserved). The code could be edited to remove this requirement, if needed.
 correct_obcs_online = False
 ### Are the OBCS transient (one file per year) or a monthly climatology
 ### (the same yearly file over and over)?
 obcs_transient = True
+### How many years to average over for the OBCS corrections?
+correct_obcs_years = 1
 
 ###### 3. MITgcm parameters ######
 
@@ -206,6 +208,9 @@ calendar_file = 'calendar'
 
 ### Name of file that is created when simulation successfully finishes
 finished_file = 'finished'
+
+### Name of log file for sea surface height. Only used if correct_obcs_online=True and correct_obcs_years > 1.
+eta_file = 'eta_log'
 
 ### Bathymetry file read by MITgcm. Should match the value in input/data.
 bathyFile = 'bathy'

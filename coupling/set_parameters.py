@@ -132,10 +132,13 @@ class Options:
             self.pload_salt = 0.
         self.ua_ini_restart = check_value('ua_ini_restart', ua_ini_restart, type='bool')
         self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
-        self.obcs_transient = check_value('obcs_transient', obcs_transient, type='bool')
         # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.couple_step % 12 != 0:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')
+        self.obcs_transient = check_value('obcs_transient', obcs_transient, type='bool')
+        self.correct_obcs_years = check_value('correct_obcs_years', correct_obcs_years, type='int')
+        if self.correct_obcs_years < 1:
+            throw_error('correct_obcs_years must be at least 1')
             
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')
@@ -180,6 +183,7 @@ class Options:
 
         self.calendar_file = calendar_file
         self.finished_file = finished_file
+        self.eta_file = eta_file
         self.bathyFile = bathyFile
         self.draftFile = draftFile
         self.ini_temp_file = ini_temp_file

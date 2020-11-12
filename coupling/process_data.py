@@ -499,6 +499,9 @@ def gather_output (options):
         copy_tmp_file(fname, options.mit_run_dir, new_mit_dir)
     # Also the calendar file
     copy_tmp_file(options.calendar_file, options.output_dir, new_dir)
+    if os.path.isfile(options.output_dir+options.eta_file):
+        # Also the eta log file
+        copy_tmp_file(options.eta_file, options.output_dir, new_dir)
     
     if not options.spinup:
         # Deal with Ua
@@ -579,6 +582,27 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
+    d_t = options.correct_obcs_years
+
+    if options.correct_obcs_years > 1:
+        # Average back over more than one year
+        # Need to use the log file
+        logfile = options.output_dir + options.eta_file
+        if os.path.isfile(logfile):
+            # It already exists - make a backup file
+            make_tmp_copy(logfile)
+        f = open(logfile, 'a')
+        f.write(str(eta_avg))
+        f.close()
+        # Now read all the values in the file
+        eta_all = np.loadtxt(logfile)
+        if eta_all.size < options.correct_obcs_years:
+            # Don't have a full averaging period yet. So average over what's there.
+            eta_avg = np.mean(eta_all)
+            d_t = eta_all.size
+        else:
+            # Average over the last given number of years
+            eta_avg = np.mean(eta_all[-options.correct_obcs_years:])            
 
     if options.obcs_transient:
         # Figure out the next year to process
@@ -590,10 +614,8 @@ def correct_next_obcs (grid, options):
     else:
         multi_year = False
         year = None
-        # Also dampen the correction by a factor of 0.5 to prevent instabilities (repeated year is more prone to resonance)
-        eta_avg *= 0.5
     # Apply the correction
-    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=1, multi_year=multi_year, start_year=year, end_year=year)
+    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=multi_year, start_year=year, end_year=year)
 
 
 # Copy the geometry files from a mirrored simulation.

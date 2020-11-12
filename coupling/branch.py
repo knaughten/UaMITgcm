@@ -43,6 +43,9 @@ os.mkdir(new_output_dir)
 # Copy the correct files so the case will restart at the right place
 # Calendar file
 copy_to_dir(options.calendar_file, old_output_dir, new_output_dir)
+if os.path.isfile(old_output_dir+options.eta_file):
+    # eta log file
+    copy_to_dir(options.eta_file, old_output_dir, new_output_dir)
 # Finished file
 copy_to_dir(options.finished_file, old_output_dir, new_output_dir)
 # Melt rate file for Ua
