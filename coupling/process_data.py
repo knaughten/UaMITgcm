@@ -592,7 +592,7 @@ def correct_next_obcs (grid, options):
             # It already exists - make a backup file
             make_tmp_copy(logfile)
         f = open(logfile, 'a')
-        f.write(str(eta_avg))
+        f.write(str(eta_avg)+'\n')
         f.close()
         # Now read all the values in the file
         eta_all = np.loadtxt(logfile)
