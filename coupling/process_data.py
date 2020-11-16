@@ -584,7 +584,7 @@ def correct_next_obcs (grid, options):
     eta_avg = area_average(eta, grid)
     d_t = options.correct_obcs_years
 
-    if options.correct_obcs_years > 1:
+    if options.correct_obcs_years != 1:
         # Average back over more than one year
         # Need to use the log file
         logfile = options.output_dir + options.eta_file
@@ -596,8 +596,9 @@ def correct_next_obcs (grid, options):
         f.close()
         # Now read all the values in the file
         eta_all = np.loadtxt(logfile)
-        if eta_all.size < options.correct_obcs_years:
-            # Don't have a full averaging period yet. So average over what's there.
+        if (options.correct_obcs_years == 0) or (eta_all.size < options.correct_obcs_years):
+            # First case: user specified to average over all years
+            # Second case: don't have a full averaging period yet, so average over what's there
             eta_avg = np.mean(eta_all)
             d_t = eta_all.size
         else:

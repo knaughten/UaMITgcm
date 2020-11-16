@@ -137,8 +137,8 @@ class Options:
             throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')
         self.obcs_transient = check_value('obcs_transient', obcs_transient, type='bool')
         self.correct_obcs_years = check_value('correct_obcs_years', correct_obcs_years, type='int')
-        if self.correct_obcs_years < 1:
-            throw_error('correct_obcs_years must be at least 1')
+        if self.correct_obcs_years < 0:
+            throw_error('correct_obcs_years cannot be negative')
             
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')

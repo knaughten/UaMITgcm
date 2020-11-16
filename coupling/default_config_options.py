@@ -148,6 +148,7 @@ correct_obcs_online = False
 ### (the same yearly file over and over)?
 obcs_transient = True
 ### How many years to average over for the OBCS corrections?
+### Can set 0 to average over all years in the simulation.
 correct_obcs_years = 1
 
 ###### 3. MITgcm parameters ######
