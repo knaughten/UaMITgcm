@@ -596,11 +596,14 @@ def correct_next_obcs (grid, options):
         f.close()
         # Now read all the values in the file
         eta_all = np.loadtxt(logfile)
-        if (options.correct_obcs_years == 0) or (eta_all.size < options.correct_obcs_years):
-            # First case: user specified to average over all years
-            # Second case: don't have a full averaging period yet, so average over what's there
+        if options.correct_obcs_years == 0:
+            # User specified to average over all years
             eta_avg = np.mean(eta_all)
             d_t = eta_all.size
+        elif eta_all.size < options.correct_obcs_years:
+            # Don't have a full averaging period yet, so average over what's there and scale it
+            d_t = eta_all.size
+            eta_avg = np.mean(eta_all)/float(d_t)            
         else:
             # Average over the last given number of years
             eta_avg = np.mean(eta_all[-options.correct_obcs_years:])            
