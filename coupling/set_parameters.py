@@ -434,13 +434,13 @@ def update_calendar_file (new_year, new_month, couple_step, options, calfile):
         if options.calendar_type == '360-day':
             # 30 days in every month
             output_intervals = couple_step*[30]
-        elif options.calendar_type == 'standard':
+        else:
             # Loop through the months to find the number of days in each
             curr_year = new_year
             curr_month = new_month
             output_intervals = []
             for t in range(couple_step):
-                output_intervals.append(days_per_month(curr_month, curr_year))
+                output_intervals.append(days_per_month(curr_month, curr_year, allow_leap=(options.calendar_type=='standard')))
                 curr_year, curr_month = add_months(curr_year, curr_month, 1)
     elif options.output_freq == 'end':
         # One line with the number of days in the simulation

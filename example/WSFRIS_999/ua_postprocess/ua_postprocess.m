@@ -15,6 +15,7 @@ time_ts = [];
 iceVAF_ts = [];
 iceVolume_ts = [];
 groundedArea_ts = [];
+meltwater_ts = [];
 xGL_all = {};
 yGL_all = {};
 
@@ -37,14 +38,17 @@ for i=1:length(segment_dir)
     for j=1:length(ua_files)
         disp(['Processing ',ua_files{j}]);
         % Read the data we need
-        load(ua_files{j},'CtrlVar','MUA','h','B','S','rho','rhow','GF','time')
+        %load(ua_files{j},'CtrlVar','MUA','h','B','S','rho','rhow','GF','time')
+	load(ua_files{j},'MUA','ab','time')
         % Save the time value
         time_ts(end+1) = time;
         % Calculate timeseries variables and save
-        [iceVAF,iceVolume,groundedArea] = CalcVAF(CtrlVar,MUA,h,B,S,rho,rhow,GF);
-        iceVAF_ts(end+1) = iceVAF.Total;
-        iceVolume_ts(end+1) = iceVolume.Total;
-        groundedArea_ts(end+1) = groundedArea.Total;
+	mw_int = FEintegrate2D([],MUA,ab);
+        meltwater_ts(end+1) = sum(mw_int);
+        %[iceVAF,iceVolume,groundedArea] = CalcVAF(CtrlVar,MUA,h,B,S,rho,rhow,GF);
+        %iceVAF_ts(end+1) = iceVAF.Total;
+        %iceVolume_ts(end+1) = iceVolume.Total;
+        %groundedArea_ts(end+1) = groundedArea.Total;
         % Calculate grounding line coordinates and save
         %GLgeo = GLgeometry(MUA.connectivity,MUA.coordinates,GF,CtrlVar);
         %[xGL, yGL] = ArrangeGroundingLinePos(CtrlVar,GLgeo);
@@ -68,9 +72,9 @@ num_time = length(time_ts);
 
 % Write NetCDF file
 disp(['Writing ', out_file])
-ts_vars = {'time', 'iceVAF', 'iceVolume', 'groundedArea'};
-ts_units = {'y', 'm^3', 'm^3', 'm^2'};
-ts_data = {time_ts, iceVAF_ts, iceVolume_ts, groundedArea_ts};
+ts_vars = {'time', 'meltwater'}; %'iceVAF', 'iceVolume', 'groundedArea'};
+ts_units = {'y', 'm^3'}; %'m^3', 'm^3', 'm^2'};
+ts_data = {time_ts, meltwater_ts}; %iceVAF_ts, iceVolume_ts, groundedArea_ts};
 for i=1:length(ts_vars)
     nccreate(out_file, ts_vars{i}, 'Dimensions', {'time', num_time}, 'Format', 'netcdf4');
     ncwriteatt(out_file, ts_vars{i}, 'units', ts_units{i});
