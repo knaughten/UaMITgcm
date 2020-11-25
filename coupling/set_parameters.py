@@ -139,6 +139,7 @@ class Options:
         self.correct_obcs_years = check_value('correct_obcs_years', correct_obcs_years, type='int')
         if self.correct_obcs_years < 0:
             throw_error('correct_obcs_years cannot be negative')
+        self.obcs_threshold = check_value('obcs_threshold', obcs_threshold, type='float') 
             
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])
         self.use_seaice = check_value('use_seaice', use_seaice, type='bool')

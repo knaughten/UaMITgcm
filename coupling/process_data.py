@@ -618,8 +618,11 @@ def correct_next_obcs (grid, options):
     else:
         multi_year = False
         year = None
-    # Apply the correction
-    balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=multi_year, start_year=year, end_year=year)
+    if np.abs(eta_avg) > options.obcs_threshold:
+        # Apply the correction
+        balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=multi_year, start_year=year, end_year=year)
+    else:
+        print 'OBCS correction not triggered as SSH anomaly below threshold of ' + str(options.obcs_threshold) + ' m'
 
 
 # Copy the geometry files from a mirrored simulation.

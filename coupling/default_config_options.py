@@ -150,6 +150,9 @@ obcs_transient = True
 ### How many years to average over for the OBCS corrections?
 ### Can set 0 to average over all years in the simulation.
 correct_obcs_years = 1
+### Threshold of acceptable SSH anomaly before OBCS corrections are triggered
+### (absolute value, in metres)
+obcs_threshold = 0
 
 ###### 3. MITgcm parameters ######
 
