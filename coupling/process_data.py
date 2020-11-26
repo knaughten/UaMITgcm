@@ -616,6 +616,12 @@ def correct_next_obcs (grid, options):
         year = int(date_code[:4])
         multi_year = True
     else:
+        # Make a copy of the master file, so that we don't entrain corrections from previous years.
+        for fname in [options.obcs_file_w_u, options.obcs_file_e_u, options.obcs_file_s_v, options.obcs_file_n_v]:
+            if fname is not None:
+                file_path = options.mit_run_dir + fname
+                print 'Making copy of ' + file_path + '.master'
+                shutil.copy(file_path+'.master', file_path)
         multi_year = False
         year = None
     if np.abs(eta_avg) > options.obcs_threshold:

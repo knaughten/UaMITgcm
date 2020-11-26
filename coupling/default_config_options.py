@@ -146,6 +146,8 @@ ua_ini_restart = False
 correct_obcs_online = False
 ### Are the OBCS transient (one file per year) or a monthly climatology
 ### (the same yearly file over and over)?
+### If False, you must make a copy of each OBCS file with the suffix ".master"
+### so that a new correction can be applied each year.
 obcs_transient = True
 ### How many years to average over for the OBCS corrections?
 ### Can set 0 to average over all years in the simulation.
