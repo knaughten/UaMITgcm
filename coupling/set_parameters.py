@@ -230,7 +230,7 @@ class Options:
             self.obcs_file_e_u = obcs_file_e_u
             self.obcs_file_s_v = obcs_file_s_v
             self.obcs_file_n_v = obcs_file_n_v
-            if not options.obcs_transient:
+            if not self.obcs_transient:
                 # Make sure master copies exist
                 for fname in [self.obcs_file_w_u, self.obcs_file_e_u, self.obcs_file_s_v, self.obcs_file_n_v]:
                     if fname is not None:
