@@ -39,6 +39,16 @@ output_dir = '/home/output/'
 ### Archer budget to charge jobs to
 budget_code = ''
 
+### Whether to rsync output to another server after each segment
+rsync_output = False
+### Get the username to set default values for next parameters
+import getpass
+user = getpass.getuser()
+### Host server including username
+rsync_host = user+'@bslcenc.nerc-bas.ac.uk'
+### Directory on host server to copy this case to
+rsync_path = '/data/oceans_output/shelf/'+user+'/'
+
 
 ###### 2. Coupling options ######
 

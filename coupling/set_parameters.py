@@ -92,6 +92,9 @@ class Options:
         if not os.path.isdir(self.output_dir):
             os.mkdir(self.output_dir)
         self.budget_code = budget_code
+        self.rsync_output = check_value('rsync_output', rsync_output, type='bool')
+        self.rsync_host = rsync_host
+        self.rsync_path = real_dir(rsync_path)
 
         self.total_time = check_value('total_time', total_time, type='int')
         self.spinup_time = check_value('spinup_time', spinup_time, type='int')

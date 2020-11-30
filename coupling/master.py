@@ -19,6 +19,10 @@ if __name__ == "__main__":
         print 'Creating dummy initial conditions files where needed'
         zero_ini_files(options)
 
+    if options.initial and options.rsync_output:
+        print 'Initialising directory on host server for rsync'
+        ini_rsync(options)
+
     # Do we need to do any processing for the next run?
     if not options.initial and not options.restart:
 
