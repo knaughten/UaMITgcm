@@ -544,7 +544,7 @@ def gather_output (options):
                 
     if options.rsync_output:
         print 'Copying output to host server'
-        subprocess.check_call(['rsync', '-razL', new_dir[:-1], options.rsync_host+':'+options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/']
+        subprocess.check_call(['rsync', '-razL', new_dir[:-1], options.rsync_host+':'+options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
 
 
 # Move output from a previous repeat into a subdirectory so it doesn't get overwritten.
