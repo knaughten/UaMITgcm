@@ -8,7 +8,6 @@ import os
 import shutil
 import sys
 import subprocess
-import glob
 
 from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list, years_between
 
@@ -545,6 +544,8 @@ def gather_output (options):
     if options.rsync_output:
         print 'Copying output to host server'
         subprocess.check_call(['rsync', '-razL', new_dir[:-1], options.rsync_host+':'+options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
+        # If it survived this far, it's safe to delete the directory
+        os.rmdir(new_dir)
 
 
 # Move output from a previous repeat into a subdirectory so it doesn't get overwritten.
@@ -668,14 +669,11 @@ def mirror_geometry (options):
 def ini_rsync (options):
 
     # Create the case directory on the remote host
-    subprocess.check_call(['ssh', '-t', options.rsync_host, '"mkdir -p '+options.rsync_path+options.expt_name+'"'])
+    subprocess.check_call(['ssh -t '+options.rsync_host+' "mkdir -p '+options.rsync_path+options.expt_name+'"'], shell=True)
+    subprocess.check_call(['ssh -t '+options.rsync_host+' "mkdir -p '+options.rsync_path+options.expt_name+'/mitgcm_run"'], shell=True)
     # Get working directory
     pwd = os.getcwd()
     # Copy all the initial files we want
-    cmd = ['rsync', '-razL']
-    cmd += glob.glob(pwd+'*.py')
-    cmd += glob.glob(pwd+'*.sh')
-    cmd += [options.mit_case_dir+'code', options.mit_case_dir+'input', options.mit_case_dir+'scripts', options.mit_case_dir+'output', options.ua_exe_dir[:-1]]
-    cmd += [options.rsync_host+':'+options.rsync_path+options.expt_name+'/']
     # If this fails, it will terminate the entire process so no need for error checking.
-    subprocess.check_call(cmd)
+    subprocess.check_call(['rsync -razL '+pwd+'/*.py '+pwd+'/*.sh '+pwd+'/output '+options.ua_exe_dir[:-1]+' '+options.rsync_host+':'+options.rsync_path+options.expt_name+'/'], shell=True)
+    subprocess.check_call(['rsync -razL '+options.mit_case_dir+'code '+options.mit_case_dir+'input '+options.mit_case_dir+'scripts '+options.rsync_host+':'+options.rsync_path+options.expt_name+'/mitgcm_run/'], shell=True)

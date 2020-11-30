@@ -1,6 +1,6 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output, mirror_geometry
+from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output, mirror_geometry, ini_rsync
 from coupling_utils import submit_job, reset_finished_files
 
 # Top-level coupling function.

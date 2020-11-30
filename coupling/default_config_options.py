@@ -40,6 +40,7 @@ output_dir = '/home/output/'
 budget_code = ''
 
 ### Whether to rsync output to another server after each segment
+### If True, you must have ssh keys set up!
 rsync_output = False
 ### Get the username to set default values for next parameters
 import getpass
