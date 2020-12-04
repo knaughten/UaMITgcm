@@ -539,13 +539,7 @@ def gather_output (options):
             if not os.path.isfile(new_ua_dir+options.ua_draft_file):
                 print 'Error gathering output'
                 print 'Ua did not create the draft file '+ua_draft_file
-                sys.exit()
-                
-    if options.rsync_output:
-        print 'Copying output to host server'
-        subprocess.check_call(['rsync', '-razL', new_dir[:-1], options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
-        # If it survived this far, it's safe to delete the directory
-        shutil.rmtree(new_dir)
+                sys.exit()                        
 
 
 # Move output from a previous repeat into a subdirectory so it doesn't get overwritten.
@@ -677,3 +671,12 @@ def ini_rsync (options):
     # If this fails, it will terminate the entire process so no need for error checking.
     subprocess.check_call(['rsync -razL '+pwd+'/*.py '+pwd+'/*.sh '+pwd+'/output '+options.ua_exe_dir[:-1]+' '+options.rsync_host+':'+options.rsync_path+options.expt_name+'/'], shell=True)
     subprocess.check_call(['rsync -razL '+options.mit_case_dir+'code '+options.mit_case_dir+'input '+options.mit_case_dir+'scripts '+options.rsync_host+':'+options.rsync_path+options.expt_name+'/mitgcm_run/'], shell=True)
+
+
+# rsync the output from this simulation segment, then delete it from the computation server.
+def rsync_segment (options):
+
+    new_dir = options.output_dir + options.last_start_date  # No trailing slash
+    subprocess.check_call(['rsync', '-razL', new_dir, options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
+    # If it survived this far, it's safe to delete the directory
+    shutil.rmtree(new_dir)

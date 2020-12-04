@@ -1,6 +1,6 @@
 from set_parameters import Options, set_calendar
 from mitgcm_python.grid import Grid
-from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output, mirror_geometry, ini_rsync
+from process_data import zero_ini_files, copy_grid, extract_melt_rates, adjust_mit_geom, adjust_mit_state, convert_mit_output, gather_output, correct_next_obcs, move_repeated_output, mirror_geometry, ini_rsync, rsync_segment
 from coupling_utils import submit_job, reset_finished_files
 
 # Top-level coupling function.
@@ -69,6 +69,10 @@ if __name__ == "__main__":
         if options.correct_obcs_online:
             print 'Balancing OBCS based on last changes in sea surface height'
             correct_next_obcs(grid, options)
+
+        if options.rsync_output:
+            print 'Copying output to host server'
+            rsync_segment(options)
 
     if options.init_repeat:
         print 'Moving output from previous repeat'
