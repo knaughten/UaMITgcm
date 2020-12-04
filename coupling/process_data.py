@@ -543,7 +543,7 @@ def gather_output (options):
                 
     if options.rsync_output:
         print 'Copying output to host server'
-        subprocess.check_call(['rsync', '-razL', new_dir[:-1], options.rsync_host+':'+options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
+        subprocess.check_call(['rsync', '-razL', new_dir[:-1], options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
         # If it survived this far, it's safe to delete the directory
         os.rmdir(new_dir)
 
