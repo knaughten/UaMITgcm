@@ -70,7 +70,7 @@ def extract_melt_rates (options):
     # Read the ice shelf melt rate output (last, avg, or all)
     # and convert to m/y.
     # Melting is negative as per Ua convention.
-    if options.melt_coupling = 'last':
+    if options.melt_coupling == 'last':
         # Make sure it's from the last timestep of the previous simulation.
         timestep = options.last_timestep
     else:
