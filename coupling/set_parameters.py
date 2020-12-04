@@ -107,6 +107,7 @@ class Options:
         if self.spinup_time % self.couple_step != 0:
             throw_error('couple_step must evenly divide spinup_time')
         self.repeat = check_value('repeat', repeat, type='bool')
+        self.melt_coupling = check_value('melt_coupling', melt_coupling, legal=['last', 'avg', 'all'])
         self.mirror = check_value('mirror', mirror, type='bool')
         if self.mirror and self.spinup_time != self.total_time:
             throw_error('spinup_time must equal total_time for mirrored simulations, so only the ocean component runs')

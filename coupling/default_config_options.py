@@ -68,6 +68,12 @@ couple_step = 6
 ### you have to set repeat back to False, or it will start from the beginning.
 repeat = False
 
+### Which melt rates to mass from MITgcm to Ua:
+### 'last': melt rates from the last available output step
+### 'avg': melt rates averaged over the entire coupling interval
+### 'all': transient melt rates over the entire coupling interval
+melt_coupling = 'last'
+
 ### Option to "mirror": re-run the ocean segments of a coupled simulation,
 ### pulling the geometry files from a previously finished simulation each segment.
 ### This is useful if you want to re-run with extra ocean diagnostics,

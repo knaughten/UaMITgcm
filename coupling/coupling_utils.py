@@ -178,7 +178,7 @@ def years_between (year_1, month_1, year_2, month_2, calendar_type):
 
 
 # Read MITgcm binary output file(s) of a given type/name (file_head, eg 'MIT2D') and extract all the variables in the given list of names. Can also pass var_names=None if there are no named variables (eg if it's a dump file with just one variable in it).
-# Will either read the most recently modified file (time_option='last') or time-average all available files (time_option='avg').
+# Will either read the most recently modified file (time_option='last'), time-average all available files (time_option='avg'), or read all available files with no averaging (time_option='all').
 # If there is an expected value for the timestep number corresponding to the 'last' output, check that it agrees.
 # For pickups, you must pass nz, which is the number of vertical layers in the model (for normal pickups) OR the number of sea ice vertical layers (for sea ice pickups).
 def read_mit_output (time_option, directory, file_head, var_names, timestep=None, nz=None):
@@ -190,10 +190,10 @@ def read_mit_output (time_option, directory, file_head, var_names, timestep=None
     if time_option == 'last':
         # Read the most recent file
         data, its, meta = rdmds(directory+file_head, itrs=np.Inf, returnmeta=True)
-    elif time_option == 'avg':
+    elif time_option in ['avg', 'all']:
         # Read all files
         data, its, meta = rdmds(directory+file_head, itrs=np.nan, returnmeta=True)
-        if len(its) > 1:
+        if len(its) > 1 and time_option == 'avg':
             # Time-average
             data = np.mean(data, axis=0)
     if len(data)==0:
