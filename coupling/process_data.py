@@ -83,12 +83,16 @@ def extract_melt_rates (options):
 
     # Write to Matlab file for Ua
     print 'Writing ' + ua_out_file
-    if options.melt_coupling == 'all':
+    if options.melt_coupling == 'all' and len(ismr.shape)==3:
         # More than one time index
-        pass
+        num_time = ismr.shape[0]
+        ismr_ravel = np.empty([num_time, ismr.size/num_time])
+        for t in range(num_time):
+            ismr_ravel[t,:] = ismr[t,:].ravel()
     else:
         # Long 1D array
-        savemat(ua_out_file, {'meltrate':ismr.ravel()})
+        ismr_ravel = ismr.ravel()
+    savemat(ua_out_file, {'meltrate':ismr_ravel})
 
 
 # Given the updated ice shelf draft from Ua, adjust the draft and/or bathymetry so that MITgcm is happy. In order to have fully connected adjacent water columns, they must overlap by at least two wet cells.

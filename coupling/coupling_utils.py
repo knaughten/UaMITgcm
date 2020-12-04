@@ -244,7 +244,11 @@ def read_mit_output (time_option, directory, file_head, var_names, timestep=None
         if file_head.startswith('pickup'):
             var_data.append(data[i])
         else:
-            var_data.append(data[i,:])
+            if time_option == 'all' and len(its) > 1:
+                # Deal with time dimension
+                var_data.append(data[:,i,:])
+            else:
+                var_data.append(data[i,:])
     # Check for single variable
     if len(var_data) == 1:
         return var_data[0]
