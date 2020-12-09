@@ -46,7 +46,7 @@ replace_line(namelist, niter0_line, ' niter0='+str(niter0_new)+',\n')
 
 # Get timestep number in pickup file (will be 1 simulation segment ahead of niter0)
 for fname in os.listdir(options.mit_run_dir):
-    if fname.startswith('pickup.') and fname.endswith('.data'):
+    if fname.startswith('pickup.') and fname.endswith('.data') and (not pickup.startswith('pickup.ckpt')):
         pickup_tstep_old = extract_first_int(fname)
         break
 # Scale it and check as before
