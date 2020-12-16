@@ -57,19 +57,29 @@ class OBCSForcingArray:
         # assign years and months for forcing
         if constant_forcing:
             print 'Constant OBCS forcing turned ON'
-            out = raw_input('You have chosen constant OBCS forcing. Enter the date code (eg 199201):').strip()
-            # make sure input is a valid date
-            valid_date = len(out)==6
+            out1 = raw_input('You have chosen constant OBCS forcing. Enter the date code of the first month of the averaging window (eg 199201):').strip()
+            out2 = raw_input('Number of months in the averaging window:').strip()
+	    # make sure input is a valid date
+            valid_date1 = len(out1)==6
+	    valid_date2 = len(out2)==6
             try:
-                int(valid_date)
+                int(valid_date1)
             except(ValueError):
-                valid_date = False
-            if not valid_date:
-                print 'Error: invalid date code ' + out
+                valid_date1 = False
+            if not valid_date1:
+                print 'Error: invalid date code ' + out1
                 sys.exit()
+	    try:
+		int(valid_date2)
+	    except(ValueError):
+		valid_date2 = False
+	    if not valid_date2:
+		print 'Error: invalid window size ' + out1
+		sys.exit()
             # assign input to array
-            self.years = self.years + int(out[:4])
-            self.months = self.months + int(out[4:6])
+            self.years = self.years + int(out1[:4])
+            self.months = self.months + int(out1[4:6]) 
+	    self.window = out2 
         else:
             print 'Time-varying OBCS forcing turned ON'
             self.years = self.years + ini_year + np.floor(np.arange(totaltime)/12)
@@ -81,46 +91,46 @@ class OBCSForcingArray:
             self.BC = loadmat('../../MIT_InputData/Kimura_OceanBC.mat')
         elif obcs_forcing_data == 'Holland':
             print 'Using Holland data for obcs conditions'
-            sys.exit('mat file needs generating first!')
+            self.BC = loadmat('../../MIT_InputData/Holland_OceanBC.mat')
         else: 
             print 'Error: input data for obcs not found'
-	
+
 	# first we isolate the ocean spinup from the forcing dataset
         BCyears = np.where(self.BC['year'][-1,:]==ini_year)
-	BCmonths = np.where(self.BC['month'][-1,:]==ini_month)
+        BCmonths = np.where(self.BC['month'][-1,:]==ini_month)
         startIndex = np.int(np.intersect1d(BCyears,BCmonths))
         Theta_spinup = self.BC['Theta'][:,:,startIndex:startIndex+spinup]
-	Salt_spinup = self.BC['Salt'][:,:,startIndex:startIndex+spinup]
+        Salt_spinup = self.BC['Salt'][:,:,startIndex:startIndex+spinup]
         Ups_spinup = self.BC['Ups'][:,:,startIndex:startIndex+spinup]
-	Vps_spinup = self.BC['Vps'][:,:,startIndex:startIndex+spinup]
-	year_spinup = self.BC['year'][:,startIndex:startIndex+spinup]
-	month_spinup = self.BC['month'][:,startIndex:startIndex+spinup]
+        Vps_spinup = self.BC['Vps'][:,:,startIndex:startIndex+spinup]
+        year_spinup = self.BC['year'][:,startIndex:startIndex+spinup]
+        month_spinup = self.BC['month'][:,startIndex:startIndex+spinup]
 
-	# we then isolate the remaining forcing years for cyclic repetition
-	Theta_cyclic = self.BC['Theta'][:,:,startIndex+spinup:]
-	Salt_cyclic = self.BC['Salt'][:,:,startIndex+spinup:]
+        # we then isolate the remaining forcing years for cyclic repetition
+        Theta_cyclic = self.BC['Theta'][:,:,startIndex+spinup:]
+        Salt_cyclic = self.BC['Salt'][:,:,startIndex+spinup:]
         Ups_cyclic = self.BC['Ups'][:,:,startIndex+spinup:]
-	Vps_cyclic = self.BC['Vps'][:,:,startIndex+spinup:]
-	year_cyclic = self.BC['year'][:,startIndex+spinup:]
-  	month_cyclic = self.BC['month'][:,startIndex+spinup:]
+        Vps_cyclic = self.BC['Vps'][:,:,startIndex+spinup:]
+        year_cyclic = self.BC['year'][:,startIndex+spinup:]
+        month_cyclic = self.BC['month'][:,startIndex+spinup:]
 
-        # check to see if year/month is within range of Kimura timestamps.
-        # if not, then it is assumed that we cycle through Kimura data until the correct year/month is reached
-        if self.years[-1] >= self.BC['year'][:,-1]:
+        # check to see if year/month is within range of timestamps input data.
+        # if not, then it is assumed that we cycle through input data until the correct year/month is reached
+	ncycles = 0
+	if self.years[-1] >= self.BC['year'][:,-1]:
             # calculate how many years need adding to the timeseries
             nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 0])
-            # calculate how many additional full cycles of the Kimura dataset are required to cover the requested simulation times
+            # calculate how many additional full cycles of the input dataset are required to cover the requested simulation times
             ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,startIndex+spinup])))
-	    print 'Spinup: ',spinup,' months, additional cycles of ',Theta_cyclic.shape[2],' months: ',ncycles
-	    n=0
-	    Theta = np.append(Theta_spinup,Theta_cyclic,axis=2)
-	    while n < ncycles:
-	  	n += 1
-		Theta = np.append(Theta,Theta_cyclic,axis=2)
-	    self.BC['Theta'] = Theta
-	    Theta = None
+            n=0
+            Theta = np.append(Theta_spinup,Theta_cyclic,axis=2)
+            while n < ncycles:
+                n += 1
+                Theta = np.append(Theta,Theta_cyclic,axis=2)
+            self.BC['Theta'] = Theta
+            Theta = None
 
-	    n=0
+            n=0
             Salt = np.append(Salt_spinup,Salt_cyclic,axis=2)
             while n < ncycles:
                 n += 1
@@ -128,7 +138,7 @@ class OBCSForcingArray:
             self.BC['Salt'] = Salt
             Salt = None
 
-	    n=0
+            n=0
             Ups = np.append(Ups_spinup,Ups_cyclic,axis=2)
             while n < ncycles:
                 n += 1
@@ -136,20 +146,28 @@ class OBCSForcingArray:
             self.BC['Ups'] = Ups
             Ups = None
 
-	    n=0
+            n=0
             Vps = np.append(Vps_spinup,Vps_cyclic,axis=2)
             while n < ncycles:
                 n += 1
                 Vps = np.append(Vps,Vps_cyclic,axis=2)
             self.BC['Vps'] = Vps
             Vps = None
-            
-	    monthstoappend = np.mod(month_cyclic[:,-1]+np.arange(month_cyclic.size*ncycles),12)+1
-	    months = np.append(month_spinup,month_cyclic)
-	    self.BC['month'] = np.append(months,monthstoappend)
-            yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(year_cyclic.size*ncycles)/12) +1 
-            years = np.append(year_spinup,year_cyclic)
- 	    self.BC['year'] = np.append(years,yearstoappend)
+
+        monthstoappend = np.mod(month_cyclic[:,-1]+np.arange(month_cyclic.size*ncycles),12)+1
+        months = np.append(month_spinup,month_cyclic)
+        self.BC['month'] = np.append(months,monthstoappend)
+        yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(year_cyclic.size*ncycles)/12) +1
+        years = np.append(year_spinup,year_cyclic)
+        self.BC['year'] = np.append(years,yearstoappend)
+
+	print 'Start/end time spinup: ',month_spinup[:,0][:],'/',year_spinup[:,0],' - ',month_spinup[:,-1],'/',year_spinup[:,-1],' (',spinup,' months)'
+	print 'Start/end time cyclic forcing: ',month_cyclic[:,0],'/',year_cyclic[:,0],' - ',month_cyclic[:,-1],'/',year_cyclic[:,-1]
+	print 'Forcing cycles: ',ncycles+1,' cycles of ',month_cyclic.size,' months'
+	print 'Start/end time forcing data: ',self.BC['month'][0],'/',self.BC['year'][0],' - ',self.BC['month'][-1],'/',self.BC['year'][-1]
+	print 'Size T/S/U/V forcing matrix: ',np.shape(self.BC['Theta'])
+	print 'Start/end time run: ',self.months[-1],'/',self.years[-1]
+	print 'Total runtime: ',totaltime,' months'
 
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
@@ -330,15 +348,15 @@ with open('/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/RunTable.csv', 'rb'
 	if options.expt_name in row[:]:
 	   filename = '/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/'+row[0]+'_InverseRestartFile.mat'
 	   if os.path.isfile(filename):
-		#shutil.copyfile(filename,'./ua_run/'+options.expt_name+'-RestartFile.mat')
-   		#shutil.copyfile(filename,'./ua_custom/'+options.expt_name+'-RestartFile.mat')
+		shutil.copyfile(filename,'./ua_run/'+options.expt_name+'-RestartFile.mat')
+   		shutil.copyfile(filename,'./ua_custom/'+options.expt_name+'-RestartFile.mat')
 		print 'Copied '+filename
 	   else:
 		print 'Ua restart file '+filename+' not found'
        		sys.exit()
 		 
 print 'Copy RefinedMesh_for_MITmask.mat to ua_run directory'
-#shutil.copyfile('/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/RefinedMesh_for_MITmask_666.mat','./ua_run/RefinedMesh_for_MITmask.mat')
+shutil.copyfile('/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData/RefinedMesh_for_MITmask.mat','./ua_run/RefinedMesh_for_MITmask.mat')
 
 
 

@@ -162,10 +162,13 @@ class OBCSForcingArray:
         years = np.append(year_spinup,year_cyclic)
         self.BC['year'] = np.append(years,yearstoappend)
 
-	print 'Start/end time spinup: ',month_spinup[:,0][:],'/',year_spinup[:,0],' - ',month_spinup[:,-1],'/',year_spinup[:,-1]
+	print 'Start/end time spinup: ',month_spinup[:,0][:],'/',year_spinup[:,0],' - ',month_spinup[:,-1],'/',year_spinup[:,-1],' (',spinup,' months)'
 	print 'Start/end time cyclic forcing: ',month_cyclic[:,0],'/',year_cyclic[:,0],' - ',month_cyclic[:,-1],'/',year_cyclic[:,-1]
 	print 'Forcing cycles: ',ncycles+1,' cycles of ',month_cyclic.size,' months'
 	print 'Start/end time forcing data: ',self.BC['month'][0],'/',self.BC['year'][0],' - ',self.BC['month'][-1],'/',self.BC['year'][-1]
+	print 'Size T/S/U/V forcing matrix: ',np.shape(self.BC['Theta'])
+	print 'Start/end time run: ',self.months[-1],'/',self.years[-1]
+	print 'Total runtime: ',totaltime,' months'
 
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
