@@ -38,7 +38,7 @@ hFacMinDr = 0.
 
 # Some additional stuff about the forcing
 obcs_forcing_data = 'Kimura' # either 'Kimura' or 'Holland'
-constant_forcing = False# False # if set to True, the forcing from options.startDate+options.spinup_time will be taken
+constant_forcing = True# False # if set to True, the forcing from options.startDate+options.spinup_time will be taken
 
 # read information about startDates, spinup time and simulation time from the options
 options = Options()
@@ -51,6 +51,16 @@ totaltime = int(options.total_time) # in months
 class OBCSForcingArray:
 
     def __init__ (self):
+        # assign forcing data
+        if obcs_forcing_data == 'Kimura':
+            print 'Using Kimura data for obcs conditions'
+            self.BC = loadmat('../../MIT_InputData/Kimura_OceanBC.mat')
+        elif obcs_forcing_data == 'Holland':
+            print 'Using Holland data for obcs conditions'
+            self.BC = loadmat('../../MIT_InputData/Holland_OceanBC.mat')
+        else:
+            print 'Error: input data for obcs not found'
+
         # first, initialize variables
         self.nt = totaltime
         self.years,self.months = np.zeros(totaltime), np.zeros(totaltime)
@@ -59,10 +69,10 @@ class OBCSForcingArray:
         if constant_forcing:
             print 'Constant OBCS forcing turned ON'
             out1 = raw_input('You have chosen constant OBCS forcing. Enter the date code of the first month of the averaging window (eg 199201):').strip()
-            out2 = raw_input('Number of months in the averaging window:').strip()
+            out2 = raw_input('Number of months in the averaging window (eg 01,02,...12,13,...):').strip()
 	    # make sure input is a valid date
             valid_date1 = len(out1)==6
-	    valid_date2 = len(out2)==6
+	    valid_date2 = len(out2)==2
             try:
                 int(valid_date1)
             except(ValueError):
@@ -75,26 +85,26 @@ class OBCSForcingArray:
 	    except(ValueError):
 		valid_date2 = False
 	    if not valid_date2:
-		print 'Error: invalid window size ' + out1
+		print 'Error: invalid window size ' + out2
 		sys.exit()
             # assign input to array
-            self.years = self.years + int(out1[:4])
-            self.months = self.months + int(out1[4:6]) 
-	    self.window = out2 
-        else:
-            print 'Time-varying OBCS forcing turned ON'
+            fixed_startyear = int(out1[:4])
+            fixed_startmonth = int(out1[4:6]) 
+	    fixed_window = int(out2)
+	    
             self.years = self.years + ini_year + np.floor(np.arange(totaltime)/12)
-            self.months = self.months + np.mod(np.arange(totaltime),12) + 1
+	    self.months = self.months + np.mod(np.arange(totaltime),12) + 1
+	    endForcing = int(np.where((self.years==self.BC['year'][-1,-1])&(self.months==self.BC['month'][-1,-1]))[0])
+	    self.years[endForcing+1:]=fixed_startyear
+	    self.months[endForcing+1:]=fixed_startmonth
+	    ##np.set_printoptions(threshold=np.inf)
+	    ##print self.years
+	    ##print self.months
 
-        # assign forcing data
-        if obcs_forcing_data == 'Kimura':
-            print 'Using Kimura data for obcs conditions'
-            self.BC = loadmat('../../MIT_InputData/Kimura_OceanBC.mat')
-        elif obcs_forcing_data == 'Holland':
-            print 'Using Holland data for obcs conditions'
-            self.BC = loadmat('../../MIT_InputData/Holland_OceanBC.mat')
-        else: 
-            print 'Error: input data for obcs not found'
+	else:
+            print 'Time-varying OBCS forcing turned ON'
+       	    self.years = self.years + ini_year + np.floor(np.arange(totaltime)/12)
+            self.months = self.months + np.mod(np.arange(totaltime),12) + 1
 
 	# first we isolate the ocean spinup from the forcing dataset
         BCyears = np.where(self.BC['year'][-1,:]==ini_year)
@@ -107,68 +117,89 @@ class OBCSForcingArray:
         year_spinup = self.BC['year'][:,startIndex:startIndex+spinup]
         month_spinup = self.BC['month'][:,startIndex:startIndex+spinup]
 
-        # we then isolate the remaining forcing years for cyclic repetition
+	# we then isolate the remaining forcing years for cyclic repetition
         Theta_cyclic = self.BC['Theta'][:,:,startIndex+spinup:]
         Salt_cyclic = self.BC['Salt'][:,:,startIndex+spinup:]
         Ups_cyclic = self.BC['Ups'][:,:,startIndex+spinup:]
         Vps_cyclic = self.BC['Vps'][:,:,startIndex+spinup:]
         year_cyclic = self.BC['year'][:,startIndex+spinup:]
         month_cyclic = self.BC['month'][:,startIndex+spinup:]
+	
+	if constant_forcing:
+	    # add 1 cycle of forcing
+	    ncycles = 1
+	else:
+	    # check to see if end year/month is within range of timestamps input data.
+            # if not, then it is assumed that we cycle through input data until the correct year/month is reached
+            if self.years[-1] >= self.BC['year'][:,-1]:
+                # calculate how many years need adding to the timeseries
+                nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 0])
+                # calculate how many additional full cycles of the input dataset are required to cover the requested simulation times
+                ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,startIndex+spinup])))
 
-        # check to see if year/month is within range of timestamps input data.
-        # if not, then it is assumed that we cycle through input data until the correct year/month is reached
-	ncycles = 0
-	if self.years[-1] >= self.BC['year'][:,-1]:
-            # calculate how many years need adding to the timeseries
-            nyears = np.amax([self.years[-1] - self.BC['year'][:,-1], 0])
-            # calculate how many additional full cycles of the input dataset are required to cover the requested simulation times
-            ncycles = np.int(np.ceil(nyears/(self.BC['year'][:,-1]-self.BC['year'][:,startIndex+spinup])))
-            n=0
-            Theta = np.append(Theta_spinup,Theta_cyclic,axis=2)
-            while n < ncycles:
-                n += 1
-                Theta = np.append(Theta,Theta_cyclic,axis=2)
-            self.BC['Theta'] = Theta
-            Theta = None
+     	n=1
+        Theta = np.append(Theta_spinup,Theta_cyclic,axis=2)
+        while n < ncycles:
+       	    n += 1
+            Theta = np.append(Theta,Theta_cyclic,axis=2)
 
-            n=0
-            Salt = np.append(Salt_spinup,Salt_cyclic,axis=2)
-            while n < ncycles:
-                n += 1
-                Salt = np.append(Salt,Salt_cyclic,axis=2)
-            self.BC['Salt'] = Salt
-            Salt = None
+	n=1
+       	Salt = np.append(Salt_spinup,Salt_cyclic,axis=2)
+       	while n < ncycles:
+       	    n += 1
+            Salt = np.append(Salt,Salt_cyclic,axis=2)
 
-            n=0
-            Ups = np.append(Ups_spinup,Ups_cyclic,axis=2)
-            while n < ncycles:
-                n += 1
-                Ups = np.append(Ups,Ups_cyclic,axis=2)
-            self.BC['Ups'] = Ups
-            Ups = None
+	n=1
+       	Ups = np.append(Ups_spinup,Ups_cyclic,axis=2)
+       	while n < ncycles:
+       	    n += 1
+       	    Ups = np.append(Ups,Ups_cyclic,axis=2)
 
-            n=0
-            Vps = np.append(Vps_spinup,Vps_cyclic,axis=2)
-            while n < ncycles:
-                n += 1
-                Vps = np.append(Vps,Vps_cyclic,axis=2)
-            self.BC['Vps'] = Vps
-            Vps = None
+	n=1
+        Vps = np.append(Vps_spinup,Vps_cyclic,axis=2)
+        while n < ncycles:
+       	    n += 1
+            Vps = np.append(Vps,Vps_cyclic,axis=2)
 
-        monthstoappend = np.mod(month_cyclic[:,-1]+np.arange(month_cyclic.size*ncycles),12)+1
-        months = np.append(month_spinup,month_cyclic)
-        self.BC['month'] = np.append(months,monthstoappend)
-        yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(year_cyclic.size*ncycles)/12) +1
-        years = np.append(year_spinup,year_cyclic)
-        self.BC['year'] = np.append(years,yearstoappend)
+        if constant_forcing:
+	    #print 'constant forcing - nothing to add'
+            #add constant constant forcing
+	    IndexConstantForcing = int(np.where((self.BC['year'][-1,:]==fixed_startyear)&(self.BC['month'][-1,:]==fixed_startmonth))[0])
+	    Theta = np.append(Theta,np.expand_dims(self.BC['Theta'][:,:,IndexConstantForcing],2),axis=2)
+            Salt = np.append(Salt,np.expand_dims(self.BC['Salt'][:,:,IndexConstantForcing],2),axis=2)
+	    Ups = np.append(Ups,np.expand_dims(self.BC['Ups'][:,:,IndexConstantForcing],2),axis=2)
+            Vps = np.append(Vps,np.expand_dims(self.BC['Vps'][:,:,IndexConstantForcing],2),axis=2)
+	    months = np.append(month_spinup,month_cyclic)
+	    self.BC['month'] = np.append(months,self.BC['month'][:,IndexConstantForcing])
+            years = np.append(year_spinup,year_cyclic)
+	    self.BC['year'] = np.append(years,self.BC['year'][:,IndexConstantForcing])
+	else:	
+            monthstoappend = np.mod(month_cyclic[:,-1]+np.arange(month_cyclic.size*ncycles),12)+1
+            months = np.append(month_spinup,month_cyclic)
+            self.BC['month'] = np.append(months,monthstoappend)
+            yearstoappend = self.BC['year'][:,-1] + np.floor(np.arange(year_cyclic.size*ncycles)/12) +1
+            years = np.append(year_spinup,year_cyclic)
+            self.BC['year'] = np.append(years,yearstoappend)
+
+	self.BC['Theta'] = Theta
+	Theta = None
+	self.BC['Salt'] = Salt
+	Salt = None
+	self.BC['Ups'] = Ups
+	Ups = None
+	self.BC['Vps'] = Vps
+	Vps = None
 
 	print 'Start/end time spinup: ',month_spinup[:,0][:],'/',year_spinup[:,0],' - ',month_spinup[:,-1],'/',year_spinup[:,-1],' (',spinup,' months)'
 	print 'Start/end time cyclic forcing: ',month_cyclic[:,0],'/',year_cyclic[:,0],' - ',month_cyclic[:,-1],'/',year_cyclic[:,-1]
-	print 'Forcing cycles: ',ncycles+1,' cycles of ',month_cyclic.size,' months'
-	print 'Start/end time forcing data: ',self.BC['month'][0],'/',self.BC['year'][0],' - ',self.BC['month'][-1],'/',self.BC['year'][-1]
-	print 'Size T/S/U/V forcing matrix: ',np.shape(self.BC['Theta'])
-	print 'Start/end time run: ',self.months[-1],'/',self.years[-1]
-	print 'Total runtime: ',totaltime,' months'
+	print 'Forcing cycles: ',ncycles,' cycles of ',month_cyclic.size,' months'
+	if constant_forcing:
+            print 'Month/year constant forcing: ',self.BC['month'][-1],'/',self.BC['year'][-1]
+        else:
+	    print 'Start/end time forcing data: ',self.BC['month'][0],'/',self.BC['year'][0],' - ',self.BC['month'][-1],'/',self.BC['year'][-1]
+            print 'End time run: ',self.months[-1],'/',self.years[-1]	
+        print 'Size T/S/U/V forcing matrix: ',np.shape(self.BC['Theta'])
+	print 'Total runtime: ',totaltime,' months or ',totaltime/12,' years'
 
 # BasicGrid object to hold some information about the grid - just the variables we need to create all the initial conditions, with the same conventions as the mitgcm_python Grid object where needed. This way we can call calc_load_anomaly without needing a full Grid object.
 class BasicGrid:
