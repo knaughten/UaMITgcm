@@ -83,4 +83,9 @@ example/FRIS_UaMITgcm_backup
 example/MISOMIP_full
 example/MISOMIP_zero
 example/WSFRIS_spinup0
-example/PAS_*
+example/PAS_ERA5
+example/PAS_PACE0*
+example/PAS_PACE1*
+example/PAS_PACE20
+example/PAS_PACEhb
+example/PAS_*ctrl
