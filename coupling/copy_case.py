@@ -25,10 +25,10 @@ def do_copy_case (old_name, new_name, check_restart=True):
     new_name, new_dir = parse_name(new_name)
 
     if not os.path.isdir(old_dir):
-        print 'Error (copy_case): ' + old_dir + ' does not exist'
+        print('Error (copy_case): ' + old_dir + ' does not exist')
         sys.exit()
     if os.path.isdir(new_dir):
-        print 'Error (copy_case): ' + new_dir + ' already exists'
+        print('Error (copy_case): ' + new_dir + ' already exists')
         sys.exit()
 
     # Add the existing configuration to the path so we can read config_options.py

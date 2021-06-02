@@ -28,8 +28,8 @@ class Options:
 
         # Inner function to throw an error and stop processing
         def throw_error(message):
-            print 'Error reading config_options.py'
-            print message
+            print('Error reading config_options.py')
+            print(message)
             sys.exit()        
 
         # Inner function to report an illegal value
@@ -239,7 +239,7 @@ class Options:
                 for fname in [self.obcs_file_w_u, self.obcs_file_e_u, self.obcs_file_s_v, self.obcs_file_n_v]:
                     if fname is not None:
                         if not os.path.isfile(self.mit_run_dir+fname+'.master'):
-                            print 'Error (Options): need to make master copy of ' + fname
+                            print('Error (Options): need to make master copy of ' + fname)
                             sys.exit()
         else:
             self.obcs_file_w_u = None
@@ -314,7 +314,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
         else:
             message = 'Warning: '
         message += var_string + ' has an incorrect value in ' + file_name
-        print message
+        print(message)
         if error:
             sys.exit()
 
@@ -325,7 +325,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
         if old_var != new_var:
             if check=='all' or (check=='360' and options.calendar_type == '360-day'):
                 throw_error_warning(var_string, file_name, error=error)
-            print 'Updating ' + var_string + ' in ' + file_name
+            print('Updating ' + var_string + ' in ' + file_name)
             replace_line(file_name, old_line, new_line)
 
     # Now the work starts
@@ -357,7 +357,7 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
         check_and_change(old_ckpt, ckpt, ckpt_line, ' pchkptFreq='+str(ckpt)+',\n', namelist, 'pchkptFreq', check='none')
         # Update niter0
         # No need to check this, as it will change every time
-        print 'Updating niter0 in ' + namelist
+        print('Updating niter0 in ' + namelist)
         if options.init_repeat:
             niter0_new = 0
         else:
@@ -377,13 +377,13 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
                 for tail in file_tails:
                     start_name = mit_dir + head + tstep_string + tail
                     end_name = mit_dir + head + 'ckptA' + tail
-                    print 'Moving ' + start_name + ' to ' + end_name
+                    print('Moving ' + start_name + ' to ' + end_name)
                     os.rename(start_name, end_name)
             # Now update namelist to use these files
             # First make sure pickupSuff is not already defined
             pickupSuff_line = line_that_matters(namelist, 'pickupSuff', throw_error=False)
             if pickupSuff_line is not None:
-                print 'Error (update_namelists): pickupSuff is already defined. Remove or comment it out so we can set pickupSuff without confusion.'
+                print('Error (update_namelists): pickupSuff is already defined. Remove or comment it out so we can set pickupSuff without confusion.')
                 sys.exit()
             # Now add the new line, right after niter0
             niter0_line = line_that_matters(namelist, 'niter0')
@@ -393,11 +393,11 @@ def update_namelists (mit_dir, segment_length, simulation_length, options):
             find_comment_line(namelist, 'pickupSuff')
 
     if options.use_ini_deltaTmom:
-        print 'Checking deltaTmom in ' + namelist
+        print('Checking deltaTmom in ' + namelist)
         if options.initial:
             # Make sure it's there and uncommented
             if line_that_matters(namelist, 'deltaTmom', throw_error=False) is None:
-                print 'Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?'
+                print('Error (update_namelists): use_ini_deltaTmom=False but ' + namelist + ' does not set a value for deltaTmom! Is it commented out?')
                 sys.exit()
         else:
             # Comment it out
@@ -458,7 +458,7 @@ def update_calendar_file (new_year, new_month, couple_step, options, calfile):
         # One line with the number of days in the simulation
         output_intervals = [ndays_new]
 
-    print 'Updating ' + calfile
+    print('Updating ' + calfile)
     f = open(calfile, 'w')
     f.write(date_code_new + '\n')
     f.write(str(ndays_new) + '\n')
@@ -490,21 +490,21 @@ def set_calendar (options):
         # Remove it
         os.remove(finifile)
         if init_repeat:
-            print 'This is a restart which repeats the forcing period from the beginning'
+            print('This is a restart which repeats the forcing period from the beginning')
         else:
-            print 'This is a restart from a previously-finished simulation that was extended'
+            print('This is a restart from a previously-finished simulation that was extended')
 
     # Get the start year and month for the whole simulation
     ini_year = int(options.startDate[:4])
     ini_month = int(options.startDate[4:6])
     
     if initial:
-        print 'This is the first segment'
-        print 'Initialising calendar'
+        print('This is the first segment')
+        print('Initialising calendar')
         new_year = ini_year
         new_month = ini_month
     else:
-        print 'Advancing calendar by ' + str(options.couple_step) + ' months'
+        print('Advancing calendar by ' + str(options.couple_step) + ' months')
         
         # Read the first 2 lines of the calendar file
         f = open(calfile, 'r')
@@ -519,7 +519,7 @@ def set_calendar (options):
         new_year, new_month = add_months(old_year, old_month, options.couple_step)
         # Make sure ndays makes sense
         if ndays != days_between(old_year, old_month, new_year, new_month, options.calendar_type):
-            print 'Error (set_calendar): number of days in last simulation does not agree with couple_step and/or calendar_type.'
+            print('Error (set_calendar): number of days in last simulation does not agree with couple_step and/or calendar_type.')
             sys.exit()
 
         # Save the last timestep and date code to the Options object
@@ -531,7 +531,7 @@ def set_calendar (options):
             options.save_last_calendar(date_code, days_between(ini_year, ini_month, old_year, old_month, options.calendar_type), days_between(ini_year, ini_month, new_year, new_month, options.calendar_type))
 
         if init_repeat:
-            print 'Resetting calendar to beginning'
+            print('Resetting calendar to beginning')
             new_year = ini_year
             new_month = ini_month
 
@@ -540,7 +540,7 @@ def set_calendar (options):
     couple_year, couple_month = add_months(ini_year, ini_month, options.spinup_time)
     spinup = (new_year < couple_year) or (new_year==couple_year and new_month < couple_month)
     if spinup:
-        print 'Simulation is in ocean-only spinup phase'
+        print('Simulation is in ocean-only spinup phase')
         
     # Figure out if it's the first coupled timestep
     first_coupled = new_year==couple_year and new_month==couple_month
@@ -554,21 +554,21 @@ def set_calendar (options):
     options.save_simulation_type(initial, restart, spinup, first_coupled, finished, init_repeat)
     
     if finished:
-        print 'Simulation has finished'
+        print('Simulation has finished')
         # Create the finished file
         open(finifile, 'a').close()
     else:
-        print 'Setting output intervals'
+        print('Setting output intervals')
         newer_year, newer_month, ndays_new, date_code_new = update_calendar_file(new_year, new_month, options.couple_step, options, calfile)
 
         if options.use_cal_pkg and options.restart_type=='zero':
-            print 'Updating start date for calendar package'
+            print('Updating start date for calendar package')
             # Look for startDate_1 in "data.cal" namelist
             namelist_cal = mit_dir + 'data.cal'
             start_date_line = line_that_matters(namelist_cal, 'startDate_1')
             replace_line(namelist_cal, start_date_line, ' startDate_1='+date_code_new+'01,\n')            
 
-        print 'Updating namelists'
+        print('Updating namelists')
         # Calculate segment length in seconds
         segment_length = ndays_new*sec_per_day
         # Calculate simulation length (up to the end of the next segment) in seconds

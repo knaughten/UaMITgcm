@@ -82,7 +82,7 @@ def extract_melt_rates (options):
         make_tmp_copy(ua_out_file)
 
     # Write to Matlab file for Ua
-    print 'Writing ' + ua_out_file
+    print('Writing ' + ua_out_file)
     if options.melt_coupling == 'all' and len(ismr.shape)==3:
         # More than one time index
         num_time = ismr.shape[0]
@@ -121,7 +121,7 @@ def adjust_mit_geom (grid, options):
     draft[index] = 0
     
     if options.preserve_ocean_mask:
-        print 'Blocking out specified regions'
+        print('Blocking out specified regions')
         # Read the existing bathymetry seen by MITgcm
         bathy_old = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
         # Find regions which Ua say are open ocean, but MITgcm say are masked
@@ -129,7 +129,7 @@ def adjust_mit_geom (grid, options):
         bathy[index] = 0
         
     if options.preserve_static_ice:
-        print 'Reinstating static ice shelves in regions outside Ua domain'
+        print('Reinstating static ice shelves in regions outside Ua domain')
         # Read the existing ice shelf draft seen by MITgcm
         draft_old = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
         # Find regions which Ua say are open ocean, but MITgcm say are ice shelves
@@ -137,37 +137,37 @@ def adjust_mit_geom (grid, options):
         draft[index] = draft_old[index]
 
     if options.misomip_wall:
-        print 'Building walls in MISOMIP domain'
+        print('Building walls in MISOMIP domain')
         bathy[0,:] = 0
         draft[0,:] = 0
         bathy[-1,:] = 0
         draft[-1,:] = 0
 
     if options.filling:
-        print 'Filling in isolated ocean bottom cells'
+        print('Filling in isolated ocean bottom cells')
         do_filling(bathy, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr)
 
     if options.digging == 'none':
-        print 'Not doing digging as per user request'
+        print('Not doing digging as per user request')
     elif options.digging == 'bathy':
-        print 'Digging bathymetry which is too shallow'
+        print('Digging bathymetry which is too shallow')
         bathy = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='bathy')
     elif options.digging == 'draft':
-        print 'Digging ice shelf drafts which are too deep'
+        print('Digging ice shelf drafts which are too deep')
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft')
 
-    print 'Fixing ice shelf drafts which are too thin'
+    print('Fixing ice shelf drafts which are too thin')
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr, only_grow=True)[0]
 
     # Figure out largest changes in ice shelf draft, not counting grounding/ungrounding
     draft_old = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
     ddraft = np.ma.masked_where(draft==0, np.ma.masked_where(draft_old==0, draft-draft_old))
     if np.amin(ddraft) < 0:
-        print 'Greatest thinning of ice shelf draft is ' + str(np.abs(np.amin(ddraft))) + ' m'
+        print('Greatest thinning of ice shelf draft is ' + str(np.abs(np.amin(ddraft))) + ' m')
     if np.amax(ddraft) > 0:
-        print 'Greatest thickening of ice shelf draft is ' + str(np.amax(ddraft)) + ' m'
-    print str(np.count_nonzero((grid.ice_mask)*(bathy==0))) + ' cells grounded'
-    print str(np.count_nonzero((grid.land_mask)*(bathy!=0))) + ' cells ungrounded'
+        print('Greatest thickening of ice shelf draft is ' + str(np.amax(ddraft)) + ' m')
+    print(str(np.count_nonzero((grid.ice_mask)*(bathy==0))) + ' cells grounded')
+    print(str(np.count_nonzero((grid.land_mask)*(bathy!=0))) + ' cells ungrounded')
 
     # Make a copy of the original bathymetry and ice shelf draft
     make_tmp_copy(mit_dir+options.draftFile)
@@ -190,7 +190,7 @@ def adjust_mit_state (grid, options):
 
     # Read the final state from the last segment (dump or pickup)
     if options.restart_type == 'zero':
-        print 'Reading last dump files'
+        print('Reading last dump files')
 
         # Inner function to read the final dump of a given variable
         def read_last_dump (var_name):
@@ -211,7 +211,7 @@ def adjust_mit_state (grid, options):
             vice = read_last_dump('VICE')
 
     elif options.restart_type == 'pickup':
-        print 'Reading last pickup file'
+        print('Reading last pickup file')
 
         var_names = ['Theta', 'Salt', 'EtaN', 'EtaH', 'Uvel', 'Vvel', 'GuNm1', 'GvNm1', 'dEtaHdt']
         if options.eosType != 'LINEAR':
@@ -235,7 +235,7 @@ def adjust_mit_state (grid, options):
             fields_ptracers = read_mit_output('last', mit_dir, 'pickup_ptracers', var_names_ptracers, timestep=options.last_timestep, nz=grid.nz)
             tracer = fields_ptracers
 
-    print 'Selecting newly opened cells'
+    print('Selecting newly opened cells')
     # Read the new ice shelf draft, and also the bathymetry
     draft = read_binary(mit_dir+options.draftFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
     bathy = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
@@ -253,7 +253,7 @@ def adjust_mit_state (grid, options):
 
     # Inner function to extrapolate a t-grid field into its newly opened cells, and mask the closed cells with zeros. Can be 3D (default) or 2D (i.e. surface).
     def extrapolate_into_new (var_string, data, is_2d=False):
-        print 'Extrapolating ' + var_string + ' into newly opened cells'
+        print('Extrapolating ' + var_string + ' into newly opened cells')
         use_3d = not is_2d
         if use_3d:
             discard = grid.hfac==0
@@ -265,7 +265,7 @@ def adjust_mit_state (grid, options):
             mask = mask_new_2d
         data_filled = discard_and_fill(data, discard, fill, use_3d=use_3d, preference='vertical', missing_val=-9999)*mask
         if np.count_nonzero(data_filled==-9999) != 0:
-            print 'Error (extrapolate_into_new): something went wrong with the masking.'
+            print('Error (extrapolate_into_new): something went wrong with the masking.')
             sys.exit()
         return data_filled
 
@@ -305,7 +305,7 @@ def adjust_mit_state (grid, options):
         return vel
 
     if options.adjust_vel:
-        print 'Adjusting velocities to preserve barotropic transport'
+        print('Adjusting velocities to preserve barotropic transport')
         u = adjust_vel(u, grid.dy_w, grid.hfac_w, hFacW_new)
         v = adjust_vel(v, grid.dx_s, grid.hfac_s, hFacS_new)
 
@@ -366,7 +366,7 @@ def adjust_mit_state (grid, options):
         if options.use_ptracers:
             overwrite_pickup(mit_dir, 'pickup_ptracers', options.last_timestep, fields_ptracers, var_names_ptracers, grid.nz)
 
-    print 'Calculating pressure load anomaly'
+    print('Calculating pressure load anomaly')
     make_tmp_copy(mit_dir+options.pload_file)
     calc_load_anomaly(grid, mit_dir+options.pload_file, option=options.pload_option, ini_temp=temp, ini_salt=salt, constant_t=options.pload_temp, constant_s=options.pload_salt, eosType=options.eosType, rhoConst=options.rhoConst, tAlpha=options.tAlpha, sBeta=options.sBeta, Tref=options.Tref, Sref=options.Sref, hfac=hFacC_new, prec=options.readBinaryPrec)
 
@@ -409,7 +409,7 @@ def convert_mit_output (options):
     def convert_files (nc_name, dump=True, tstep=None):
         if dump:
             if tstep is None:
-                print 'Error (convert_files): must define tstep'
+                print('Error (convert_files): must define tstep')
                 sys.exit()
             iters = [tstep]
             prefixes = find_dump_prefixes(options.mit_run_dir, tstep)
@@ -438,7 +438,7 @@ def convert_mit_output (options):
         move_to_dir(fname, tmp_dir, options.mit_run_dir)
     # Make sure we can safely delete it
     if len(os.listdir(tmp_dir)) != 0:
-        print 'Error (convert_mit_output): '+tmp_dir+' is not empty'
+        print('Error (convert_mit_output): '+tmp_dir+' is not empty')
         sys.exit()
     os.rmdir(tmp_dir)
 
@@ -448,7 +448,7 @@ def gather_output (options):
 
     # Make a subdirectory named after the starting date of the simulation segment
     new_dir = options.output_dir + options.last_start_date + '/'
-    print 'Creating ' + new_dir
+    print('Creating ' + new_dir)
     os.mkdir(new_dir)
 
     # Make a subdirectory for MITgcm
@@ -458,8 +458,8 @@ def gather_output (options):
     # Inner function to check a file exists, and if so, move it to the new MITgcm output folder. This is just called for xmitgcm output files.
     def check_and_move (directory, fname):
         if not os.path.isfile(directory+fname):
-            print 'Error gathering output'
-            print directory+fname + ' does not exist'
+            print('Error gathering output')
+            print(directory+fname + ' does not exist')
             sys.exit()
         move_to_dir(fname, directory, new_mit_dir)
 
@@ -497,7 +497,7 @@ def gather_output (options):
             os.rename(source_dir+fname+'.tmp', target_dir+fname)
         elif check_tmp:
             # There should have been a temporary copy
-            print 'Error (copy_tmp_file): a temporary copy of ' + fname + ' does not exist'
+            print('Error (copy_tmp_file): a temporary copy of ' + fname + ' does not exist')
             sys.exit()
         else:
             # They were not modified, so copy them
@@ -526,7 +526,7 @@ def gather_output (options):
             if fname.endswith('RestartFile.mat'):
                 restart_name = fname
         if restart_name is None and (options.ua_ini_restart or not options.first_coupled):
-            print 'Error (gather_output): there is no Ua restart file.'
+            print('Error (gather_output): there is no Ua restart file.')
             sys.exit()
         if options.first_coupled:
             # There is no actual Ua output yet.
@@ -551,8 +551,8 @@ def gather_output (options):
             copy_tmp_file(options.ua_melt_file, options.output_dir, new_ua_dir, check_tmp=True)
             # Make sure the draft file exists
             if not os.path.isfile(new_ua_dir+options.ua_draft_file):
-                print 'Error gathering output'
-                print 'Ua did not create the draft file '+ua_draft_file
+                print('Error gathering output')
+                print('Ua did not create the draft file '+ua_draft_file)
                 sys.exit()                        
 
 
@@ -564,7 +564,7 @@ def move_repeated_output(options):
     while True:
         new_dir = options.output_dir + 'repeat_' + str(n).zfill(2) + '/'
         if not os.path.isdir(new_dir):
-            print 'Moving output to ' + new_dir
+            print('Moving output to ' + new_dir)
             os.mkdir(new_dir)
             break
         n += 1
@@ -635,7 +635,7 @@ def correct_next_obcs (grid, options):
         for fname in [options.obcs_file_w_u, options.obcs_file_e_u, options.obcs_file_s_v, options.obcs_file_n_v]:
             if fname is not None:
                 file_path = options.mit_run_dir + fname
-                print 'Making copy of ' + file_path + '.master'
+                print('Making copy of ' + file_path + '.master')
                 shutil.copy(file_path+'.master', file_path)
         multi_year = False
         year = None
@@ -643,7 +643,7 @@ def correct_next_obcs (grid, options):
         # Apply the correction
         balance_obcs(grid, option='correct', in_dir=options.mit_run_dir, obcs_file_w_u=options.obcs_file_w_u, obcs_file_e_u=options.obcs_file_e_u, obcs_file_s_v=options.obcs_file_s_v, obcs_file_n_v=options.obcs_file_n_v, d_eta=eta_avg, d_t=d_t, multi_year=multi_year, start_year=year, end_year=year)
     else:
-        print 'OBCS correction not triggered as SSH anomaly below threshold of ' + str(options.obcs_threshold) + ' m'
+        print('OBCS correction not triggered as SSH anomaly below threshold of ' + str(options.obcs_threshold) + ' m')
 
 
 # Copy the geometry files from a mirrored simulation.
@@ -664,9 +664,9 @@ def mirror_geometry (options):
 
     if source_dir is not None:
         if not os.path.isdir(source_dir):
-            print 'Error (mirror_geometry): ' + source_dir + ' does not exist'
+            print('Error (mirror_geometry): ' + source_dir + ' does not exist')
             sys.exit()
-        print 'Copying geometry files from ' + source_dir
+        print('Copying geometry files from ' + source_dir)
 
         # Copy the geometry files to the run directory
         for fname in [options.bathyFile, options.draftFile]:

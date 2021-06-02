@@ -18,14 +18,14 @@ namelist = options.mit_run_dir + 'data'
 
 # Update deltaT in config_options.py and mitgcm_run/run/data
 for file_name in ['config_options.py', namelist]:
-    print 'Updating deltaT in ' + file_name
+    print('Updating deltaT in ' + file_name)
     # Try with space
     old_line = line_that_matters(file_name, 'deltaT =', throw_error=False)
     if old_line is None:
         # Try without space
         old_line = line_that_matters(file_name, 'deltaT=', throw_error=False)
         if old_line is None:
-            print 'Error (change_ocean_timestep): Cannot find deltaT in ' + file_name
+            print('Error (change_ocean_timestep): Cannot find deltaT in ' + file_name)
             sys.exit()
     replace_line(file_name, old_line, old_line.replace(str(old_deltaT), str(new_deltaT)))
 
@@ -38,10 +38,10 @@ niter0_old = extract_first_int(niter0_line[i:])
 niter0_new = niter0_old*old_deltaT/float(new_deltaT)
 # Make sure it's a round number
 if int(niter0_new) != niter0_new:
-    print 'Error (change_ocean_timestep): This combination of timesteps does not work as niter0 is not evenly divided.'
+    print('Error (change_ocean_timestep): This combination of timesteps does not work as niter0 is not evenly divided.')
     sys.exit()
 niter0_new = int(niter0_new)
-print 'Updating niter0 in ' + namelist + ' from ' + str(niter0_old) + ' to ' + str(niter0_new)
+print('Updating niter0 in ' + namelist + ' from ' + str(niter0_old) + ' to ' + str(niter0_new))
 replace_line(namelist, niter0_line, ' niter0='+str(niter0_new)+',\n')
 
 # Get timestep number in pickup file (will be 1 simulation segment ahead of niter0)
@@ -52,10 +52,10 @@ for fname in os.listdir(options.mit_run_dir):
 # Scale it and check as before
 pickup_tstep_new = pickup_tstep_old*old_deltaT/float(new_deltaT)
 if int(pickup_tstep_new) != pickup_tstep_new:
-    print 'Error (change_ocean_timestep): This combination of timesteps does not work as the pickup timestep is not evenly divided.'
+    print('Error (change_ocean_timestep): This combination of timesteps does not work as the pickup timestep is not evenly divided.')
     sys.exit()
 pickup_tstep_new = int(pickup_tstep_new)
-print 'Renaming pickup files from timestep ' + str(pickup_tstep_old) + ' to ' + str(pickup_tstep_new)
+print('Renaming pickup files from timestep ' + str(pickup_tstep_old) + ' to ' + str(pickup_tstep_new))
 for fname in os.listdir(options.mit_run_dir):
     if str(pickup_tstep_old) in fname:
         fname_new = fname.replace(str(pickup_tstep_old).zfill(10), str(pickup_tstep_new).zfill(10))
