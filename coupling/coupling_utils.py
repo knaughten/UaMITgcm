@@ -323,7 +323,7 @@ def list_with_separator (A, sep):
 def submit_job (options, pbs_script, input_var=None, afterok=None):
 
     # Construct qsub call line by line.
-    command = 'qsub'
+    command = 'sbatch'
     # Specify budget
     command += ' -A ' + options.budget_code
     # Specify job name
@@ -334,17 +334,17 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
         jobname += 'i'
     elif 'coupler' in pbs_script:
         jobname += 'c'
-    command += ' -N ' + jobname
+    command += ' -J ' + jobname
     if input_var is not None:
         # Add variable definitions
-        command += ' -v '
+        command += ' --export '
         command += list_with_separator(input_var,',')
     if afterok is not None:
         command += ' -W depend=afterok:'
         command += list_with_separator(afterok,':')
     # Specify script
     command += ' ' + pbs_script
-
+    
     # Call the command and capture the output
     pbs_id = subprocess.check_output(command, shell=True)
     # Now extract the digits from the PBS job ID and return as a string
