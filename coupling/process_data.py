@@ -411,7 +411,7 @@ def convert_mit_output (options):
             if tstep is None:
                 print('Error (convert_files): must define tstep')
                 sys.exit()
-            iters = [tstep]
+            iters = [int(tstep)]
             prefixes = find_dump_prefixes(options.mit_run_dir, tstep)
         else:
             iters = 'all'
