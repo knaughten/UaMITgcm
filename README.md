@@ -14,4 +14,4 @@ Also note that `git pull` will not pull any changes to submodules. If you need t
 You will require the python packages numpy and scipy. These are pre-installed on most systems. On the NERC-UK supercomputer ARCHER2, `module load cray-python` will give you access to them.
 
 If you are using xmitgcm to convert your MITgcm output from binary to NetCDF, you will also need the python package xarray. This is not pre-installed on ARCHER2 but you can do a local install with `pip install --user xarray`.
-Make sure to specify the correct installation paths, as explained [here](https://docs.archer2.ac.uk/user-guide/python/). Install xmitgcm and MITgcmutils using `pip install ---user xmitgcm` and `pip install --user MITgcmutils`.
+Make sure to specify the correct installation paths, as explained [here](https://docs.archer2.ac.uk/user-guide/python/). Install xmitgcm and MITgcmutils using `pip install --user xmitgcm` and `pip install --user MITgcmutils`.
