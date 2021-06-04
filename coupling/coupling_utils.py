@@ -337,7 +337,7 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
     command += ' -J ' + jobname
     if input_var is not None:
         # Add variable definitions
-        command += ' --export '
+        command += ' --export=ALL,'
         command += list_with_separator(input_var,',')
     if afterok is not None:
         command += ' -W depend=afterok:'

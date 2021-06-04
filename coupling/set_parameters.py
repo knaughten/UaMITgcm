@@ -266,8 +266,8 @@ class Options:
     # Class function to save calendar info from the previous simulation segment: the starting date (useful for NetCDF conversion) and the initial/final timestep numbers in the simulation (useful for reading output).
     def save_last_calendar (self, start_date, ndays_old, ndays_new):
         self.last_start_date = start_date
-        self.first_timestep = ndays_old*sec_per_day/self.deltaT
-        self.last_timestep = ndays_new*sec_per_day/self.deltaT
+        self.first_timestep = int(ndays_old*sec_per_day/self.deltaT)
+        self.last_timestep = int(ndays_new*sec_per_day/self.deltaT)
 
         
     # Class function to set the simulation type (initial, restart, spinup, first_coupled, finished, and/or init_repeat).
