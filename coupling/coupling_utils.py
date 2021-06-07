@@ -289,7 +289,7 @@ def overwrite_pickup (directory, file_head, timestep, fields, var_names, nz):
         sys.exit()
 
     # Now overwrite the file
-    file_path = directory + file_head + '.' + str(timestep).zfill(10) + '.data'
+    file_path = directory + file_head + '.' + str(int(timestep)).zfill(10) + '.data'
     if not os.path.isfile(file_path):
         print('Error (overwrite_pickup): incorrect pickup file path.')
         sys.exit()
@@ -337,7 +337,7 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
     command += ' -J ' + jobname
     if input_var is not None:
         # Add variable definitions
-        command += ' --export '
+        command += ' --export=ALL,'
         command += list_with_separator(input_var,',')
     if afterok is not None:
         command += ' -W depend=afterok:'
@@ -346,8 +346,8 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
     command += ' ' + pbs_script
     
     # Call the command and capture the output
-    pbs_id = subprocess.check_output(command, shell=True)
-    # Now extract the digits from the PBS job ID and return as a string
+    pbs_id = subprocess.check_output(command, shell=True, text=True)
+    # Now extract the digits from the SBATCH job ID and return as a string
     try:
         return str(extract_first_int(pbs_id))
     except(ValueError):
