@@ -1,8 +1,0 @@
-# Age Tracer set-up: No initial file means Age Tracer
-# is automatically initialized uniformely to zero. 
- &PTRACERS_PARM01
- PTRACERS_numInUse=1,
- PTRACERS_diffKr=1.E-5,
- PTRACERS_names(1)='age_trc',
- PTRACERS_units(1)='y',
- &
