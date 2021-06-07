@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/MITgcm_67g" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/MITgcm_67k" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/MITgcm_67s" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/UaSource_22Nov2018" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/UaSource_beta_25Mar2020" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/xmitgcm" vcs="Git" />
+  </component>
+</project>

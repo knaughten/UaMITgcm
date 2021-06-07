@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# To be used with the suite of GCC compilers (PrgEnv-gnu).
+
+CC='cc'
+FC='ftn'
+F90C='ftn'
+
+DEFINES='-DWORDLENGTH=4 -D_BYTESWAPIO -DHAVE_LAPACK -DNML_TERMINATOR'
+CPP='cpp -traditional -P'
+EXTENDED_SRC_FLAG='-Mextend'
+GET_FC_VERSION="--version"
+CHECK_FOR_LAPACK=t
+FC_CHECK=f
+
+INCLUDES='-I/opt/cray/pe/netcdf-hdf5parallel/4.7.4.0/gnu/9.1/include -I/opt/cray/pe/mpich/8.0.15/ofi/gnu/9.1/include'
+LIBS='-L/opt/cray/pe/netcdf-hdf5parallel/4.7.4.0/gnu/9.1/lib -L/opt/cray/pe/mpich/8.0.15/ofi/gnu/9.1/lib'
+
+NOOPTFLAGS='-O0'
+NOOPTFILES=''
+
+FFLAGS='-fallow-argument-mismatch'
+
+if test "x$IEEE" = x ; then   #- with optimisation:
+    FOPTIM='-O3 -funroll-loops'
+else
+    if test "x$DEVEL" = x ; then  #- no optimisation + IEEE :
+      FOPTIM='-O0'
+    else                          #- development/check options:
+      FOPTIM='-O0 -g'
+    fi
+fi
