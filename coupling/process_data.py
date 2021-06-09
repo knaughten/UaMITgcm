@@ -86,7 +86,7 @@ def extract_melt_rates (options):
     if options.melt_coupling == 'all' and len(ismr.shape)==3:
         # More than one time index
         num_time = ismr.shape[0]
-        ismr_ravel = np.empty([num_time, ismr.size/num_time])
+        ismr_ravel = np.empty([num_time, ismr.size//num_time])
         for t in range(num_time):
             ismr_ravel[t,:] = ismr[t,:].ravel()
     else:
