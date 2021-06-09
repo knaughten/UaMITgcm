@@ -14,3 +14,6 @@
 [submodule "MITgcm_67s"]
 	path = MITgcm_67s
 	url = git@github.com:MITgcm/MITgcm.git
+[submodule "tools/mitgcm_python"]
+	path = tools/mitgcm_python
+	url = git@github.com:knaughten/mitgcm_python.git
