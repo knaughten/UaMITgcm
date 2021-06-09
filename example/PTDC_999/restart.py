@@ -2,8 +2,8 @@
 
 import sys
 sys.path.insert(0,'./')
-sys.path.append('../../UaMITgcm_git/coupling')
-sys.path.append('../../UaMITgcm_git/tools')
+sys.path.append('../../UaMITgcm_archer2/coupling')
+sys.path.append('../../UaMITgcm_archer2/tools')
 import os
 import shutil
 
@@ -14,16 +14,16 @@ from clean import clean_ua
 if __name__ == "__main__":
 
     # Make sure the user didn't call this accidentally
-    out = raw_input('This will delete all existing results following the restart point, unless they are backed up. Are you sure you want to proceed (yes/no)? ').strip()
+    out = input('This will delete all existing results following the restart point, unless they are backed up. Are you sure you want to proceed (yes/no)? ').strip()
     while True:
         if out == 'yes':
             break
         if out == 'no':
             sys.exit()
-        out = raw_input('Please answer yes or no. ').strip()
+        out = input('Please answer yes or no. ').strip()
 
     # Get date code to restart from
-    date_code = raw_input('Enter the date code to restart at (eg 199201): ').strip()
+    date_code = input('Enter the date code to restart at (eg 199201): ').strip()
     # Make sure it's a date
     valid_date = len(date_code)==6
     try:
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     except(ValueError):
         valid_date = False
     if not valid_date:
-        print 'Error: invalid date code ' + date_code
+        print('Error: invalid date code ' + date_code)
         sys.exit()
 
     # Read simulation options so we have directories
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # Make sure this date code exists in the output directory
     output_date_dir = options.output_dir + date_code + '/'
     if not os.path.isdir(output_date_dir):
-        print 'Error: ' + output_date_dir + ' does not exist'
+        print('Error: ' + output_date_dir + ' does not exist')
         sys.exit()
 
     # Copy the calendar file
@@ -122,12 +122,10 @@ if __name__ == "__main__":
         os.remove(finifile)
 
     # Submit the next jobs
-    print 'Submitting next MITgcm segment'
+    print('Submitting next MITgcm segment')
     mit_id = submit_job(options, 'run_mitgcm.sh', input_var=['MIT_DIR='+options.mit_case_dir])
     afterok = [mit_id]
     if not spinup:
-        print 'Submitting next Ua segment'
+        print('Submitting next Ua segment')
         ua_id = submit_job(options, 'run_ua.sh', input_var=['UA_DIR='+options.ua_exe_dir])
         afterok.append(ua_id)
-    print 'Submitting next coupler job to start after segment is finished'
-    submit_job(options, 'run_coupler.sh', afterok=afterok)

@@ -2,6 +2,7 @@
 *.pyc
 *.sh.o*
 *.png
+*.bak
 example/MISOMIP_999/Ua
 example/MISOMIP_999/coupler_stdout
 example/MISOMIP_999/jobs.log

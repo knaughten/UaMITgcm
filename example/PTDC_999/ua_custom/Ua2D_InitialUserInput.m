@@ -12,7 +12,7 @@ CtrlVar.Restart=1;
 CtrlVar.dt = 1e-3;
 CtrlVar.RestartTime=0; 
 CtrlVar.ResetTime=1;
-CtrlVar.ResetTimeStep=0;    % perhaps this has to be reconsidered if model has issues converging
+CtrlVar.ResetTimeStep=1;    % perhaps this has to be reconsidered if model has issues converging
 
 % Parallel options
 %myCluster = parcluster('local') ;  
@@ -25,7 +25,7 @@ CtrlVar.Parallel.uvhAssembly.spmd.nWorkers=[];
 
 % Grid options
 CtrlVar.TriNodes=3;
-CtrlVar.kH=1;
+CtrlVar.kH=100;
 CtrlVar.nip=6;
 CtrlVar.niph=6;
 CtrlVar.AdaptMesh=1;
@@ -34,13 +34,14 @@ CtrlVar.AdaptMesh=1;
 CtrlVar.ATStimeStepTarget = UserVar.UaMITgcm.ATStimeStepTarget; 
 CtrlVar.dtmin = 1e-10;
 CtrlVar.ATStimeStepFactorUp=2 ;
-CtrlVar.ATStimeStepFactorDown=1e2 ;
-CtrlVar.ATSTargetIterations=3;
+CtrlVar.ATStimeStepFactorDown=5 ;
+CtrlVar.ATSTargetIterations=2;
 
 CtrlVar.InitialDiagnosticStep=1;
-CtrlVar.InitialDiagnosticStepAfterRemeshing=0;
+CtrlVar.TestUserInputs=0;
+CtrlVar.InitialDiagnosticStepAfterRemeshing=1;
 CtrlVar.Implicituvh=1;
-CtrlVar.TG3=0 ; CtrlVar.Gamma=1;
+CtrlVar.TG3=0 ; %CtrlVar.Gamma=1;
 CtrlVar.uvhTimeSteppingMethod='supg';
 
 %CtrlVar.MITgcmDataDirectory=['/data/dataphy/janryd69/Ua_MITgcm/',Experiment,'/MIT_data'];
@@ -57,9 +58,13 @@ CtrlVar.WriteRestartFileInterval=50;
 CtrlVar.NameOfRestartFiletoWrite=[UserVar.UaMITgcm.Experiment,'-RestartFile.mat'];
 CtrlVar.NameOfRestartFiletoRead=CtrlVar.NameOfRestartFiletoWrite;
 
+CtrlVar.SlidingLaw = UserVar.SlidingLaw;
 CtrlVar.NameOfFileForReadingSlipperinessEstimate=UserVar.NameOfFileForReadingSlipperinessEstimate;
-CtrlVar.NameOfFileForReadingAGlenEstimate=UserVar.NameOfFileForReadingAGlenEstimate;
 CtrlVar.NameOfFileForSavingSlipperinessEstimate='';
+CtrlVar.Cmin=1e-100;  
+CtrlVar.Cmax=1e100;
+
+CtrlVar.NameOfFileForReadingAGlenEstimate=UserVar.NameOfFileForReadingAGlenEstimate;
 CtrlVar.NameOfFileForSavingAGlenEstimate='';
 
 CtrlVar.GeometricalVarsDefinedEachTransienRunStepByDefineGeometry='SB';
@@ -72,11 +77,11 @@ CtrlVar.PlotMesh=0;  CtrlVar.PlotBCs=0;
 CtrlVar.MeltNodesDefinition='edge-wise';
 CtrlVar.MassBalanceGeometryFeedback = 0;
 CtrlVar.MeltRateFactor=1;
-CtrlVar.MeltReductionTime=Inf;
+%CtrlVar.MeltReductionTime=Inf;
 
-CtrlVar.MeshSizeMax=10e3;
-CtrlVar.MeshSize=CtrlVar.MeshSizeMax/5;
-CtrlVar.MeshSizeMin=CtrlVar.MeshSizeMax/25;
+CtrlVar.MeshSizeMax=20e3;
+CtrlVar.MeshSize=20e3;
+CtrlVar.MeshSizeMin=CtrlVar.MeshSize/40;
 %CtrlVar.MeshSizeFastFlow=CtrlVar.MeshSizeMax/10;
 %CtrlVar.MeshSizeIceShelves=CtrlVar.MeshSizeMax/10;
 CtrlVar.MeshSizeBoundary=CtrlVar.MeshSize;
@@ -91,13 +96,13 @@ CtrlVar.MeshSizeBoundary=CtrlVar.MeshSize;
 %     CtrlVar.GmshGeoFileAdditionalInputLines{8}='Field[10] = Min;';
 %     CtrlVar.GmshGeoFileAdditionalInputLines{9}='Field[10].FieldsList = {7};';
 %     CtrlVar.GmshGeoFileAdditionalInputLines{10}='Background Field = 10;';
-%
 
 %CtrlVar.ReadInitialMeshFileName='MeshFileAdapt_68410Ele_34746Nod.mat';
 %CtrlVar.ReadInitialMeshFileName='MeshFileAdapt_138451Ele_69814Nod.mat';
 %CtrlVar.ReadInitialMeshFileName='MeshFileAdapt_149786Ele_75526Nod.mat';
-CtrlVar.ReadInitialMeshFileName='';
-CtrlVar.SaveInitialMeshFileName='MeshFile.mat';
+CtrlVar.ReadInitialMesh=0;
+%CtrlVar.ReadInitialMeshFileName='MeshFileAdapt_Ele135446_Nod3.mat';
+%CtrlVar.SaveInitialMeshFileName='MeshFile.mat';
 
 CtrlVar.OnlyMeshDomainAndThenStop=0; % if true then only meshing is done and no further calculations. Usefull for checking if mesh is reasonable
 CtrlVar.MaxNumberOfElements=150e4;
@@ -118,41 +123,43 @@ CtrlVar.MeshRefinementMethod='explicit:local:newest vertex bisection';
                                                    % 'explicit:local'
                                                    % 'implicit:global'  (broken at the moment, do not use)
                                                    % 'implicit:local'   (broken at the moment, do not use)
-I=1;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Name='effective strain rates';
-CtrlVar.ExplicitMeshRefinementCriteria(I).Scale=1e-3;
-CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).p=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
-
-I=I+1;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Name='thickness gradient';
-CtrlVar.ExplicitMeshRefinementCriteria(I).Scale=1e-2;
-CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).p=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
-
-I=I+1;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Name='effective strain rates gradient';
-CtrlVar.ExplicitMeshRefinementCriteria(I).Scale=5e-7;
-CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
-CtrlVar.ExplicitMeshRefinementCriteria(I).p=[0.7];
-CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
-CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
-                                                   
-CtrlVar.MeshAdapt.GLrange=[20000 CtrlVar.MeshSizeMax; 5000  CtrlVar.MeshSize; 2000 CtrlVar.MeshSizeMin];
+% I=1;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Name='effective strain rates';
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Scale=1e-3;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).p=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
+% 
+% I=I+1;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Name='thickness gradient';
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Scale=1e-2;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).p=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
+% 
+% I=I+1;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Name='effective strain rates gradient';
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Scale=5e-7;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).EleMin=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).EleMax=[];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).p=[0.7];
+% CtrlVar.ExplicitMeshRefinementCriteria(I).InfoLevel=1000;
+% CtrlVar.ExplicitMeshRefinementCriteria(I).Use=false;
+         
+CtrlVar.MeshSizeMin = 400;
+CtrlVar.MeshAdapt.GLrange=[2000 750 ; 1000 400];
+%CtrlVar.MeshAdapt.GLrange=[2500 CtrlVar.MeshSizeMin];
 
 CtrlVar.RefineMeshOnStart=0;
 CtrlVar.InfoLevelAdaptiveMeshing=1;                                            
 CtrlVar.AdaptMeshInitial=1  ; % remesh in first iteration (Itime=1)  even if mod(Itime,CtrlVar.AdaptMeshInterval)~=0.
 CtrlVar.AdaptMeshAndThenStop=0;    % if true, then mesh will be adapted but no further calculations performed
                                    % useful, for example, when trying out different remeshing options (then use CtrlVar.doAdaptMeshPlots=1 to get plots)
-CtrlVar.AdaptMeshMaxIterations=1;
+CtrlVar.AdaptMeshMaxIterations=5;
 CtrlVar.AdaptMeshUntilChangeInNumberOfElementsLessThan = 20;
 CtrlVar.SaveAdaptMeshFileName='MeshFileAdapt';    %  file name for saving adapt mesh. If left empty, no file is written
 CtrlVar.AdaptMeshRunStepInterval=50 ; % remesh whenever mod(Itime,CtrlVar.AdaptMeshInterval)==0

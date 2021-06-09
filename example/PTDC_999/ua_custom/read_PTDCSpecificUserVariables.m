@@ -1,6 +1,7 @@
 function UserVar=read_PTDCSpecificUserVariables(UserVar)
 
-InputDataDirectory='/home/n02/n02/janryd69/work/UaMITgcm/Ua_InputData';
+InputDataDirectory='/work/n02/n02/janryd69/UaMITgcm/Ua_InputData';
+%InputDataDirectory='/media/janryd69/mainJDeRydt/UaMITgcm_v2/Ua_InputData';
 
 RunTable=readtable([InputDataDirectory,'/RunTable.csv']);
 
@@ -35,8 +36,16 @@ switch RunTable{I(1),'GeometryInterpolants'}{:}
         UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine.mat'];
         UserVar.FirnInterpolants = 'Bedmachine';
     case 'Bedmachine_Bamber2009_modifiedThwaites'
-	UserVar.Geometry = 'Bedmachine_Bamber2009_modifiedThwaites';
+        UserVar.Geometry = 'Bedmachine_Bamber2009_modifiedThwaites';
         UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine_Bamber2009_modifiedThwaites'];
+        UserVar.FirnInterpolants = [InputDataDirectory,'/GriddedInterpolants_Firn_RACMO.mat'];
+    case 'Bedmachine20190905_Bamber2009'
+	UserVar.Geometry = 'Bedmachine_Bamber2009';
+        UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine2019-09-05_Bamber2009.mat'];
+        UserVar.FirnInterpolants = [InputDataDirectory,'/GriddedInterpolants_Firn_RACMO.mat'];
+    case 'Bedmachine20200715_Bamber2009'
+        UserVar.Geometry = 'Bedmachine_Bamber2009';
+        UserVar.GeometryInterpolants = [InputDataDirectory,'/GriddedInterpolants_sBh_Bedmachine2020-07-15_Bamber2009.mat'];
         UserVar.FirnInterpolants = [InputDataDirectory,'/GriddedInterpolants_Firn_RACMO.mat'];
     otherwise
         error('Geometry unknown');    
@@ -48,3 +57,5 @@ UserVar.NameOfFileForReadingSlipperinessEstimate=[InputDataDirectory,'/',Experim
 UserVar.NameOfFileForReadingAGlenEstimate=[InputDataDirectory,'/',Experiment_fullname,'_AGlen-Estimate.mat'];
 
 UserVar.RACMO_SMB=[InputDataDirectory,'/SMB_RACMO_1979_2013.mat'];
+
+UserVar.SlidingLaw = RunTable{I(1),'SlidingLaw'}{:};

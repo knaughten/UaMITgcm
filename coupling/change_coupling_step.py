@@ -17,10 +17,10 @@ options = Options()
 
 # Error checking
 if old_couple_step != options.couple_step:
-    print 'Error (change_coupling_step): an original coupling step of ' + str(old_couple_step) + ' does not match the value in config_options.py, of ' + str(options.couple_step) + '.'
+    print('Error (change_coupling_step): an original coupling step of ' + str(old_couple_step) + ' does not match the value in config_options.py, of ' + str(options.couple_step) + '.')
     sys.exit()
 if not os.path.isfile(options.output_dir + options.finished_file):
-    print 'Warning (change_coupling_step): Looks like the last simulation did not finish properly. If this is deliberate, make sure everything works when you restart!!'
+    print('Warning (change_coupling_step): Looks like the last simulation did not finish properly. If this is deliberate, make sure everything works when you restart!!')
 
 # Read the date code from the calendar file
 calfile = options.output_dir + options.calendar_file

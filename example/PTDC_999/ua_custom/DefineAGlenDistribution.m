@@ -8,7 +8,7 @@ else
     if isempty(FAGlen)
         load(CtrlVar.NameOfFileForReadingAGlenEstimate,'xA','yA','AGlen');
         FAGlen = scatteredInterpolant(xA,yA,AGlen,'linear');
-        fprintf('\n Read rate factor from file \n');
+        fprintf(['\n Read rate factor from file ',CtrlVar.NameOfFileForReadingAGlenEstimate,' \n']);
     end
     
     load(CtrlVar.NameOfFileForReadingAGlenEstimate,'n');

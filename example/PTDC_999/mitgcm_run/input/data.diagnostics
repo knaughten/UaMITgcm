@@ -14,15 +14,15 @@
 #
 #
 # 30 days (but will update each month since calendar dumps are on)
- frequency(1) = 2592000.,
+ frequency(1) = 2592000,
  filename(1)  = 'MITout_2D',
  fields(1,1)  = 'SHIfwFlx','SHIuLoc ','SHIvLoc ','SHIForcT','SHIForcS','SHIgammT','SHIgammS','ETAN    ','SHIuStar',
 
 # 30 days
- frequency(2) = 2592000.,
+ frequency(2) = 2592000,
  filename(2)  = 'MITout_3D',
  fields(1,2)  = 'UVEL ','VVEL ','THETA','SALT ',
-&
+ &
 
 
 
@@ -41,7 +41,7 @@
 #- an example just to check the agreement with MONITOR output:
 #stat_fields(1,1)= 'ETAN    ','UVEL    ','VVEL    ','WVEL    ', 'THETA   ',
 #   stat_fname(1)= 'dynStDiag',
-#    stat_freq(1)= -864000.,
-#   stat_phase(1)= 0.,
+#    stat_freq(1)= -864000,
+#   stat_phase(1)= 0,
  &
 

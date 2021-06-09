@@ -70,7 +70,7 @@ ab=DTbmelt(x,y);
 I = [find(GF.NodesCrossingGroundingLines(:)); find(GF.NodesUpstreamOfGroundingLines(:))];
 ab(I)=0;
 
-[~,LakeNodes]=LakeOrOcean(CtrlVar,GF,MUA.Boundary,MUA.connectivity,MUA.coordinates);
+[~,LakeNodes,~,~,~,~] = LakeOrOcean(CtrlVar,MUA,GF);
 ab(LakeNodes)=0;
 
 h=s-b;

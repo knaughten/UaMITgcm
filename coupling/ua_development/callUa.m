@@ -120,6 +120,6 @@ end
 %%%%%%%%%%%%
 %% run Ua %%
 %%%%%%%%%%%%
-setenv('UaHomeDirectory','./');
-UaHomeDirectory=getenv('UaHomeDirectory'); addpath(genpath(UaHomeDirectory));
-Ua2D(UserVar,varargin{:});
+%setenv('UaHomeDirectory','./');
+%UaHomeDirectory=getenv('UaHomeDirectory'); addpath(genpath(UaHomeDirectory));
+Ua2D(UserVar);

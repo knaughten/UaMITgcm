@@ -32,7 +32,7 @@ new_uaexe_dir = old_uaexe_dir.replace(old_name, new_name)
 
 # Make sure the old simulation is finished
 if not os.path.isfile(old_output_dir + options.finished_file):
-    print 'Error (branch.py): experiment ' + old_name + ' is not finished. Branching will not work properly.'
+    print('Error (branch.py): experiment ' + old_name + ' is not finished. Branching will not work properly.')
     sys.exit()
 
 # Copy the case as usual, but ignore the Ua restart file

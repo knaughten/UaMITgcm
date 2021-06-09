@@ -59,7 +59,7 @@ def line_that_matters (file_name, substr, ignore_case=True, throw_error=True):
     
     # Make sure we found it
     if line_to_save is None and throw_error:
-        print 'Error (line_that_matters): ' + file_name + ' does not contain ' + substr
+        print('Error (line_that_matters): ' + file_name + ' does not contain ' + substr)
         sys.exit()
         
     return line_to_save
@@ -100,7 +100,7 @@ def find_comment_line (file_name, substring):
         comment_line(file_name, line)
         line_2 = line_that_matters(file_name, substring, throw_error=False)
         if line_2 is not None:
-            print 'Error (find_comment_line): ' + substring + ' is set multiple times in ' + file_name + '. Choose one so we can comment it out without confusion.'
+            print('Error (find_comment_line): ' + substring + ' is set multiple times in ' + file_name + '. Choose one so we can comment it out without confusion.')
             sys.exit()
     
 
@@ -198,16 +198,16 @@ def read_mit_output (time_option, directory, file_head, var_names, timestep=None
             data = np.mean(data, axis=0)
     if len(data)==0:
         # Nothing was read, no such files exist
-        print 'Error (read_mit_output): no such files ' + directory+file_head+'.*.data exist.'
+        print('Error (read_mit_output): no such files ' + directory+file_head+'.*.data exist.')
         if var_names is None:
             # This looks like a case of missing dump files
-            print 'Make sure that dumpInitAndLast=.true. in input/data.'
+            print('Make sure that dumpInitAndLast=.true. in input/data.')
         sys.exit()
     if time_option == 'last':
-        print 'Read ' + file_head + ' data from MITgcm timestep ' + str(its[0])
+        print('Read ' + file_head + ' data from MITgcm timestep ' + str(its[0]))
         # Make sure it agrees with any expected timestep number
         if timestep is not None and its[0] != timestep:
-            print 'Error: most recent ' + file_head + ' file is not from the expected timestep ' + str(timestep)
+            print('Error: most recent ' + file_head + ' file is not from the expected timestep ' + str(timestep))
             sys.exit()
         
     if var_names is None:
@@ -219,7 +219,7 @@ def read_mit_output (time_option, directory, file_head, var_names, timestep=None
         # Instead this is collapsed into the depth dimension.
         # Unpick the resulting large 3D array into the different variables.
         if nz is None:
-            print 'Error (read_mit_output): must define nz for pickup files'
+            print('Error (read_mit_output): must define nz for pickup files')
             sys.exit()
         data_unpick = []
         for var in meta['fldlist']:
@@ -232,7 +232,7 @@ def read_mit_output (time_option, directory, file_head, var_names, timestep=None
                 data_unpick.append(data[0,:])
                 data = data[1:,:]
             else:
-                print 'Error (read_mit_output): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.'
+                print('Error (read_mit_output): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.')
                 sys.exit()
         data = data_unpick            
 
@@ -262,7 +262,7 @@ def overwrite_pickup (directory, file_head, timestep, fields, var_names, nz):
     data, its, meta = rdmds(directory+file_head, itrs=[timestep], returnmeta=True)
     if len(data)==0:
         # Nothing was read; no such files exist
-        print 'Error (overwrite_pickup): file not found.'
+        print('Error (overwrite_pickup): file not found.')
         sys.exit()
 
     # Loop over the variables in order and overwrite them along the depth dimension.
@@ -272,7 +272,7 @@ def overwrite_pickup (directory, file_head, timestep, fields, var_names, nz):
         try:
             i = var_names.index(var)
         except(ValueError):
-            print 'Error (overwrite_pickup): variable ' + var + ' is not in input var_names'
+            print('Error (overwrite_pickup): variable ' + var + ' is not in input var_names')
             sys.exit()
         if var in pickup_vars_3d:
             # Overwrite nz depth records
@@ -282,16 +282,16 @@ def overwrite_pickup (directory, file_head, timestep, fields, var_names, nz):
             data[posn,:] = fields[i]
             posn += 1
         else:
-            print 'Error (overwrite_pickup): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.'
+            print('Error (overwrite_pickup): ' + var + ' is not in list of standard pickup variables. Add it to pickup_vars_3d or pickup_vars_2d array.')
             sys.exit()
     if posn != data.shape[0]:
-        print "Error (overwrite_pickup): didn't overwrite the entire pickup; something is wrong."
+        print("Error (overwrite_pickup): didn't overwrite the entire pickup; something is wrong.")
         sys.exit()
 
     # Now overwrite the file
-    file_path = directory + file_head + '.' + str(timestep).zfill(10) + '.data'
+    file_path = directory + file_head + '.' + str(int(timestep)).zfill(10) + '.data'
     if not os.path.isfile(file_path):
-        print 'Error (overwrite_pickup): incorrect pickup file path.'
+        print('Error (overwrite_pickup): incorrect pickup file path.')
         sys.exit()
     prec = int(meta['dataprec'][0][-2:])
     write_binary(data, file_path, prec=prec)
@@ -323,7 +323,7 @@ def list_with_separator (A, sep):
 def submit_job (options, pbs_script, input_var=None, afterok=None):
 
     # Construct qsub call line by line.
-    command = 'qsub'
+    command = 'sbatch'
     # Specify budget
     command += ' -A ' + options.budget_code
     # Specify job name
@@ -334,26 +334,26 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
         jobname += 'i'
     elif 'coupler' in pbs_script:
         jobname += 'c'
-    command += ' -N ' + jobname
+    command += ' -J ' + jobname
     if input_var is not None:
         # Add variable definitions
-        command += ' -v '
+        command += ' --export=ALL,'
         command += list_with_separator(input_var,',')
     if afterok is not None:
         command += ' -W depend=afterok:'
         command += list_with_separator(afterok,':')
     # Specify script
     command += ' ' + pbs_script
-
+    
     # Call the command and capture the output
-    pbs_id = subprocess.check_output(command, shell=True)
-    # Now extract the digits from the PBS job ID and return as a string
+    pbs_id = subprocess.check_output(command, shell=True, text=True)
+    # Now extract the digits from the SBATCH job ID and return as a string
     try:
         return str(extract_first_int(pbs_id))
     except(ValueError):
-        print 'Error (submit_job): job did not submit properly'
-        print 'Error message from qsub was:'
-        print pbs_id
+        print('Error (submit_job): job did not submit properly')
+        print('Error message from qsub was:')
+        print(pbs_id)
         sys.exit()
 
         
@@ -422,12 +422,12 @@ def reset_finished_files (options):
 
 # Function to copy the Ua restart file when a simulation is being duplicated or cleaned.
 def copy_ua_restart (directory, restart_name):
-    orig_restart = raw_input('Enter path to desired Ua restart file, or press enter if you want Ua to start from scratch: ')
+    orig_restart = input('Enter path to desired Ua restart file, or press enter if you want Ua to start from scratch: ')
     if len(orig_restart) > 0:
         while True:
             if os.path.isfile(orig_restart):
                 break
-            orig_restart = raw_input('That file does not exist. Try again: ')
+            orig_restart = input('That file does not exist. Try again: ')
         shutil.copy(orig_restart, directory+restart_name)
                 
                 

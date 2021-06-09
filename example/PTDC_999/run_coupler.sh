@@ -1,18 +1,27 @@
-#!/bin/bash --login
-#PBS -l select=serial=true:ncpus=1
-#PBS -l walltime=00:30:00
-#PBS -j oe
-#PBS -m n
-#PBS -r n
+#!/bin/sh
+#SBATCH --time=00:20:00
+#SBATCH --exclusive
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=standard
+#SBATCH --qos=short
+#SBATCH --reservation=shortqos
+
 ###############################################################
 # Run coupling script to exchange data between MITgcm and Ua.
+# Must pass the arguments
+# --export=ALL -A <Archer budget>
 ###############################################################
+
+module load epcc-job-env
+module load cray-python
 
 # USER VARIABLES
 # Path to UaMITgcm repository
-REPO_DIR=$WORK/UaMITgcm/UaMITgcm_git
+REPO_DIR=$WORK/UaMITgcm/UaMITgcm_archer2
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
-MIT_SOURCE=$REPO_DIR/MITgcm_67g
+MIT_SOURCE=$REPO_DIR/MITgcm_67k
 
 cd $PBS_O_WORKDIR
 echo 'Coupler starts '`date` >> jobs.log

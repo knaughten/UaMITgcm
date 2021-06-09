@@ -2,11 +2,10 @@
 # User-defined options for the configuration.
 #################################################
 
-
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'PTDC_999'
+expt_name = 'PTDC_ARCHER2_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
@@ -117,6 +116,13 @@ ua_ini_restart = True
 use_seaice = False
 ### Does your configuration of MITgcm use the calendar package?
 use_cal_pkg = True
+
+### Does your configuration have a different value for deltaTmom
+### (not equal to deltaT) just for the first ocean segment?
+### If so, set this variable to true, and make sure that input/data has
+### deltaTmom set for the first segment. The code will comment it out
+### in later segments so deltaTmom=deltaT implicitly.
+use_ini_deltaTmom = False
 
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000

@@ -23,28 +23,28 @@
  diffKzS=1.e-15,
  bottomDragQuadratic=2.5E-3,
  eosType='MDJWF', 
- HeatCapacity_cp = 3974.0,
- rhoConst=1024.,
- rhoNil=1024.,
+ HeatCapacity_cp=3974.0,
+ rhoConst=1024,
+ rhoNil=1024,
  gravity=9.81,
 # convertFW2Salt = 33.4,
- convertFW2Salt = -1,
- useRealFreshWaterFlux = .true.,
+ convertFW2Salt=-1,
+ useRealFreshWaterFlux=.true.,
  rigidLid=.FALSE.,
  implicitFreeSurface=.TRUE.,
  exactConserv=.TRUE.,
  hFacMin=0.05,
  nonHydrostatic=.false.,
  readBinaryPrec=64,
- useSingleCPUio = .true.,
- tempAdvScheme=33.,
- saltAdvScheme=33.,
+ useSingleCPUio=.true.,
+ tempAdvScheme=33,
+ saltAdvScheme=33,
  staggerTimeStep=.true.,
  f0=-1.4074E-4,
  beta=0.0,
  implicitViscosity=.true.,
  implicitDiffusion=.true.,
-# useCDScheme = .TRUE.,
+# useCDScheme=.TRUE.,
  &
 
 # Elliptic solver parameters
@@ -62,29 +62,29 @@
 # 1 month = 365/12 days
  endTime=15768000,
  abEps=0.1,
- cAdjFreq = 0.,
+ cAdjFreq=0,
 # monthly checkpoints
 # chkptFreq = 2628000.,
 # pickupSuff='ckptA',
 # 6-monthly permanent checkpoint
- pchkptFreq=15552000., 
+ pchkptFreq=15552000,
  dumpFreq=0.0,
  taveFreq=0.0,
  dumpInitAndLast=.false.,
- monitorFreq=64800.,
- monitorSelect=64800.,
+ monitorFreq=64800,
+ monitorSelect=64800,
 # for time dependent open boundary conditions, activate the following 3 lines:
  periodicExternalForcing=.false.,
- externForcingPeriod=0.,
- externForcingCycle=0.,
+ externForcingPeriod=0,
+ externForcingCycle=0,
  &
 
 # Gridding parameters
  &PARM04
  usingCartesianGrid=.TRUE.,
 # usingSphericalPolarGrid=.TRUE.,
- xgOrigin = -1700000.,
- ygOrigin = -700000.,
+ xgOrigin=-1700000,
+ ygOrigin=-700000,
  delX=180*1300,
  delY=360*1300,
  delZ=50*20.0,
@@ -101,4 +101,4 @@
 # vVelInitFile='V_ini.bin',
  checkIniTemp=.false.,
  checkIniSalt=.false.,
-&
+ &
