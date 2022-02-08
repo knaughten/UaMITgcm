@@ -1,0 +1,23 @@
+#!/bin/bash
+# called from in the scripts directory:
+#  - prior to  building
+#  - in  starting a slurm job to run the model
+#  - interactive analyses post-model run,  to have consistent envoronment (and include ncview)
+# Also enables the setup to be captured in one file to hold (some of the) provenance of tests.
+
+# Convention being used:
+# a case corresponds to a specific build of a model (defined compiler options, opt file, code...)
+# a run uses that build
+# In testing there will be many runs for one case to explore SLURM options
+# such as number of nodes.
+
+# the script create_case copies tjhis and sets it up
+
+module load PrgEnv-gnu 
+module load cray-hdf5-parallel
+module load cray-netcdf-hdf5parallel
+
+export MITGCM_ROOTDIR=$WORK/UaMITgcm/MITgcm_67s
+export MITGCM_GENM_FLAGS= #  is replaced by create_case (may be empty)
+export MITGCM_FFLAGS='' # '' is replaced by create_case (may be empty)
+export MITGCM_OPT=$WORK/UaMITgcm/example/dev_linux_amd64_gfortran_archer2

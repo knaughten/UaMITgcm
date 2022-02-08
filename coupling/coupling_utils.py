@@ -315,24 +315,24 @@ def list_with_separator (A, sep):
     return s[:-1]    
 
 
-# Submit the given PBS script and return the PBS job ID.
+# Submit the given SBATCH script and return the PBS job ID.
 # Optional keyword arguments:
 # options: Options object
 # input_var: a list of variable definitions to pass with -v option, eg 'MIT_DIR=directory_path'
-# afterok: a list of PBS job IDs of previously submitted jobs. If it is defined, this job will stay on hold until the given jobs successfully complete.
-def submit_job (options, pbs_script, input_var=None, afterok=None):
+# afterok: a list of SBATCH job IDs of previously submitted jobs. If it is defined, this job will stay on hold until the given jobs successfully complete.
+def submit_job (options, sbatch_script, input_var=None, afterok=None):
 
-    # Construct qsub call line by line.
+    # Construct sbatch call line by line.
     command = 'sbatch'
     # Specify budget
     command += ' -A ' + options.budget_code
     # Specify job name
     jobname = options.expt_name
-    if 'mitgcm' in pbs_script:
+    if 'mitgcm' in sbatch_script:
         jobname += 'o'
-    elif 'ua' in pbs_script:
+    elif 'ua' in sbatch_script:
         jobname += 'i'
-    elif 'coupler' in pbs_script:
+    elif 'coupler' in sbatch_script:
         jobname += 'c'
     command += ' -J ' + jobname
     if input_var is not None:
@@ -343,17 +343,17 @@ def submit_job (options, pbs_script, input_var=None, afterok=None):
         command += ' -W depend=afterok:'
         command += list_with_separator(afterok,':')
     # Specify script
-    command += ' ' + pbs_script
+    command += ' ' + sbatch_script
     
     # Call the command and capture the output
-    pbs_id = subprocess.check_output(command, shell=True, text=True)
+    sbatch_id = subprocess.check_output(command, shell=True, text=True)
     # Now extract the digits from the SBATCH job ID and return as a string
     try:
-        return str(extract_first_int(pbs_id))
+        return str(extract_first_int(sbatch_id))
     except(ValueError):
         print('Error (submit_job): job did not submit properly')
-        print('Error message from qsub was:')
-        print(pbs_id)
+        print('Error message from sbatch was:')
+        print(sbatch_id)
         sys.exit()
 
         
