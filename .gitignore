@@ -90,3 +90,10 @@ example/PAS_PACE1*
 example/PAS_PACE20
 example/PAS_PACEhb
 example/PAS_*ctrl
+example/PAS_999/coupler_stdout
+example/PAS_999/jobs.log
+example/PAS_999/mitgcm_run/build
+example/PAS_999/mitgcm_run/run
+example/PAS_999/output
+example/PAS_999/slurm-*.out
+example/PAS_999/ua_run

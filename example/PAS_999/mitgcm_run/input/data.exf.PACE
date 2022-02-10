@@ -17,7 +17,7 @@
  useKatabCorr=.true.,
  katabSclFile='katabatic_scale_PAS_90W',
  katabRtFile='katabatic_rotate_PAS_90W',
- &
+ /
 
 # *********************
  &EXF_NML_02
@@ -63,7 +63,7 @@
  apressurefile= 'PACE_ens01_PSL',
 # runofffile   = 'runoff_200Gt.bin',
 #
- &
+ /
 
 # *********************
  &EXF_NML_03
@@ -82,7 +82,7 @@
  exf_inscal_lwdown = -1.0,
 # must include the below, as default is not 1
 # exf_inscal_runoff = 1.0,
- &
+ /
 
 # *********************
  &EXF_NML_04
@@ -149,7 +149,7 @@
 # runoff_lat_inc    = 269*0.05,
 # runoff_nlon       = 1201,
 # runoff_nlat       = 270,
- &
+ /
 
 # *********************
  &EXF_NML_OBCS
@@ -184,4 +184,4 @@
  siobEstartdate1   = 18900101,
  siobEstartdate2   = 000000,
  siobEperiod       = -12.0,
- &
+ /

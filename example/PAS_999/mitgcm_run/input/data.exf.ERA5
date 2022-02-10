@@ -14,7 +14,7 @@
  cstanton_1        = 0.035,
  cstanton_2        = 0.02,
  cdalton           = 0.035,
- &
+ /
 
 # *********************
  &EXF_NML_02
@@ -60,7 +60,7 @@
  apressurefile= 'ERA5_apressure',
 # runofffile   = 'runoff_200Gt.bin',
 #
- &
+ /
 
 # *********************
  &EXF_NML_03
@@ -70,7 +70,7 @@
  exf_inscal_lwdown = -1.0,
 # must include the below, as default is not 1
 # exf_inscal_runoff = 1.0,
- &
+ /
 
 # *********************
  &EXF_NML_04
@@ -137,7 +137,7 @@
 # runoff_lat_inc    = 269*0.05,
 # runoff_nlon       = 1201,
 # runoff_nlat       = 270,
- &
+ /
 
 # *********************
  &EXF_NML_OBCS
@@ -172,4 +172,4 @@
  siobEstartdate1   = 19470101,
  siobEstartdate2   = 000000,
  siobEperiod       = -12.0,
- &
+ /

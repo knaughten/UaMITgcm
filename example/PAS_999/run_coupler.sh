@@ -3,7 +3,8 @@
 #SBATCH --qos=serial
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --time=00:30:00
+#SBATCH --time=00:10:00
+#SBATCH --mem=32gb
 ###############################################################
 # Run coupling script to exchange data between MITgcm and Ua.
 ###############################################################
@@ -14,7 +15,6 @@ REPO_DIR=$WORK/UaMITgcm
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
 MIT_SOURCE=$REPO_DIR/MITgcm_67s
 
-cd $PBS_O_WORKDIR
 echo 'Coupler starts '`date` >> jobs.log
 
 # Get various python files/packages in the path
@@ -26,8 +26,7 @@ MITPY=$REPO_DIR/tools
 XMIT=$REPO_DIR/tools/xmitgcm
 # MITgcmutils
 MITU=$MIT_SOURCE/utils/python/MITgcmutils
-# Note, also need PBS_O_WORKDIR in path so it sees config_options.py
-export PYTHONPATH=$PBS_O_WORKDIR:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
+export PYTHONPATH=$PWD:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
 echo $'\n''*****'`date`'*****' >> coupler_stdout
 

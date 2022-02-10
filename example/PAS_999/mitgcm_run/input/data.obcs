@@ -43,7 +43,7 @@
  OBEsnFile = 'OBEhsnow_sose.bin',
  OBEuiceFile = 'OBEuice_sose.bin',
  OBEviceFile = 'OBEvice_sose.bin',
- &
+ /
 #
  &OBCS_PARM03
  spongeThickness = 5,
@@ -56,7 +56,7 @@
 # Vrelaxobcsinner = 86400.0,
 # Urelaxobcsbound = 0.0,
 # Vrelaxobcsbound = 0.0,
- &
+ /
 #
  &OBCS_PARM05
  seaiceSpongeThickness = 5,
@@ -73,5 +73,5 @@
 # Arelaxobcsbound = 0.0,
 # Hrelaxobcsbound = 0.0,
 # SNrelaxobcsbound = 0.0,
- &
+ /
 

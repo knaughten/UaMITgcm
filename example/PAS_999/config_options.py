@@ -7,16 +7,17 @@
 
 ###### 1. Server workflow options ######
 
-expt_name = 'PAS_ERA5'
+expt_name = 'PAS_999'
 use_xmitgcm = True
 save_dumps = False
+save_tmp_ckpt = False
 
 work_dir = '/work/n02/n02/kaight/UaMITgcm/example/'+expt_name+'/'
 mit_case_dir = work_dir+'mitgcm_run/'
 ua_exe_dir = work_dir+'ua_run/'  # Empty
 output_dir = work_dir+'output/'
 
-budget_code = 'n02-bas'
+budget_code = 'n02-NES011994'
 
 rsync_output = False  # Need to set this up for Archer2
 rsync_host = 'kaight@bslcenb.nerc-bas.ac.uk'
@@ -24,8 +25,8 @@ rsync_path = '/data/oceans_output/shelf/kaight/mitgcm/'
 
 ###### 2. Coupling options ######
 
-total_time = 73*12
-spinup_time = 73*12
+total_time = 12 #73*12
+spinup_time = 12 #73*12
 couple_step = 12
 
 calendar_type = 'standard'

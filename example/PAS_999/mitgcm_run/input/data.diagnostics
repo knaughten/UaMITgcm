@@ -66,7 +66,7 @@
  frequency(7) = 2592000.,
  filename(7)  = 'stateDifT',
  fields(1,7)  = 'DFrI_TH','KPPg_TH',
- &
+ /
 
 # Parameter for Diagnostics of per level statistics:
 #-----------------
@@ -85,5 +85,5 @@
 #   stat_fname(1)= 'dynStDiag',
 #    stat_freq(1)= -864000.,
 #   stat_phase(1)= 0.,
- &
+ /
 

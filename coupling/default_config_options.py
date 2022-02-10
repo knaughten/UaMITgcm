@@ -24,6 +24,8 @@ use_xmitgcm = False
 # If use_xmitgcm is False, you can just switch off dumpInitAndLast instead,
 # unless you have restart_type='zero'.
 save_dumps = True
+# Whether to save temporary checkpoints (eg pickup.ckptA.data)
+save_tmp_ckpt = True
 
 # Format for Ua output
 # For now the only option is 'matlab', later 'netcdf' will be added

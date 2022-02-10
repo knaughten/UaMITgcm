@@ -478,7 +478,7 @@ def gather_output (options):
                 if options.restart_type == 'pickup' and str(options.last_timestep) in fname:
                     # The run directory still needs these files, so copy them
                     copy_to_dir(fname, options.mit_run_dir, new_mit_dir)
-                else:
+                elif options.save_tmp_ckpt:
                     # Move them
                     move_to_dir(fname, options.mit_run_dir, new_mit_dir)
             else:

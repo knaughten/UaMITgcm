@@ -16,7 +16,7 @@ mit_case_dir = work_dir+'mitgcm_run/'
 ua_exe_dir = work_dir+'ua_run/'  # Empty
 output_dir = work_dir+'output/'
 
-budget_code = 'n02-bas'
+budget_code = 'n02-NES011994'
 
 rsync_output = False  # Need to set this up for Archer2
 rsync_host = 'kaight@bslcenb.nerc-bas.ac.uk'

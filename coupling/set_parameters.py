@@ -80,6 +80,7 @@ class Options:
         self.ua_option = check_value('ua_option', ua_option, legal=['compiled', 'matlab'])
         self.use_xmitgcm = check_value('use_xmitgcm', use_xmitgcm, type='bool')
         self.save_dumps = check_value('save_dumps', save_dumps, type='bool')
+        self.save_tmp_ckpt = check_value('save_tmp_ckpt', save_tmp_ckpt, type='bool')
         self.ua_output_format = check_value('ua_output_format', ua_output_format, legal=['matlab'])
         self.mit_case_dir = real_dir(mit_case_dir)
         # Save the run directory derived from this

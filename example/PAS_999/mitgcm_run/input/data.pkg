@@ -7,5 +7,5 @@
  useOBCS = .TRUE.,
  useSEAICE=.TRUE.,
  useShelfIce = .TRUE.,
- &
+ /
   
