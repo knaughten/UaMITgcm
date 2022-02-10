@@ -19,7 +19,7 @@ output_dir = work_dir+'output/'
 
 budget_code = 'n02-NES011994'
 
-rsync_output = False  # Need to set this up for Archer2
+rsync_output = True
 rsync_host = 'kaight@bslcenb.nerc-bas.ac.uk'
 rsync_path = '/data/oceans_output/shelf/kaight/mitgcm/'
 
