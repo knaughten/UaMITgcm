@@ -129,4 +129,44 @@ if [ $REANALYSIS = PACE ]
 
 fi
 
+#
+# LENS forcing
+#
+
+if [ $REANALYSIS = LENS ] 
+  then
+
+  TARGETYEAR=$TARGETSTART
+  SOURCEYEAR=$SOURCESTART
+
+  while [ $TARGETYEAR -le $TARGETEND ]
+    do 
+
+    for ENS in $(seq -f "%03g" 1 1)  # Update with more ensemble members later
+      do
+
+      ln -fs LENS_ens${ENS}_FLDS_$SOURCEYEAR LENS_ens${ENS}_FLDS_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_FSDS_$SOURCEYEAR LENS_ens${ENS}_FSDS_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_PRECT_$SOURCEYEAR LENS_ens${ENS}_PRECT_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_PSL_$SOURCEYEAR LENS_ens${ENS}_PSL_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_QBOT_$SOURCEYEAR LENS_ens${ENS}_QBOT_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_TREFHT_$SOURCEYEAR LENS_ens${ENS}_TREFHT_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_UBOT_$SOURCEYEAR LENS_ens${ENS}_UBOT_$TARGETYEAR
+      ln -fs LENS_ens${ENS}_VBOT_$SOURCEYEAR LENS_ens${ENS}_VBOT_$TARGETYEAR
+
+    done
+
+    TARGETYEAR=$((TARGETYEAR+1))
+    SOURCEYEAR=$((SOURCEYEAR+1))
+
+  done
+
+  SOURCETEST=$((SOURCEYEAR-1))
+  if [ $SOURCETEST -ne $SOURCEEND ]
+    then
+      echo "ERROR: links do not include source end"
+  fi
+
+fi
+
 
