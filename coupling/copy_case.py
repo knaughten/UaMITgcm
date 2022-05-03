@@ -67,8 +67,9 @@ def do_copy_case (old_name, new_name, check_restart=True):
     # Now call the prepare_run.sh script to reset the MITgcm run directory
     subprocess.check_output([new_scripts_dir+'prepare_run.sh', new_scripts_dir])
 
-    # Ua custom source code directory
-    shutil.copytree(old_dir+'ua_custom/', new_dir+'ua_custom/')
+    # Ua custom source code directory, if it exists
+    if os.path.isdir(old_dir+'ua_custom/'):
+        shutil.copytree(old_dir+'ua_custom/', new_dir+'ua_custom/')
 
     # Ua postprocessing directory, if it exists
     if os.path.isdir(old_uapost_dir):
@@ -77,23 +78,24 @@ def do_copy_case (old_name, new_name, check_restart=True):
             if not (fname.startswith('matlab') and fname.endswith('.out')) and not fname.startswith('run_postprocess.o'):
                 copy_to_dir(fname, old_uapost_dir, new_uapost_dir)
 
-    # Ua executable directory
-    os.mkdir(new_uaexe_dir)
-    new_restart_name = None
-    for fname in os.listdir(old_uaexe_dir):
-        if fname.endswith('RestartFile.mat'):
-            # Save the name of the restart file, with the experiment name updated
-            new_restart_name = fname.replace(old_name, new_name)
-        if fname in ['Ua', 'Ua_MCR.sh'] or (fname.endswith('.mat') and (not fname.endswith('RestartFile.mat')) and fname not in ['NewMeshFile.mat', 'AdaptMesh.mat']):
-            copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
-    if new_restart_name is not None:
-        # The old simulation had a restart, so the new one might need one too
-        if check_restart:
-            # See what the user thinks
-            copy_ua_restart(new_uaexe_dir, new_restart_name)
-        else:
-            # Don't do anything yet - the restart will be copied by another script
-            pass
+    # Ua executable directory, if it exists
+    if os.path.isdir(old_uaexe_dir):
+        os.mkdir(new_uaexe_dir)
+        new_restart_name = None
+        for fname in os.listdir(old_uaexe_dir):
+            if fname.endswith('RestartFile.mat'):
+                # Save the name of the restart file, with the experiment name updated
+                new_restart_name = fname.replace(old_name, new_name)
+            if fname in ['Ua', 'Ua_MCR.sh'] or (fname.endswith('.mat') and (not fname.endswith('RestartFile.mat')) and fname not in ['NewMeshFile.mat', 'AdaptMesh.mat']):
+                copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)
+        if new_restart_name is not None:
+            # The old simulation had a restart, so the new one might need one too
+            if check_restart:
+                # See what the user thinks
+                copy_ua_restart(new_uaexe_dir, new_restart_name)
+            else:
+                # Don't do anything yet - the restart will be copied by another script
+                pass
 
     # Change experiment name in config_options.py
     options_file = new_dir + 'config_options.py'
