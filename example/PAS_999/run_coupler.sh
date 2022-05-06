@@ -22,11 +22,9 @@ echo 'Coupler starts '`date` >> jobs.log
 COUPLEPY=$REPO_DIR/coupling
 # mitgcm_python
 MITPY=$REPO_DIR/tools
-# xmitgcm
-XMIT=$REPO_DIR/tools/xmitgcm
 # MITgcmutils
 MITU=$MIT_SOURCE/utils/python/MITgcmutils
-export PYTHONPATH=$PWD:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
+export PYTHONPATH=$PWD:$COUPLEPY:$MITPY:$MITU:$PYTHONPATH
 
 echo $'\n''*****'`date`'*****' >> coupler_stdout
 
