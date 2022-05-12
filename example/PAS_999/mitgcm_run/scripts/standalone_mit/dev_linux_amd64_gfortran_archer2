@@ -1,0 +1,55 @@
+#!/bin/bash
+
+CC='cc'
+FC='ftn'
+F90C='ftn'
+
+# test without NML TRMINATOR if namleists end in & as in PAS
+# MA2 - added alwaysuse mpi
+
+CPP='cpp -traditional -P'
+EXTENDED_SRC_FLAG='-Mextend'
+CHECK_FOR_LAPACK=t
+FC_CHECK=f
+
+if [ ${PE_ENV} == "GNU" ]
+then
+
+    GET_FC_VERSION="--version"
+
+    DEFINES='-DWORDLENGTH=4 -D_BYTESWAPIO -DHAVE_LAPACK -DALWAYS_USE_MPI'
+
+    INCLUDES='-I${NETCDF_DIR}/include -I${CRAY_MPICH_DIR}/include'
+    LIBS='-L${NETCDF_DIR}/lib -L${CRAY_MPICH_DIR}/include/lib'
+
+    NOOPTFLAGS='-O0'
+    NOOPTFILES=''
+
+    FFLAGS='-fallow-argument-mismatch'
+
+    if test "x$IEEE" = x ; then   #- with optimisation:
+
+        FOPTIM='-O3 -funroll-loops'
+    else
+        if test "x$DEVEL" = x ; then  #- no optimisation + IEEE :
+	     # -ieee  genmake2 option
+          FOPTIM='-O0 -frecursive  -finit-local-zero -finit-real=zero'
+        else                          #- development/check options:
+	     # -devel   genmake2 option
+          FOPTIM='-O0 -g'
+#          FFLAGS="$FFLAGS -fcheck=bounds -fbacktrace -Warray-bounds"
+           #FFLAGS="$FFLAGS -fcheck=all -fbacktrace -Wall"
+           FFLAGS="$FFLAGS -frecursive -ffpe-trap=zero,invalid,overflow,underflow"
+           FFLAGS="$FFLAGS -finit-local-zero -finit-real=zero"
+        fi
+    fi
+
+        # added following due to truncation errors in TAF
+        # need retest ECCO without TAF
+
+    FFLAGS="$FFLAGS -mcmodel=medium"
+    CFLAGS="$CFLAGS -mcmodel=medium"
+
+else
+	    echo not set compiler to be gnu
+fi  # end GNU

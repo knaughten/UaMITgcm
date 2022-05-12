@@ -1,0 +1,21 @@
+cd scripts
+
+#check case_setup as expect
+. ./case_setup
+
+# check length of run in run_repeat
+
+# check SIZES.h 
+
+./compile.sh
+
+  # (relies on build_options script, and MITgcm source code version 67s)
+./prep_run.sh
+   (calls dummy_link.sh - links ERA5 files - copy the 1979 ones)
+
+cd ../run
+# check data and run length
+../scripts/sub_run.sh
+        #calls run_repeat.sh which uses leave_time
+            #calls netcdf_out.sh in a repeating chain
+                 #calls convert_netcdf.py which uses xmitgcm)
