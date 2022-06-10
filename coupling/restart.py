@@ -77,11 +77,13 @@ if __name__ == "__main__":
         niter0 = extract_first_int(niter0_line[start:])
         # Reconstruct timestep stamp for pickup files we want
         niter0_stamp = str(niter0).zfill(10)
-        mit_file_names += ['pickup.'+niter0_stamp+'.data', 'pickup.'+niter0_stamp+'.meta']
+        # They will actually be in the directory from the year before
+        prefix = '../'+output_date_dir.replace(str(new_year),str(new_year-1))+'/MITgcm/'
+        mit_file_names += [prefix+'pickup.'+niter0_stamp+'.data', prefix+'pickup.'+niter0_stamp+'.meta']
         if options.use_seaice:
-            mit_file_names += ['pickup_seaice.'+niter0_stamp+'.data', 'pickup_seaice.'+niter0_stamp+'.meta']
+            mit_file_names += [prefix+'pickup_seaice.'+niter0_stamp+'.data', prefix+'pickup_seaice.'+niter0_stamp+'.meta']
         if options.use_ptracers:
-            mit_file_names += ['pickup_ptracers.'+niter0_stamp+'.data', 'pickup_ptracers.'+niter0_stamp+'.meta']
+            mit_file_names += [prefix+'pickup_ptracers.'+niter0_stamp+'.data', prefix+'pickup_ptracers.'+niter0_stamp+'.meta']
     # Now copy all the files
     for fname in mit_file_names:
         copy_to_dir(fname, output_date_dir+'MITgcm/', options.mit_run_dir)
