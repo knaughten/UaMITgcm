@@ -3,7 +3,7 @@
 #SBATCH --qos=serial
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --time=00:10:00
+#SBATCH --time=1:00:00
 #SBATCH --mem=32gb
 ###############################################################
 # Run coupling script to exchange data between MITgcm and Ua.

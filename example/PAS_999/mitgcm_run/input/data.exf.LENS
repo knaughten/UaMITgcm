@@ -21,35 +21,35 @@
 
 # *********************
  &EXF_NML_02
- atempstartdate1=18500101,
+ atempstartdate1=18900101,
  atempstartdate2=000000,
  atempperiod=86400.0,
 #
- precipstartdate1=18500101,
+ precipstartdate1=18900101,
  precipstartdate2=000000,
  precipperiod=86400.0,
 #
- uwindstartdate1=18500101,
+ uwindstartdate1=18900101,
  uwindstartdate2=000000,
  uwindperiod=86400.0,
 #
- vwindstartdate1=18500101,
+ vwindstartdate1=18900101,
  vwindstartdate2=000000,
  vwindperiod=86400.0,
 #
- aqhstartdate1=18500101,
+ aqhstartdate1=18900101,
  aqhstartdate2=000000,
  aqhperiod=86400.0,
 #
- lwdownstartdate1=18500116,
+ lwdownstartdate1=18900116,
  lwdownstartdate2=000000,
  lwdownperiod=2592000.0,
 #
- swdownstartdate1=18500116,
+ swdownstartdate1=18900116,
  swdownstartdate2=000000,
  swdownperiod=2592000.0,
 #
- apressurestartdate1=18500101,
+ apressurestartdate1=18900101,
  apressurestartdate2=000000,
  apressureperiod=86400.0,
 #
@@ -153,35 +153,35 @@
 
 # *********************
  &EXF_NML_OBCS
- obcsSstartdate1   = 18500101,
+ obcsSstartdate1   = 18900101,
  obcsSstartdate2   = 000000,
  obcsSperiod       = -12.0,
 #
- obcsNstartdate1   = 18500101,
+ obcsNstartdate1   = 18900101,
  obcsNstartdate2   = 000000,
  obcsNperiod       = -12.0,
 #
- obcsWstartdate1   = 18500101,
+ obcsWstartdate1   = 18900101,
  obcsWstartdate2   = 000000,
  obcsWperiod       = -12.0,
 #
- obcsEstartdate1   = 18500101,
+ obcsEstartdate1   = 18900101,
  obcsEstartdate2   = 000000,
  obcsEperiod       = -12.0,
 #
- siobSstartdate1   = 18500101,
+ siobSstartdate1   = 18900101,
  siobSstartdate2   = 000000,
  siobSperiod       = -12.0,
 #
- siobNstartdate1   = 18500101,
+ siobNstartdate1   = 18900101,
  siobNstartdate2   = 000000,
  siobNperiod       = -12.0,
 #
- siobWstartdate1   = 18500101,
+ siobWstartdate1   = 18900101,
  siobWstartdate2   = 000000,
  siobWperiod       = -12.0,
 #
- siobEstartdate1   = 18500101,
+ siobEstartdate1   = 18900101,
  siobEstartdate2   = 000000,
  siobEperiod       = -12.0,
  /

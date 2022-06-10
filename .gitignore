@@ -97,3 +97,4 @@ example/PAS_999/mitgcm_run/run
 example/PAS_999/output
 example/PAS_999/slurm-*.out
 example/PAS_999/ua_run
+example/PAS_LENS*
