@@ -59,13 +59,13 @@
  fields(1,5)  = 'UVEL','VVEL','WVEL',
 
 # 30 days
- frequency(6) = 2592000.,
- filename(6)  = 'stateAdvT',
- fields(1,6)  = 'ADVx_TH','ADVy_TH','ADVr_TH',
+# frequency(6) = 2592000.,
+# filename(6)  = 'stateAdvT',
+# fields(1,6)  = 'ADVx_TH','ADVy_TH','ADVr_TH',
 
- frequency(7) = 2592000.,
- filename(7)  = 'stateDifT',
- fields(1,7)  = 'DFrI_TH','KPPg_TH',
+# frequency(7) = 2592000.,
+# filename(7)  = 'stateDifT',
+# fields(1,7)  = 'DFrI_TH','KPPg_TH',
  /
 
 # Parameter for Diagnostics of per level statistics:

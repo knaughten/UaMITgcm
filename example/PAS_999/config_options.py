@@ -7,14 +7,14 @@
 
 ###### 1. Server workflow options ######
 
-expt_name = 'PAS_LENS001_obcsBC'
+expt_name = 'PAS_999'
 use_xmitgcm = True
 save_dumps = False
 save_tmp_ckpt = False
 
 work_dir = '/work/n02/n02/kaight/UaMITgcm/example/'+expt_name+'/'
 mit_case_dir = work_dir+'mitgcm_run/'
-ua_exe_dir = work_dir+'ua_run/'  # Empty
+ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
 budget_code = 'n02-NES011994'
@@ -25,15 +25,27 @@ rsync_path = '/data/oceans_output/shelf/kaight/archer2_mitgcm/'
 
 ###### 2. Coupling options ######
 
-total_time = 211*12
-spinup_time = 211*12
+total_time = 12*5
+spinup_time = 12
 couple_step = 12
+
+melt_coupling = 'last'  # TODO: Try 'avg' or 'all'
 
 calendar_type = 'noleap'
 output_freq = 'monthly'
 
-digging = 'none'
-adjust_vel = False
+digging = 'bathy'
+filling = True
+adjust_vel = True
+
+preserve_ocean_mask = True
+preserve_static_ice = True
+
+pload_option = 'constant'
+pload_temp = 1.
+pload_salt = 34.5
+
+ua_ini_restart = False  # TODO: change to True once regenerated
 
 correct_obcs_online = True
 obcs_transient = True
@@ -63,7 +75,7 @@ pload_file = 'panom.bin'
 
 ismr_name = 'state2D'
 etan_name = 'state2D'
-output_names = ['state2D', 'stateExf', 'stateTheta', 'stateSalt', 'stateVel', 'stateAdvT', 'stateDifT']
+output_names = ['state2D', 'stateExf', 'stateTheta', 'stateSalt', 'stateVel']
 
 obcs_file_w_u = 'LENS_ens001_UVEL_W_'
 obcs_file_e_u = 'LENS_ens001_UVEL_E_'
