@@ -7,7 +7,7 @@
 
 ###### 1. Server workflow options ######
 
-expt_name = 'PAS_PACE'
+expt_name = 'PAS_999'
 use_xmitgcm = True
 save_dumps = False
 

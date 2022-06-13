@@ -142,17 +142,24 @@ if [ $REANALYSIS = LENS ]
   while [ $TARGETYEAR -le $TARGETEND ]
     do 
 
-    for ENS in $(seq -f "%03g" 1 1)  # Update with more ensemble members later
+    for ENS in $(seq -f "%03g" 1 5)  # Update with more ensemble members later
       do
 
-      ln -fs LENS_ens${ENS}_FLDS_$SOURCEYEAR LENS_ens${ENS}_FLDS_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_FSDS_$SOURCEYEAR LENS_ens${ENS}_FSDS_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_PRECT_$SOURCEYEAR LENS_ens${ENS}_PRECT_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_PSL_$SOURCEYEAR LENS_ens${ENS}_PSL_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_QBOT_$SOURCEYEAR LENS_ens${ENS}_QBOT_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_TREFHT_$SOURCEYEAR LENS_ens${ENS}_TREFHT_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_UBOT_$SOURCEYEAR LENS_ens${ENS}_UBOT_$TARGETYEAR
-      ln -fs LENS_ens${ENS}_VBOT_$SOURCEYEAR LENS_ens${ENS}_VBOT_$TARGETYEAR
+      ATM_VAR=( FLDS FSDS PRECT PSL QBOT TREFHT UBOT VBOT )
+      for VAR in "${ATM_VAR[@]}"
+      do
+	  ln -fs LENS_ens${ENS}_${VAR}_$SOURCEYEAR LENS_ens${ENS}_${VAR}_$TARGETYEAR
+      done
+
+      BDRY_LOC=( N E W )
+      OBCS_VAR=( TEMP SALT UVEL VVEL aice hi hs uvel vvel )
+      for BDRY in "${BDRY_LOC[@]}"
+      do
+	  for VAR in "${OBCS_VAR[@]}"
+	  do
+	      ln -fs LENS_ens${ENS}_${VAR}_${BDRY}_$SOURCEYEAR LENS_ens${ENS}_${VAR}_${BDRY}_$TARGETYEAR
+	  done
+      done
 
     done
 

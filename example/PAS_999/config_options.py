@@ -7,7 +7,7 @@
 
 ###### 1. Server workflow options ######
 
-expt_name = 'PAS_999'
+expt_name = 'PAS_LENS001_obcsBC'
 use_xmitgcm = True
 save_dumps = False
 save_tmp_ckpt = False
@@ -25,18 +25,18 @@ rsync_path = '/data/oceans_output/shelf/kaight/archer2_mitgcm/'
 
 ###### 2. Coupling options ######
 
-total_time = 12 #73*12
-spinup_time = 12 #73*12
+total_time = 211*12
+spinup_time = 211*12
 couple_step = 12
 
-calendar_type = 'standard'
+calendar_type = 'noleap'
 output_freq = 'monthly'
 
 digging = 'none'
 adjust_vel = False
 
 correct_obcs_online = True
-obcs_transient = False
+obcs_transient = True
 
 
 ###### 3. MITgcm parameters ######
@@ -52,7 +52,7 @@ hFacMinDr = 10.
 rhoConst = 1028.5
 seaice_nz = 7
 
-startDate = '19470101'
+startDate = '18900101'
 
 
 ###### 4. Filenames ######
@@ -65,6 +65,6 @@ ismr_name = 'state2D'
 etan_name = 'state2D'
 output_names = ['state2D', 'stateExf', 'stateTheta', 'stateSalt', 'stateVel', 'stateAdvT', 'stateDifT']
 
-obcs_file_w_u = 'OBWuvel_sose_corr.bin'
-obcs_file_e_u = 'OBEuvel_sose_corr.bin'
-obcs_file_n_v = 'OBNvvel_sose_corr.bin'
+obcs_file_w_u = 'LENS_ens001_UVEL_W_'
+obcs_file_e_u = 'LENS_ens001_UVEL_E_'
+obcs_file_n_v = 'LENS_ens001_VVEL_N_'
