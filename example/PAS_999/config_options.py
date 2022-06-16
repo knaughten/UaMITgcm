@@ -1,10 +1,3 @@
-#############################################################
-# Important note: PAS is an ocean-only configuration which is
-# only within UaMITgcm so it can use the OBCS balancing code.
-# Some coupling variables are not specified here because the
-# coupling code is never used.
-#############################################################
-
 ###### 1. Server workflow options ######
 
 expt_name = 'PAS_999'
@@ -27,9 +20,9 @@ rsync_path = '/data/oceans_output/shelf/kaight/archer2_mitgcm/'
 
 total_time = 12*5
 spinup_time = 12
-couple_step = 12
+couple_step = 1
 
-melt_coupling = 'last'  # TODO: Try 'avg' or 'all'
+melt_coupling = 'avg'
 
 calendar_type = 'noleap'
 output_freq = 'monthly'
@@ -49,7 +42,7 @@ ua_ini_restart = False  # TODO: change to True once regenerated
 
 correct_obcs_online = True
 obcs_transient = True
-
+correct_obcs_steps = 12
 
 ###### 3. MITgcm parameters ######
 
