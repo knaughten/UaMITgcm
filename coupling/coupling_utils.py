@@ -165,6 +165,12 @@ def days_between (year_1, month_1, year_2, month_2, calendar_type):
             return num_days
 
 
+# Calculate the number of months between the given dates.
+def months_between (year_1, month_1, year_2, month_2):
+
+    return 12*(year_2 - year_1) + (month_2 - month_1)
+
+
 # As above, but in years (conversion depends on calendar type).
 def years_between (year_1, month_1, year_2, month_2, calendar_type):
 

@@ -119,8 +119,6 @@ class Options:
         self.restart_type = check_value('restart_type', restart_type, legal=['zero', 'pickup'])
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
-        #if self.calendar_type=='noleap' and self.output_freq=='monthly':
-            #throw_error("output_freq='monthly' does not work with calendar_type='noleap'")
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
         self.filling = check_value('filling', filling, type='bool')
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
@@ -137,13 +135,13 @@ class Options:
             self.pload_salt = 0.
         self.ua_ini_restart = check_value('ua_ini_restart', ua_ini_restart, type='bool')
         self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
-        # Make sure couple_step is a multiple of 12 if we want to do OBCS corrections online
-        if self.correct_obcs_online and self.couple_step % 12 != 0:
-            throw_error('couple_step must be a multiple of 12 when correct_obcs_online is set')
         self.obcs_transient = check_value('obcs_transient', obcs_transient, type='bool')
-        self.correct_obcs_years = check_value('correct_obcs_years', correct_obcs_years, type='int')
-        if self.correct_obcs_years < 0:
-            throw_error('correct_obcs_years cannot be negative')
+        self.correct_obcs_steps = check_value('correct_obcs_steps', correct_obcs_steps, type='int')
+        if self.correct_obcs_steps < self.couple_step:
+            throw_error('correct_obcs_steps cannot be less than couple_step')
+        # Make sure couple_step*correct_obcs_steps is a multiple of 12 if we want to do OBCS corrections online
+        if self.correct_obcs_online and self.correct_obcs_steps*self.couple_step % 12 != 0:
+            throw_error('couple_step*correct_obcs_steps must be a multiple of 12 when correct_obcs_online is set')
         self.obcs_threshold = check_value('obcs_threshold', obcs_threshold, type='float') 
             
         self.coordinates = check_value('coordinates', coordinates, legal=['xy', 'latlon'])

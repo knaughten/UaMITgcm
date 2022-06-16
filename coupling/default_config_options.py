@@ -159,18 +159,16 @@ pload_salt = 34.2
 ua_ini_restart = False
 
 ### Do you want the coupler to adjust the incoming OBCS velocities such that
-### the volume of the domain is approximately conserved on an annual basis?
-### If so, couple_step must be a multiple of 12 (so the seasonal cycle is
-### preserved). The code could be edited to remove this requirement, if needed.
+### the volume of the domain is approximately conserved?
 correct_obcs_online = False
 ### Are the OBCS transient (one file per year) or a monthly climatology
 ### (the same yearly file over and over)?
 ### If False, you must make a copy of each OBCS file with the suffix ".master"
 ### so that a new correction can be applied each year.
 obcs_transient = True
-### How many years to average over for the OBCS corrections?
-### Can set 0 to average over all years in the simulation.
-correct_obcs_years = 1
+### How many coupling steps to average over for the OBCS corrections?
+### Must set this up so it averages over a multiple of 12 months.
+correct_obcs_steps = 1
 ### Threshold of acceptable SSH anomaly before OBCS corrections are triggered
 ### (absolute value, in metres)
 obcs_threshold = 0
@@ -234,7 +232,7 @@ calendar_file = 'calendar'
 ### Name of file that is created when simulation successfully finishes
 finished_file = 'finished'
 
-### Name of log file for sea surface height. Only used if correct_obcs_online=True and correct_obcs_years > 1.
+### Name of log file for sea surface height. Only used if correct_obcs_online=True and correct_obcs_steps > 1.
 eta_file = 'eta_log'
 
 ### Bathymetry file read by MITgcm. Should match the value in input/data.

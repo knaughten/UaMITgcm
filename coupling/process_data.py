@@ -9,7 +9,7 @@ import shutil
 import sys
 import subprocess
 
-from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list, years_between
+from coupling_utils import read_mit_output, move_to_dir, copy_to_dir, find_dump_prefixes, move_processed_files, make_tmp_copy, overwrite_pickup, line_that_matters, replace_line, get_file_list, years_between, months_between
 
 from mitgcm_python.utils import convert_ismr, calc_hfac, xy_to_xyz, z_to_xyz, mask_land_ice
 from mitgcm_python.make_domain import do_filling, do_digging, do_zapping
@@ -583,8 +583,9 @@ def move_repeated_output(options):
 
 # Edit the OBCS normal velocity files (for next and all following years,
 # if they're transient) to prevent massive drift in the sea surface height.
-# This correction will be performed each coupling step, based on the mean
-# sea surface height over the last step, and will relax this toward zero.
+# This correction will be performed every correct_obcs_steps coupling steps,
+# based on the mean sea surface height over the last correct_obcs_steps steps,
+# and will relax this toward zero.
 # Only called if options.correct_obcs_online = True.
 def correct_next_obcs (grid, options):
 
@@ -597,10 +598,10 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    d_t = options.correct_obcs_years
+    d_t = options.correct_obcs_steps
 
-    if options.correct_obcs_years != 1:
-        # Average back over more than one year
+    if options.correct_obcs_steps != 1:
+        # Average back over more than one coupling step
         # Need to use the log file
         logfile = options.output_dir + options.eta_file
         if os.path.isfile(logfile):
@@ -609,19 +610,30 @@ def correct_next_obcs (grid, options):
         f = open(logfile, 'a')
         f.write(str(eta_avg)+'\n')
         f.close()
+
+        # Check if it's time to do a correction
+        # Read the calendar file to get the start date of the next simulation
+        calfile = options.output_dir + options.calendar_file
+        f = open(calfile, 'r')
+        date_code = f.readline().strip()
+        f.close()
+        new_year = int(date_code[:4])
+        new_month = int(date_code[4:])
+        # Calculate number of months since the beginning of the simulation
+        ini_year = int(options.startDate[:4])
+        ini_month = int(options.startDate[4:6])        
+        num_months = months_between(ini_year, ini_month, new_year, new_month)
+        # See if it's a multiple of correct_obcs_steps
+        if num_months >= options.correct_obcs_steps and num_months % options.correct_obcs_steps == 0:
+            print('OBCS correction will be applied: '+str(num_months)+' months since simulation start')
+        else:
+            print('Not time for OBCS correction yet')
+            # Exit the function
+            return        
         # Now read all the values in the file
         eta_all = np.loadtxt(logfile)
-        if options.correct_obcs_years == 0:
-            # User specified to average over all years
-            eta_avg = np.mean(eta_all)
-            d_t = eta_all.size
-        elif eta_all.size < options.correct_obcs_years:
-            # Don't have a full averaging period yet, so average over what's there and scale it
-            d_t = eta_all.size
-            eta_avg = np.mean(eta_all)/float(d_t)            
-        else:
-            # Average over the last given number of years
-            eta_avg = np.mean(eta_all[-options.correct_obcs_years:])            
+        # Average over the last given number of steps
+        eta_avg = np.mean(eta_all[-options.correct_obcs_steps:])
 
     if options.obcs_transient:
         # Figure out the next year to process
