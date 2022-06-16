@@ -135,6 +135,8 @@ adjust_vel = True
 
 ### Is this a MISOMIP domain that needs a wall built at the north and south boundaries?
 misomip_wall = False
+### Flag to preserve the MITgcm bathymetry everywhere outside the Ua domain (i.e. the open ocean)
+preserve_open_ocean_bathy = False
 ### Flag to preserve the MITgcm land mask in regions outside the Ua domain. 
 preserve_ocean_mask = False
 ### Flag to allow static ice shelves in regions outside the Ua domain.

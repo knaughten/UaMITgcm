@@ -119,8 +119,15 @@ def adjust_mit_geom (grid, options):
     index = bathy > 0
     bathy[index] = 0
     draft[index] = 0
-    
-    if options.preserve_ocean_mask:
+
+    if options.preserve_open_ocean_bathy:
+        print('Reverting open ocean bathymetry to original')
+        # Read the existing bathymetry seen by MITgcm
+        bathy_old = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)
+        # Find regions which Ua say are open ocean
+        index = mask==2
+        bathy[index] = bathy_old[index]
+    elif options.preserve_ocean_mask:
         print('Blocking out specified regions')
         # Read the existing bathymetry seen by MITgcm
         bathy_old = read_binary(mit_dir+options.bathyFile, [grid.nx, grid.ny], 'xy', prec=options.readBinaryPrec)

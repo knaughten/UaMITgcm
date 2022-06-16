@@ -31,7 +31,7 @@ digging = 'bathy'
 filling = True
 adjust_vel = True
 
-preserve_ocean_mask = True
+preserve_open_ocean_bathy = True
 preserve_static_ice = True
 
 pload_option = 'constant'

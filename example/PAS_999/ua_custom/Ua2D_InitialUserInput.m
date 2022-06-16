@@ -1,6 +1,12 @@
 function [UserVar,CtrlVar,MeshBoundaryCoordinates]=Ua2D_InitialUserInput(UserVar,CtrlVar)
 
-UserVar = read_PTDCSpecificUserVariables(UserVar);
+UserVar.Geometry = 'Bedmachine_Bamber2009';
+UserVar.GeometryInterpolants = 'GriddedInterpolants_sBh_Bedmachine2020-07-15_Bamber2009.mat';
+UserVar.FirnInterpolants = 'GriddedInterpolants_Firn_RACMO.mat';
+UserVar.NameOfFileForReadingSlipperinessEstimate='PTDC_C.mat';
+UserVar.NameOfFileForReadingAGlenEstimate='PTDC_AGlen.mat';
+UserVar.RACMO_SMB='SMB_RACMO_1979_2013.mat';
+UserVar.SlidingLaw = 'Weertman';
 
 %% Type of run
 %
@@ -43,10 +49,6 @@ CtrlVar.InitialDiagnosticStepAfterRemeshing=1;
 CtrlVar.Implicituvh=1;
 CtrlVar.TG3=0 ; %CtrlVar.Gamma=1;
 CtrlVar.uvhTimeSteppingMethod='supg';
-
-%CtrlVar.MITgcmDataDirectory=['/data/dataphy/janryd69/Ua_MITgcm/',Experiment,'/MIT_data'];
-%CtrlVar.UaDataDirectory=['/home/UNN/wchm8/Documents/Ua_MITgcm/',Experiment,'/Ua_data'];
-%CtrlVar.logfilename=[CtrlVar.UaDataDirectory,'/',Experiment,'.log'];
 
 load BoundaryCoordinates MeshBoundaryCoordinates
 

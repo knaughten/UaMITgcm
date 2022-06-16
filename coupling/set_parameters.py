@@ -123,6 +123,7 @@ class Options:
         self.filling = check_value('filling', filling, type='bool')
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
+        self.preserve_open_ocean_bathy = check_value('preserve_open_ocean_bathy', preserve_open_ocean_bathy, type='bool')
         self.preserve_ocean_mask = check_value('preserve_ocean_mask', preserve_ocean_mask, type='bool')
         self.preserve_static_ice = check_value('preserve_static_ice', preserve_static_ice, type='bool')
         self.pload_option = check_value('pload_option', pload_option, legal=['constant', 'nearest'])

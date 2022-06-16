@@ -97,4 +97,11 @@ example/PAS_999/mitgcm_run/run
 example/PAS_999/output
 example/PAS_999/slurm-*.out
 example/PAS_999/ua_run
+example/PAS_999/ua_run/Ua
+example/PAS_999/ua_run/options_for_ua
+example/PAS_999/ua_run/matlab*.out
+example/PAS_999/ua_run/*RunInfo.txt
+example/PAS_999/ua_run/ResultsFiles
+example/PAS_999/ua_run/*.mat
+example/PAS_999/ua_run/*.mat.tmp
 example/PAS_LENS*
