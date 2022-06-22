@@ -227,10 +227,11 @@ def adjust_mit_state (grid, options):
         if options.use_addmass:
             var_names += ['AddMass']
         fields = read_mit_output('last', mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
-        if options.eosType == 'LINEAR':
-            [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt] = fields
-        else:
-            [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt, phihyd] = fields
+        [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt] = fields[:9]
+        if options.eosType != 'LINEAR':
+            phihyd = fields[9]
+        if options.use_addmass:
+            addmass = fields[-1]
 
         if options.use_seaice:
             # Read the sea ice pickup too
@@ -238,7 +239,9 @@ def adjust_mit_state (grid, options):
             if options.seaice_sigma:
                 var_names_seaice += ['siSigm1', 'siSigm2', 'siSigm12']
             fields_seaice = read_mit_output('last', mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
-            temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = fields_seaice
+            temp_ice, aice, hice, hsnow, uice, vice = fields_seaice[:6]
+            if options.seaice_sigma:
+                sigm1_ice, sigm2_ice, sigm12_ice = fields_seaice[6:]
 
         if options.use_ptracers:
             # This assumes there is only one tracer: read_mit_output will throw an error if there's more.
@@ -335,9 +338,10 @@ def adjust_mit_state (grid, options):
         detahdt *= mask_new_2d
         if options.use_seaice:
             temp_ice *= xy_to_xyz(mask_new[0,:], [grid.nx, grid.ny, options.seaice_nz])
-            sigm1_ice *= mask_new[0,:]
-            sigm2_ice *= mask_new[0,:]
-            sigm12_ice *= mask_new[0,:]
+            if options.seaice_sigma:
+                sigm1_ice *= mask_new[0,:]
+                sigm2_ice *= mask_new[0,:]
+                sigm12_ice *= mask_new[0,:]
 
     # Write the new state
     if options.restart_type == 'zero':
@@ -361,12 +365,15 @@ def adjust_mit_state (grid, options):
     elif options.restart_type == 'pickup':
 
         # Update pointers
-        if options.eosType == 'LINEAR':
-            fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt]
-        else:
-            fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt, phihyd]
+        fields = [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt]
+        if options.eosType != 'LINEAR':
+            fields.append(phihyd)
+        if options.use_addmass:
+            fields.append(addmass)
         if options.use_seaice:
-            fields_seaice = [temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice]
+            fields_seaice = [temp_ice, aice, hice, hsnow, uice, vice]
+            if options.seaice_sigma:
+                fields_seaice += [sigm1_ice, sigm2_ice, sigm12_ice]
         if options.use_ptracers:
             fields_ptracers = [tracer]
 
