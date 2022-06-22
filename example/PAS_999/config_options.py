@@ -66,7 +66,7 @@ seaice_sigma = False
 ###### 4. Filenames ######
 
 bathyFile = 'bathymetry_bedmach.bin'
-draftFile = 'shelfice.bin'
+draftFile = 'shelfice_bedmach.bin'
 pload_file = 'panom.bin'
 
 ismr_name = 'state2D'

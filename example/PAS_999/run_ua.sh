@@ -1,12 +1,12 @@
 #!/bin/sh
-#SBATCH --time=00:20:00
+#SBATCH --time=2:00:00
 #SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=standard
-#SBATCH --qos=short
-#SBATCH --reservation=shortqos
+#SBATCH --qos=standard
+##SBATCH --reservation=shortqos
 
 ###############################################################
 # Run Ua.
@@ -35,7 +35,7 @@ cd $UA_DIR
 srun --distribution=block:block --hint=nomultithread ./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
 OUT=$?
 
-cd $PBS_O_WORKDIR
+cd ../
 if [ $OUT == 0 ]; then
     echo 'Ua ends '`date` >> jobs.log
     touch ua_finished
@@ -45,6 +45,6 @@ if [ $OUT == 0 ]; then
     fi
     exit 0
 else
-    echo 'Error in Ua '`date` >> jobs.log
+    echo 'Error in Ua '`date` >> ../jobs.log
     exit 1
 fi
