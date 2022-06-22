@@ -18,7 +18,7 @@ from mitgcm_python.file_io import write_binary
 # Global variables
 # Dimensions (2D or 3D) of variables in pickup file
 # These files are structured differently so a 2D/3D key is necessary.
-pickup_vars_3d = ['Uvel', 'Vvel', 'Theta', 'Salt', 'GuNm1', 'GvNm1', 'PhiHyd', 'siTICES', 'pTr01']
+pickup_vars_3d = ['Uvel', 'Vvel', 'Theta', 'Salt', 'GuNm1', 'GvNm1', 'PhiHyd', 'siTICES', 'pTr01', 'AddMass']
 pickup_vars_2d = ['EtaN', 'dEtaHdt', 'EtaH', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE', 'siSigm1', 'siSigm2', 'siSigm12']
 
 # Extract the first continuous group of digits in a string, including minus signs. Return as an integer.
