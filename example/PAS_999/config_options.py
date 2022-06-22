@@ -59,6 +59,9 @@ seaice_nz = 7
 
 startDate = '18900101'
 
+use_addmass = True
+seaice_sigma = False
+
 
 ###### 4. Filenames ######
 

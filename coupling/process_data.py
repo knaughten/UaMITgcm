@@ -224,6 +224,8 @@ def adjust_mit_state (grid, options):
         if options.eosType != 'LINEAR':
             # Also need PhiHyd
             var_names += ['PhiHyd']
+        if options.use_addmass:
+            var_names += ['AddMass']
         fields = read_mit_output('last', mit_dir, 'pickup', var_names, timestep=options.last_timestep, nz=grid.nz)
         if options.eosType == 'LINEAR':
             [temp, salt, etan, etah, u, v, gunm1, gvnm1, detahdt] = fields
@@ -232,7 +234,9 @@ def adjust_mit_state (grid, options):
 
         if options.use_seaice:
             # Read the sea ice pickup too
-            var_names_seaice = ['siTICES', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE', 'siSigm1', 'siSigm2', 'siSigm12']
+            var_names_seaice = ['siTICES', 'siAREA', 'siHEFF', 'siHSNOW', 'siUICE', 'siVICE']
+            if options.seaice_sigma:
+                var_names_seaice += ['siSigm1', 'siSigm2', 'siSigm12']
             fields_seaice = read_mit_output('last', mit_dir, 'pickup_seaice', var_names_seaice, timestep=options.last_timestep, nz=options.seaice_nz)
             temp_ice, aice, hice, hsnow, uice, vice, sigm1_ice, sigm2_ice, sigm12_ice = fields_seaice
 

@@ -184,7 +184,9 @@ class Options:
             problem = True
         if problem:
             throw_error('startDate should be an 8-digit code in the form YYYYMMDD')
-        self.startDate = startDate            
+        self.startDate = startDate
+        self.use_addmass = check_value('use_addmass', use_addmass, type='bool')
+        self.seaice_sigma = check_value('seaice_sigma', seaice_sigma, type='bool')
 
         self.calendar_file = calendar_file
         self.finished_file = finished_file

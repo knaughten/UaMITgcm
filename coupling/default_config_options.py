@@ -220,6 +220,10 @@ seaice_nz = 7
 ### Otherwise set it to whatever you want!
 startDate = '20000101'
 
+### Does the ocean use the addMass package?
+use_addmass = False
+### Does the sea ice use sigma terms? (Check in pickup_seaice.*.meta)
+seaice_sigma = True
 
 
 ###### 4. Filenames ######
