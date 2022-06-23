@@ -499,6 +499,9 @@ def gather_output (options):
                 elif options.save_tmp_ckpt:
                     # Move them
                     move_to_dir(fname, options.mit_run_dir, new_mit_dir)
+                else:
+                    # Delete them, otherwise they stick around in run/ forever and take up space
+                    os.remove(options.mit_run_dir+fname)
             else:
                 if options.use_xmitgcm:
                     # Delete binary files which were savely converted to NetCDF
