@@ -138,8 +138,8 @@ class Options:
         self.correct_obcs_online = check_value('correct_obcs_online', correct_obcs_online, type='bool')
         self.obcs_transient = check_value('obcs_transient', obcs_transient, type='bool')
         self.correct_obcs_steps = check_value('correct_obcs_steps', correct_obcs_steps, type='int')
-        if self.correct_obcs_steps < self.couple_step:
-            throw_error('correct_obcs_steps cannot be less than couple_step')
+        if self.correct_obcs_steps < 1:
+            throw_error('correct_obcs_steps cannot be less than 1')
         # Make sure couple_step*correct_obcs_steps is a multiple of 12 if we want to do OBCS corrections online
         if self.correct_obcs_online and self.correct_obcs_steps*self.couple_step % 12 != 0:
             throw_error('couple_step*correct_obcs_steps must be a multiple of 12 when correct_obcs_online is set')
