@@ -3,7 +3,7 @@
 #SBATCH --qos=standard
 #SBATCH --nodes=2
 #SBATCH --tasks-per-node=120
-#SBATCH --time=00:30:00
+#SBATCH --time=3:00:00
 #SBATCH --no-requeue
 ####################################################################
 # Run MITgcm.

@@ -1,3 +1,4 @@
+
 ###### 1. Server workflow options ######
 
 expt_name = 'PAS_999'
@@ -18,9 +19,9 @@ rsync_path = '/data/oceans_output/shelf/kaight/archer2_mitgcm/'
 
 ###### 2. Coupling options ######
 
-total_time = 12*5
-spinup_time = 12
-couple_step = 1
+total_time = 12*211
+spinup_time = 12*116
+couple_step = 12
 
 melt_coupling = 'avg'
 
@@ -38,11 +39,11 @@ pload_option = 'constant'
 pload_temp = 1.
 pload_salt = 34.5
 
-ua_ini_restart = False  # TODO: change to True once regenerated
+ua_ini_restart = True
 
 correct_obcs_online = True
 obcs_transient = True
-correct_obcs_steps = 12
+correct_obcs_steps = 1
 
 ###### 3. MITgcm parameters ######
 

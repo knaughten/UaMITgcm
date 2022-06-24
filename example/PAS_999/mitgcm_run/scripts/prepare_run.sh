@@ -42,6 +42,9 @@ ln -s $LENS_OBCS/* .
 
 
 # Deep copy of some files that will be modified
+rm -f shelfice_bedmach.bin bathymetry_bedmach.bin panom.bin
+cp $PAS_IN/shelfice_bedmach.bin $PAS_IN/bathymetry_bedmach.bin $PAS_IN/panom.bin .
+
 OBCS_CORR=( UVEL_E UVEL_W VVEL_N )
 for VAR in "${OBCS_CORR[@]}"; do
     rm -f LENS_ens001_${VAR}_*
