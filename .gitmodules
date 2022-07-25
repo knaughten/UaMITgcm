@@ -17,7 +17,7 @@
 [submodule "tools/mitgcm_python"]
 	path = tools/mitgcm_python
 	url = git@github.com:knaughten/mitgcm_python.git
-[submodule "UaSource_9081fdb"]
-	path = UaSource_9081fdb
+[submodule "UaSource_7Dec2021"]
+	path = UaSource_7Dec2021
 	url = git@github.com:GHilmarG/UaSource.git
 	branch = master
