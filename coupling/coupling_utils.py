@@ -311,7 +311,7 @@ def move_to_dir (fname, old_dir, new_dir):
 def copy_to_dir (fname, old_dir, new_dir):
     try:
         shutil.copy(old_dir+fname, new_dir+fname)
-    except(SameFileError):
+    except(shutil.SameFileError):
         # They are already the same file (probably symlinks)
         pass
 
