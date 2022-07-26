@@ -309,7 +309,11 @@ def move_to_dir (fname, old_dir, new_dir):
 
 # Copy a file from one directory to another, without changing its name.
 def copy_to_dir (fname, old_dir, new_dir):
-    shutil.copy(old_dir+fname, new_dir+fname)    
+    try:
+        shutil.copy(old_dir+fname, new_dir+fname)
+    except(SameFileError):
+        # They are already the same file (probably symlinks)
+        pass
 
 
 # Convert a list of strings to a single string with elements separated by the given separator character.
