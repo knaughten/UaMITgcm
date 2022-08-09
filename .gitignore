@@ -107,6 +107,8 @@ example/PAS_999/ua_run/*.mat.tmp
 example/PAS_LENS*
 example/PAS_MENS*
 example/PAS_LW*
+example/PAS_couple*
+example/PAS_serialUa
 example/AMUND_999/coupler_stdout
 example/AMUND_999/jobs.log
 example/AMUND_999/mitgcm_run/build
