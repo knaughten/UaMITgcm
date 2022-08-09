@@ -1,0 +1,10 @@
+run branch.py
+edit config_options.py
+edit data.exf
+edit data.obcs
+edit dummy_link.sh
+edit prepare_run.sh
+run prepare_run.sh
+recopy data and pickup files from branched run
+replicate ini_rsync on host server
+submit run_coupler.sh
