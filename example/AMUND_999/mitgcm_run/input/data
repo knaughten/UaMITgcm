@@ -1,0 +1,102 @@
+# ====================
+# | Model parameters |
+# ====================
+#
+# Continuous equation parameters
+ &PARM01
+ tRef = 50*1.0,
+ sRef = 50*34.5,
+ viscAr = 1.E-4,
+ viscC2Leith = 2.0,
+ viscC2LeithD = 2.0,
+ viscAhGridMax = 1.0,
+ diffKhT = 0.0,
+ diffKrT = 1.E-5,
+ diffKhS = 0.0,
+ diffKrS = 1.E-5,
+ rhoConst = 1028.5,
+ rhoNil   = 1028.5,
+ rhoConstFresh = 1000.0,
+ gravity = 9.81,
+ eosType = 'MDJWF',
+ hFacMin = 0.1,
+ hFacMindr = 10.0,
+ hFacInf = 0.05,
+ hFacSup = 2.0,
+ no_slip_sides  = .FALSE.,
+ no_slip_bottom = .FALSE.,
+ selectBotDragQuadr = 2,
+ bottomDragQuadratic = 2.5E-3,
+ implicitDiffusion = .TRUE.,
+ implicitViscosity = .TRUE.,
+ staggerTimeStep = .TRUE.,
+ useRealFreshWaterFlux = .TRUE.,
+ exactConserv = .TRUE.,
+ implicitFreeSurface = .TRUE.,
+ nonlinFreeSurf = 0,
+ select_rStar = 0,
+ tempAdvScheme = 77,
+ saltAdvScheme = 77,
+ debugLevel = -1,
+ readBinaryPrec = 64,
+ useSingleCPUio = .TRUE.,
+ convertFW2Salt = -1,
+ selectAddFluid = 1,
+ temp_addMass = -92.5,
+ salt_addMass = 0.0,
+/
+
+# Elliptic solver parameters
+ &PARM02
+ cg2dMaxIters = 300,
+ cg2dTargetResidual = 1.E-7,
+ /
+
+# Time stepping parameters
+ &PARM03
+ dumpInitAndLast = .FALSE.,
+ forcing_In_AB = .FALSE.,
+ abEps = 0.1,
+# pickupSuff='ckptA',
+ deltaT = 600.0,
+ niter0 = 0,
+ endTime=3910464000.0,
+# deltaT_chunkTwo = 1080.0,
+# endTime_chunkTwo = 1728000.0,
+# endTime = 864000.0,
+# endTime = 2592000.0,
+# endTime = 2678400.0,
+# endTime = 31536000.0,
+# endTime = 315360000.0,
+# endTime = 630720000.0,
+# endTime = 1262304000.0,
+# endTime = 3153600000.0,
+ pChkptFreq = 31536000.0,
+# pChkptFreq = 315360000.0,
+# ChkptFreq = 86400.0,
+ ChkptFreq = 2592000.0,
+# monitorFreq = 1,
+ monitorFreq = 2592000.0,
+ /
+
+# Gridding parameters
+ &PARM04
+ usingSphericalPolarGrid = .TRUE.,
+ delR= 10.0, 10.0, 10.0, 10.0, 12.0, 14.5, 17.5, 21.0, 25.0, 30.0,
+       35.0, 40.0, 45.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0,
+       50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 60.0,
+       70.0, 80.0, 90.0,105.0,125.0,150.0,175.0,200.0,225.0,250.0,
+      300.0,300.0,300.0,300.0,300.0,300.0,300.0,300.0,300.0,300.0,
+ ygOrigin = -76.,
+ xgOrigin = 220.,
+ dxSpacing = 0.1,
+ delYfile = 'delY_AMUND',
+ /
+# Input datasets
+ &PARM05
+ bathyFile = 'bathy_AMUND',
+ hydrogThetaFile = 'THETA_WOA18.ini',
+ hydrogSaltFile = 'SALT_WOA18.ini',
+ addMassFile = 'addmass_merino_AMUND',
+ /
+

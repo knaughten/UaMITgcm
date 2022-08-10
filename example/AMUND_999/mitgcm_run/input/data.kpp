@@ -1,0 +1,10 @@
+# KPP parameters
+ &KPP_PARM01
+ minKPPhbl = 5.0,
+ Ricr = 0.3,
+ concv = 1.8,
+ cstar = 10.0,
+ difm0 = 5.0E-3,
+ difs0 = 5.0E-3,
+ dift0 = 5.0E-3,
+ /

@@ -1,0 +1,74 @@
+# ***************
+# Open boundaries
+# ***************
+ &OBCS_PARM01
+ OB_Jnorth = 600*-1,
+ OB_Iwest = 400*1,
+ OB_Ieast = 400*-1,
+#
+ OBCSfixTopo = .FALSE.,
+ useOBCSprescribe = .TRUE.,
+ useOBCSsponge = .TRUE.,
+ useSeaiceSponge = .TRUE.,
+#
+ OBNsFile = 'LENS_ens001_SALT_N',
+ OBNtFile = 'LENS_ens001_TEMP_N',
+ OBNuFile = 'LENS_ens001_UVEL_N',
+ OBNvFile = 'LENS_ens001_VVEL_N',
+ OBNaFile = 'LENS_ens001_aice_N',
+ OBNhFile = 'LENS_ens001_hi_N',
+ OBNsnFile = 'LENS_ens001_hs_N',
+ OBNuiceFile = 'LENS_ens001_uvel_N',
+ OBNviceFile = 'LENS_ens001_vvel_N',
+#
+ OBWsFile = 'LENS_ens001_SALT_W',
+ OBWtFile = 'LENS_ens001_TEMP_W',
+ OBWuFile = 'LENS_ens001_UVEL_W',
+ OBWvFile = 'LENS_ens001_VVEL_W',
+ OBWaFile = 'LENS_ens001_aice_W',
+ OBWhFile = 'LENS_ens001_hi_W',
+ OBWsnFile = 'LENS_ens001_hs_W',
+ OBWuiceFile = 'LENS_ens001_uvel_W',
+ OBWviceFile = 'LENS_ens001_vvel_W',
+#
+ OBEsFile = 'LENS_ens001_SALT_E',
+ OBEtFile = 'LENS_ens001_TEMP_E',
+ OBEuFile = 'LENS_ens001_UVEL_E',
+ OBEvFile = 'LENS_ens001_VVEL_E',
+ OBEaFile = 'LENS_ens001_aice_E',
+ OBEhFile = 'LENS_ens001_hi_E',
+ OBEsnFile = 'LENS_ens001_hs_E',
+ OBEuiceFile = 'LENS_ens001_uvel_E',
+ OBEviceFile = 'LENS_ens001_vvel_E',
+ /
+#
+ &OBCS_PARM03
+ spongeThickness = 5,
+ Urelaxobcsinner = 432000.0,
+ Vrelaxobcsinner = 432000.0,
+ Urelaxobcsbound = 86400.0,
+ Vrelaxobcsbound = 86400.0,
+# spongeThickness = 10,
+# Urelaxobcsinner = 86400.0,
+# Vrelaxobcsinner = 86400.0,
+# Urelaxobcsbound = 0.0,
+# Vrelaxobcsbound = 0.0,
+ /
+#
+ &OBCS_PARM05
+ seaiceSpongeThickness = 5,
+ Arelaxobcsinner = 432000.0,
+ Hrelaxobcsinner = 432000.0,
+ SNrelaxobcsinner = 432000.0,
+ Arelaxobcsbound = 86400.0,
+ Hrelaxobcsbound = 86400.0,
+ SNrelaxobcsbound = 86400.0,
+# seaiceSpongeThickness = 10,
+# Arelaxobcsinner = 86400.0,
+# Hrelaxobcsinner = 86400.0,
+# SNrelaxobcsinner = 86400.0,
+# Arelaxobcsbound = 0.0,
+# Hrelaxobcsbound = 0.0,
+# SNrelaxobcsbound = 0.0,
+ /
+

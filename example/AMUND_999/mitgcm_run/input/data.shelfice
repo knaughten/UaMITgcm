@@ -1,0 +1,17 @@
+# ===================================
+# | Parameters for SHELFICE package |
+# ===================================
+ &SHELFICE_PARM01
+ SHELFICEwriteState = .TRUE.,
+ SHELFICEtopoFile  = 'draft_AMUND',
+ SHELFICEloadAnomalyFile  = 'pload_AMUND',
+ no_slip_shelfice = .FALSE.,
+ useISOMIPTD = .FALSE.,
+ SHELFICEconserve = .TRUE.,
+ SHELFICEboundaryLayer = .TRUE.,
+ SHELFICEuseGammaFrict = .TRUE.,
+ SHELFICEadvDiffHeatFlux = .TRUE.,
+ SHELFICEselectDragQuadr = 2,
+ SHELFICEDragQuadratic = 0.0025,
+ shiCdrag=0.004,
+ /
