@@ -1,11 +1,12 @@
 #!/bin/sh
-
-#SBATCH --partition=serial
-#SBATCH --qos=serial
+#SBATCH --time=8:00:00
+#SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --time=8:00:00
-#SBATCH --mem=64gb
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=standard
+#SBATCH --qos=standard
+##SBATCH --reservation=shortqos
 
 ###############################################################
 # Run Ua.
@@ -30,7 +31,8 @@ fi
 echo 'Ua starts '`date` >> jobs.log
 
 cd $UA_DIR
-./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
+
+srun --distribution=block:block --hint=nomultithread ./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
 OUT=$?
 
 cd ../
