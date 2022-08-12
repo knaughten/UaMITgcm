@@ -15,8 +15,8 @@
  cstanton_2        = 0.02,
  cdalton           = 0.035,
  useKatabCorr=.true.,
- katabSclFile='katabatic_tmp',
- katabRtFile='katabatic_tmp',
+ katabSclFile='katabatic_scale_AMUND_90W',
+ katabRtFile='katabatic_rotate_AMUND_90W',
  /
 
 # *********************
@@ -61,7 +61,6 @@
  lwdownfile   = 'LENS_ens001_FLDS',
  swdownfile   = 'LENS_ens001_FSDS',
  apressurefile= 'LENS_ens001_PSL',
-# runofffile   = 'runoff_200Gt.bin',
 #
  /
 
@@ -73,15 +72,13 @@
  exf_offset_swdown = 0.0,
  exf_offset_lwdown = 0.0,
  exf_offset_precip = 0.0,
- exf_offset_atemp_file = 'atemp_offset_tmp',
- exf_offset_aqh_file = 'aqh_offset_tmp',
- exf_offset_swdown_file = 'swdown_offset_tmp',
- exf_offset_lwdown_file = 'lwdown_offset_tmp',
- exf_offset_precip_file = 'precip_offset_tmp',
+ exf_offset_atemp_file = 'atemp_offset_AMUND',
+ exf_offset_aqh_file = 'aqh_offset_AMUND',
+ exf_offset_swdown_file = 'swdown_offset_AMUND',
+ exf_offset_lwdown_file = 'lwdown_offset_AMUND',
+ exf_offset_precip_file = 'precip_offset_AMUND',
  exf_inscal_swdown = -1.0,
  exf_inscal_lwdown = -1.0,
-# must include the below, as default is not 1
-# exf_inscal_runoff = 1.0,
  /
 
 # *********************

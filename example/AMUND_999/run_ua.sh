@@ -45,6 +45,6 @@ if [ $OUT == 0 ]; then
     fi
     exit 0
 else
-    echo 'Error in Ua '`date` >> ../jobs.log
+    echo 'Error in Ua '`date` >> jobs.log
     exit 1
 fi
