@@ -1,6 +1,11 @@
 function [UserVar,CtrlVar,MeshBoundaryCoordinates]=DefineInitialInputs(UserVar,CtrlVar)
 
-UserVar = read_PTDCSpecificUserVariables(UserVar);
+UserVar.Geometry = 'Bedmachinev2';
+UserVar.GeometryInterpolants = 'GriddedInterpolants_Bedmachine2020-07-15.mat';
+UserVar.NameOfFileForReadingSlipperinessEstimate = 'AMUND_gsC100000_gsA100000_gaC1_gaA250_kH100_Weertman_m3_Bedmachine20200715_C-Estimate.mat';
+UserVar.NameOfFileForReadingAGlenEstimate = 'AMUND_gsC100000_gsA100000_gaC1_gaA250_kH100_Weertman_m3_Bedmachine20200715_AGlen-Estimate.mat';
+UserVar.RACMO_SMB = 'SMB_RACMO_1979_2013.mat';
+UserVar.SlidingLaw = 'Weertman';
 
 %
 CtrlVar.TimeDependentRun=1;  % {0|1} if true (i.e. set to 1) then the run is a forward transient one, if not
