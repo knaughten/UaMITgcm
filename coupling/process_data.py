@@ -158,10 +158,10 @@ def adjust_mit_geom (grid, options):
         print('Not doing digging as per user request')
     elif options.digging == 'bathy':
         print('Digging bathymetry which is too shallow')
-        bathy = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='bathy')
+        bathy = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='bathy', dig_full_cells=options.dig_full_cells)
     elif options.digging == 'draft':
         print('Digging ice shelf drafts which are too deep')
-        draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft')
+        draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=options.hFacMin, hFacMinDr=options.hFacMinDr, dig_option='draft', dig_full_cells=options.dig_full_cells)
 
     print('Fixing ice shelf drafts which are too thin')
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=options.hFacMinDr, only_grow=True)[0]

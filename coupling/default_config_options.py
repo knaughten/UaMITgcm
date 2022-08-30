@@ -123,6 +123,9 @@ output_freq = 'monthly'
 ### 'bathy': dig bathymetry which is too shallow
 ### 'draft': dig ice shelf drafts which are too deep
 digging = 'bathy'
+### Should we dig full cells instead of the minimum amount
+### (needed to match PAS domain generation)?
+dig_full_cells = False
 ### Should we fill isolated single bottom cells to prevent pooling
 ### of dense water?
 ### This is a really good thing to do, but you also need to have it

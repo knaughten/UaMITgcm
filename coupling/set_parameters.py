@@ -120,6 +120,7 @@ class Options:
         self.calendar_type = check_value('calendar_type', calendar_type, legal=['standard', 'noleap', '360-day'])
         self.output_freq = check_value('output_freq', output_freq, legal=['monthly', 'daily', 'end'])
         self.digging = check_value('digging', digging, legal=['none', 'bathy', 'draft'])
+        self.dig_full_cells = check_value('dig_full_cells', dig_full_cells, type='bool')
         self.filling = check_value('filling', filling, type='bool')
         self.adjust_vel = check_value('adjust_vel', adjust_vel, type='bool')
         self.misomip_wall = check_value('misomip_wall', misomip_wall, type='bool')
