@@ -724,6 +724,18 @@ def ini_rsync (options):
 def rsync_segment (options):
 
     new_dir = options.output_dir + options.last_start_date  # No trailing slash
-    subprocess.check_call(['rsync', '-razL', new_dir, options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
+    count = 0
+    while True:
+        try:
+            subprocess.check_call(['rsync', '-razL', new_dir, options.rsync_host+':'+options.rsync_path+options.expt_name+'/output/'])
+        except(subprocess.CalledProcessError):
+            if count > 5:
+                print('rsync keeps dropping. Bailing')
+                sys.exit()
+            print('rsync dropped, trying again')
+            count += 1
+            continue
+        print('rsync success')
+        break
     # If it survived this far, it's safe to delete the directory
     shutil.rmtree(new_dir)
