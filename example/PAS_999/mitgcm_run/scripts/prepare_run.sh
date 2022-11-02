@@ -30,7 +30,7 @@ fi
 cp ../input/* .
 
 # Link input files stored elsewhere
-PAS_IN=$WORK/PAS_files/
+PAS_IN=/work/n02/n02/shared/baspog/PAS_files/
 ln -s $PAS_IN/* .
 LENS_ATM=/work/n02/n02/shared/baspog/CESM/LENS
 ln -s $LENS_ATM/* .
