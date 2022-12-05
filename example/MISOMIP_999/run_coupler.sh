@@ -11,7 +11,7 @@
 
 # USER VARIABLES
 # Path to UaMITgcm repository
-REPO_DIR=$WORK/UaMITgcm
+REPO_DIR=$WORK/uamitgcm/uamitgcm_archer2
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
 MIT_SOURCE=$REPO_DIR/MITgcm_67g
 
@@ -24,7 +24,7 @@ COUPLEPY=$REPO_DIR/coupling
 MITPY=$REPO_DIR/tools
 # MITgcmutils
 MITU=$MIT_SOURCE/utils/python/MITgcmutils
-export PYTHONPATH=$PWD:$COUPLEPY:$MITPY:$MITU:$PYTHONPATH
+export PYTHONPATH=$SLURM_SUBMIT_DIR:$COUPLEPY:$MITPY:$MITU:$PYTHONPATH
 
 echo $'\n''*****'`date`'*****' >> coupler_stdout
 

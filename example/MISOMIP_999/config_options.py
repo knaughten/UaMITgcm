@@ -25,7 +25,7 @@ ua_output_format = 'matlab'
 
 # Optional base directory to simplify definition of directories below
 # This variable won't be read by the coupler, so you don't have to use it.
-work_dir = '/work/n02/n02/kaight/UaMITgcm/example/'+expt_name+'/'
+work_dir = '/work/n02/n02/rreese/uamitgcm/cases/'+expt_name+'/'
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
 mit_case_dir = work_dir+'mitgcm_run/'
@@ -46,7 +46,7 @@ total_time = 102*12
 spinup_time = 24
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 24
+couple_step = 12 
 
 ### Calculation of melt rates 
 ### 'last': Ua sees melt rates from the end of the coupling interval
@@ -149,8 +149,10 @@ seaice_nz = 7
 
 ### Starting date of simulation
 ### Should match startDate_1 in data.cal
-startDate = '00010101'
+startDate = '20010101'
 
+save_dumps = False
+save_tmp_ckpt = False
 
 
 ###### 4. Filenames ######

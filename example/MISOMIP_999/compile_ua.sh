@@ -3,11 +3,11 @@
 # USER VARIABLES
 # Path to correct version of Matlab
 # For running executable on Archer, need 2017a or later
-MATLAB_PATH=$HOME/matlab_2021a
+MATLAB_PATH=/usr/local/MATLAB/R2022b
 # Path to UaMITgcm repository
-REPO_DIR=$HOME/UaMITgcm
+REPO_DIR=$HOME/UaMITgcm/UaMITgcm_archer2
 # Path to Ua build directory (will be created if it doesn't exist)
-UA_BUILD=$HOME/UaBuild
+UA_BUILD=$HOME/UaMITgcm/UaBuild
 # Path to configuration-specific Ua files to overwrite
 UA_CASE_UPDATES=$PWD/ua_custom
 # Path to Ua source directory (default use the one inside UaMITgcm)

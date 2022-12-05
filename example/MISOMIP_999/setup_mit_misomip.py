@@ -7,7 +7,8 @@ import numpy as np
 from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
-sys.path.append('../../tools/')
+mitgcmpythonpath='../../uamitgcm_archer2/tools/'
+sys.path.append(mitgcmpythonpath)
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz, calc_hfac
 from mitgcm_python.make_domain import do_digging, do_zapping
@@ -51,7 +52,7 @@ class BasicGrid:
     # Compatibility function with Grid.
     def get_hfac (self, gtype='t'):
         if gtype != 't':
-            print 'Error (BasicGrid.get_hfac): hfac only exists on tracer grid'
+            print ('Error (BasicGrid.get_hfac): hfac only exists on tracer grid')
             sys.exit()
         return self.hfac
 
@@ -78,15 +79,15 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
     draft[-1,:] = 0
 
     if dig_option == 'none':
-        print 'Not doing digging as per user request'
+        print ('Not doing digging as per user request')
     elif dig_option == 'bathy':
-        print 'Digging bathymetry which is too shallow'
+        print ('Digging bathymetry which is too shallow')
         bathy = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr, dig_option='bathy')
     elif dig_option == 'draft':
-        print 'Digging ice shelf drafts which are too deep'
+        print ('Digging ice shelf drafts which are too deep')
         draft = do_digging(bathy, draft, grid.dz, grid.z_edges, hFacMin=hFacMin, hFacMinDr=hFacMinDr, dig_option='draft')
 
-    print 'Zapping ice shelf drafts which are too thin'
+    print ('Zapping ice shelf drafts which are too thin')
     draft = do_zapping(draft, draft!=0, grid.dz, grid.z_edges, hFacMinDr=hFacMinDr)[0]        
 
     # Calculate hFacC and save to the grid for later
@@ -102,7 +103,7 @@ def make_topo (grid, ua_topo_file, bathy_file, draft_file, prec=64, dig_option='
 def ts_profile(z, option='warm'):
 
     if option not in ['warm', 'cold']:
-        print 'Error (ts_profile): invalid option ' + option
+        print ('Error (ts_profile): invalid option ' + option)
         sys.exit()
 
     T0 = -1.9
@@ -164,13 +165,13 @@ def make_ics_obcs (grid, ini_temp_file, ini_salt_file, obcs_temp_file_cold, obcs
 # Path to MITgcm input/ directory for the MISOMIP case
 input_dir = 'mitgcm_run/input/'
 
-print 'Building grid'
+print ('Building grid')
 grid = BasicGrid()
 
-print 'Creating topography'
+print ('Creating topography')
 make_topo(grid, 'ua_custom/DataForMIT.mat', input_dir+'bathymetry.shice', input_dir+'shelfice_topo.bin', dig_option='bathy', prec=64)
 
-print 'Creating initial and boundary conditions'
+print ('Creating initial and boundary conditions')
 make_ics_obcs(grid, input_dir+'lev_t.shice', input_dir+'lev_s.shice', input_dir+'OBEt_cold', input_dir+'OBEs_cold', input_dir+'OBEt_warm', input_dir+'OBEs_warm', input_dir+'OBEu', input_dir+'OBEv', input_dir+'phi0surf.bin', prec=64)
 
 

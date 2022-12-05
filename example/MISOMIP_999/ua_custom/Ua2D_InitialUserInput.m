@@ -22,13 +22,13 @@ CtrlVar.WriteRestartFile = 1;
 
 %% parallel settings
 myCluster = parcluster('local') ;  
-myCluster.NumWorkers = 6;
+myCluster.NumWorkers = 1;
 saveProfile(myCluster);
 
-% CtrlVar.Parallel.uvhAssembly.parfor.isOn=1;     % assembly over integration points done in parallel using parfor
-% CtrlVar.Parallel.uvhAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
+CtrlVar.Parallel.uvhAssembly.parfor.isOn=0;     % assembly over integration points done in parallel using parfor
+CtrlVar.Parallel.uvhAssembly.spmd.isOn=0;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
 % CtrlVar.Parallel.uvhAssembly.spmd.nWorkers=[];  % If left empty, all workers available are used
-% CtrlVar.Parallel.uvAssembly.spmd.isOn=1;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
+CtrlVar.Parallel.uvAssembly.spmd.isOn=0;       % assembly in parallel using spmd over sub-domain (domain decomposition)  
 % CtrlVar.Parallel.uvAssembly.spmd.nWorkers=[]; 
 
 %% Reading in mesh

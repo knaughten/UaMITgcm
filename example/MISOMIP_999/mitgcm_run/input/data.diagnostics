@@ -22,7 +22,7 @@
  frequency(2) = 2592000.,
  filename(2)  = 'MITout_3D',
  fields(1,2)  = 'UVEL ','VVEL ','THETA','SALT ',
-&
+/
 
 
 
@@ -43,5 +43,5 @@
 #   stat_fname(1)= 'dynStDiag',
 #    stat_freq(1)= -864000.,
 #   stat_phase(1)= 0.,
- &
+ /
 

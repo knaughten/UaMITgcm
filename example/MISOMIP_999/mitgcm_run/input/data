@@ -45,7 +45,7 @@
  implicitViscosity=.true.,
  implicitDiffusion=.true.,
  useCDScheme = .FALSE.,
- &
+ /
 
 # Elliptic solver parameters
  &PARM02
@@ -53,42 +53,42 @@
  cg2dTargetResidual=1.E-13,
  cg3dMaxIters=400,
  cg3dTargetResidual=1.E-13,
- &
+ /
 
 # Time stepping parameters
  &PARM03
  niter0=0,
  deltaT=300.0,
 # 6-month simulation
- endTime=15552000.,
+ endTime=15552000,
  abEps=0.1,
- cAdjFreq = -1.,
+ cAdjFreq = -1,
 # monthly checkpoints
 # chkptFreq = 2592000.,
 # pickupSuff='ckptA',
 # 6-monthly permanent checkpoint
- pchkptFreq = 15552000.,
+ pchkptFreq = 15552000,
  dumpFreq=0.0,
  taveFreq=0.0,
- dumpInitAndLast=.true.,
- monitorFreq=64800.,
- monitorSelect=64800.,
+ dumpInitAndLast=.false.,
+ monitorFreq=64800,
+ monitorSelect=64800,
 # for time dependent open boundary conditions, activate the following 3 lines:
  periodicExternalForcing=.false.,
- externForcingPeriod=0.,
- externForcingCycle=0.,
- &
+ externForcingPeriod=0,
+ externForcingCycle=0,
+ /
 
 # Gridding parameters
  &PARM04
  usingCartesianGrid=.TRUE.,
 # usingSphericalPolarGrid=.TRUE.,
- xgOrigin = 320000.,
- ygOrigin = -2000.,
+ xgOrigin = 320000.0,
+ ygOrigin = -2000.0,
  delX=240*2000,
  delY=42*2000,
  delZ=36*20.0,
- &
+ /
 
 # Input datasets
  &PARM05
@@ -100,4 +100,4 @@
 # pSurfInitFile='eta_init.bin',
  checkIniTemp=.false.,
  checkIniSalt=.false.,
-&
+/

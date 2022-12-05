@@ -11,13 +11,13 @@
 # In testing there will be many runs for one case to explore SLURM options
 # such as number of nodes.
 
-# the script create_case copies tjhis and sets it up
+# the script create_case copies this and sets it up
 
 module load PrgEnv-gnu 
 module load cray-hdf5-parallel
 module load cray-netcdf-hdf5parallel
 
-export MITGCM_ROOTDIR=$WORK/UaMITgcm/MITgcm_67s
+export MITGCM_ROOTDIR=$WORK/uamitgcm/uamitgcm_archer2/MITgcm_67g #$WORK/UaMITgcm/MITgcm_67s
 export MITGCM_GENM_FLAGS= #  is replaced by create_case (may be empty)
 export MITGCM_FFLAGS='' # '' is replaced by create_case (may be empty)
-export MITGCM_OPT=$WORK/UaMITgcm/example/dev_linux_amd64_gfortran_archer2
+export MITGCM_OPT=$WORK/uamitgcm/uamitgcm_archer2/example/dev_linux_amd64_gfortran_archer2

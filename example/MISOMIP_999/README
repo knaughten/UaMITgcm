@@ -6,14 +6,19 @@ wget http://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R20
 If you want another version for a different machine, they're all available here https://uk.mathworks.com/products/compiler/matlab-runtime.html. 
 Follow instructions here to unzip and install; https://uk.mathworks.com/help/compiler/install-the-matlab-runtime.html On Archer, make sure you install to a folder in /work rather than /home.
 
+
 Set some variables specific to your filesystem (all within this example/MISOMIP_999 directory):
 For Compile-Machine:
 compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD
 For Run-Machine:
-mitgcm_run/scripts/compile.sh: MIT_SOURCE
+mitgcm_run/scripts/case_setup: MITGCM_ROOTDIR, MITGCM_OPT 
 run_coupler.sh: REPO_DIR
 run_ua.sh: MCR
 config_options.py: work_dir, budget_code
+For setup:
+setup_mit_misomip.py: mitgcmpythonpath
+
+Copy example to your personal runs directory and rename (name set in config_options.py: expt_name)
 
 Setup MITgcm:
 Go to Run-Machine.
@@ -26,10 +31,10 @@ cd ../../
 Setup Ua:
 Go to Compile-Machine.
 ./compile_ua.sh
-scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP_999/ua_run/
+rsync -avCPr -e ssh Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP_999/ua_run/
 Go back to Run-Machine.
 cp MISOMIP_999-RestartFile.mat ua_run/
-(note this will get overwritten during simulations.)
+(note this will get overwritten during simulations. Make sure to rename to your new experiment name.)
 
 Run the model:
-qsub -A <budget code> run_coupler.sh
+sbatch --export=ALL -A <budget_code> run_coupler.sh
