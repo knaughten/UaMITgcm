@@ -6,7 +6,7 @@ import os
 import shutil
 
 from set_parameters import Options
-from coupling_utils import copy_to_dir, line_that_matters, extract_first_int, make_tmp_copy, submit_job, add_months
+from coupling_utils import copy_to_dir, line_that_matters, extract_first_int, make_tmp_copy, submit_job, add_months, subtract_months
 from clean import clean_ua
 
 if __name__ == "__main__":
@@ -77,15 +77,36 @@ if __name__ == "__main__":
         niter0 = extract_first_int(niter0_line[start:])
         # Reconstruct timestep stamp for pickup files we want
         niter0_stamp = str(niter0).zfill(10)
-        # They will actually be in the directory from the year before
-        prefix = '../'+output_date_dir.replace(str(new_year),str(new_year-1))+'/MITgcm/'
-        mit_file_names += [prefix+'pickup.'+niter0_stamp+'.data', prefix+'pickup.'+niter0_stamp+'.meta']
-        if options.use_seaice:
-            mit_file_names += [prefix+'pickup_seaice.'+niter0_stamp+'.data', prefix+'pickup_seaice.'+niter0_stamp+'.meta']
-        if options.use_ptracers:
-            mit_file_names += [prefix+'pickup_ptracers.'+niter0_stamp+'.data', prefix+'pickup_ptracers.'+niter0_stamp+'.meta']
-    # Now copy all the files
+        
+        if options.save_tmp_ckpt==False:
+            # pickup files will actually be in the directory from the previous output
+            # reconstruct the previous year and month 
+            previous_year, previous_month  = subtract_months( new_year, new_month, options.couple_step)
+            # get the previous output directory
+            output_date_dir_prev = output_date_dir.replace(date_code,str(previous_year).zfill(4)+str(previous_month).zfill(2))
+            # the relevant files will be copied individually
+            mit_file_names_prev = ['pickup.'+niter0_stamp+'.data', 'pickup.'+niter0_stamp+'.meta']
+            if options.use_seaice:
+                mit_file_names_prev += ['pickup_seaice.'+niter0_stamp+'.data', 'pickup_seaice.'+niter0_stamp+'.meta']
+            if options.use_ptracers:
+                mit_file_names_prev += ['pickup_ptracers.'+niter0_stamp+'.data', 'pickup_ptracers.'+niter0_stamp+'.meta']
+            # Now copy the pickup files
+            for fname in mit_file_names_prev:
+                print(output_date_dir_prev)
+                print(fname)
+                copy_to_dir(fname, output_date_dir_prev+'MITgcm/', options.mit_run_dir)
+        else: 
+            # pickup files are also in the current directory 
+            mit_file_names += ['pickup.'+niter0_stamp+'.data', 'pickup.'+niter0_stamp+'.meta']
+            if options.use_seaice:
+                mit_file_names += ['pickup_seaice.'+niter0_stamp+'.data', 'pickup_seaice.'+niter0_stamp+'.meta']
+            if options.use_ptracers:
+                mit_file_names += ['pickup_ptracers.'+niter0_stamp+'.data', 'pickup_ptracers.'+niter0_stamp+'.meta']
+
+    # Now copy all other files
     for fname in mit_file_names:
+        print(output_date_dir)
+        print(fname)
         copy_to_dir(fname, output_date_dir+'MITgcm/', options.mit_run_dir)
 
     if spinup or first_coupled:
