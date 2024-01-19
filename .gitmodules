@@ -21,3 +21,10 @@
 	path = UaSource_7Dec2021
 	url = git@github.com:GHilmarG/UaSource.git
 	branch = master
+[submodule "UaSource_beta_19Jan2024"]
+	path = UaSource_beta_19Jan2024
+	url = git@github.com:GHilmarG/UaSource.git
+	branch = beta
+[submodule "MITgcm_68r"]
+	path = MITgcm_68r
+	url = git@github.com:MITgcm/MITgcm.git
