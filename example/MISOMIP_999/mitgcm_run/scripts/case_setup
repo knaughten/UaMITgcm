@@ -13,11 +13,13 @@
 
 # the script create_case copies this and sets it up
 
-module load PrgEnv-gnu 
-module load cray-hdf5-parallel
-module load cray-netcdf-hdf5parallel
+module load PrgEnv-cray
 
-export MITGCM_ROOTDIR=$WORK/uamitgcm/uamitgcm_archer2/MITgcm_67g #$WORK/UaMITgcm/MITgcm_67s
+#module load PrgEnv-gnu 
+#module load cray-hdf5-parallel
+#module load cray-netcdf-hdf5parallel
+
+export MITGCM_ROOTDIR=$WORK/uamitgcm/uamitgcm_archer2/MITgcm_68r #$WORK/UaMITgcm/MITgcm_67s
 export MITGCM_GENM_FLAGS= #  is replaced by create_case (may be empty)
 export MITGCM_FFLAGS='' # '' is replaced by create_case (may be empty)
-export MITGCM_OPT=$WORK/uamitgcm/uamitgcm_archer2/example/dev_linux_amd64_gfortran_archer2
+export MITGCM_OPT=$WORK/uamitgcm/uamitgcm_archer2/example/dev_linux_amd64_cray_archer2
