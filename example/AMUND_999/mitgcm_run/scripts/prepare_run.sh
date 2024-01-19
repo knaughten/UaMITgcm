@@ -42,7 +42,8 @@ cp $AMUND_IN/draft_AMUND $AMUND_IN/bathy_AMUND $AMUND_IN/pload_AMUND .
 OBCS_CORR=( UVEL_BSOSE.OBCS_E UVEL_BSOSE.OBCS_W VVEL_BSOSE.OBCS_N )
 for VAR in "${OBCS_CORR[@]}"; do
     rm -f ${VAR}
-    cp $AMUND_IN/${VAR} ${VAR}.master
+    cp $AMUND_IN/${VAR} .
+    cp ${VAR} ${VAR}.master
 done    
 
 # Link executable
