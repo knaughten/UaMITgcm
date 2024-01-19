@@ -30,34 +30,19 @@ fi
 cp ../input/* .
 
 # Link input files stored elsewhere
-AMUND_IN=$WORK/AMUND_files/
+AMUND_IN=/work/n02/n02/shared/baspog/AMUND_files/
 ln -s $AMUND_IN/* .
-LENS_ATM=/work/n02/n02/shared/baspog/CESM/LENS
-ln -s $LENS_ATM/* .
-LENS_OBCS=/work/n02/n02/shared/baspog/CESM/LENS_obcs
-ln -s $LENS_OBCS/* .
-../scripts/dummy_link.sh LENS 1890 1919 1920 1949
-../scripts/dummy_link.sh LENS 1889 1889 1890 1890
-../scripts/dummy_link.sh LENS 2101 2101 2100 2100
-
+ln -s /work/n02/n02/shared/baspog/ERA5/* .
+../scripts/dummy_link.sh ERA5 1947 1978 1979 2010
+../scripts/dummy_link.sh ERA5 2022 2022 2021 2021
 
 # Deep copy of some files that will be modified
 rm -f draft_AMUND bathy_AMUND pload_AMUND
 cp $AMUND_IN/draft_AMUND $AMUND_IN/bathy_AMUND $AMUND_IN/pload_AMUND .
-
-OBCS_CORR=( UVEL_E UVEL_W VVEL_N )
+OBCS_CORR=( UVEL_BSOSE.OBCS_E UVEL_BSOSE.OBCS_W VVEL_BSOSE.OBCS_N )
 for VAR in "${OBCS_CORR[@]}"; do
-    rm -f LENS_ens001_${VAR}_*
-    cp $LENS_OBCS/LENS_ens001_${VAR}_* .
-    # Now redo the work of dummy_link.sh as deep copies
-    for YEAR in {1920..1949}; do
-	cp LENS_ens001_${VAR}_$YEAR LENS_ens001_${VAR}_$((YEAR-30))
-    done
-    cp LENS_ens001_${VAR}_1890 LENS_ens001_${VAR}_1889
-    cp LENS_ens001_${VAR}_2100 LENS_ens001_${VAR}_2101
-    for f in LENS_ens001_${VAR}_*; do
-	cp $f $f.master
-    done
+    rm -f ${VAR}
+    cp $AMUND_IN/${VAR} ${VAR}.master
 done    
 
 # Link executable

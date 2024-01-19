@@ -19,13 +19,13 @@ rsync_path = '/data/oceans_output/shelf/kaight/archer2_mitgcm/'
 
 ###### 2. Coupling options ######
 
-total_time = 12*116 #211
-spinup_time = 12*116
+total_time = 12*73
+spinup_time = 12*73
 couple_step = 12
 
 melt_coupling = 'avg'
 
-calendar_type = 'noleap'
+calendar_type = 'standard'
 output_freq = 'monthly'
 
 digging = 'bathy'
@@ -41,7 +41,7 @@ pload_salt = 34.5
 ua_ini_restart = True
 
 correct_obcs_online = True
-obcs_transient = True
+obcs_transient = False
 correct_obcs_steps = 1
 
 ###### 3. MITgcm parameters ######
@@ -57,7 +57,7 @@ hFacMinDr = 10.
 rhoConst = 1028.5
 seaice_nz = 7
 
-startDate = '18900101'
+startDate = '19470101'
 
 use_addmass = True
 seaice_sigma = False
@@ -73,6 +73,6 @@ ismr_name = 'state2D'
 etan_name = 'state2D'
 output_names = ['state2D', 'stateExf', 'stateTheta', 'stateSalt', 'stateVel']
 
-obcs_file_w_u = 'LENS_ens001_UVEL_W_'
-obcs_file_e_u = 'LENS_ens001_UVEL_E_'
-obcs_file_n_v = 'LENS_ens001_VVEL_N_'
+obcs_file_w_u = 'UVEL_BSOSE.OBCS_W'
+obcs_file_e_u = 'UVEL_BSOSE.OBCS_E'
+obcs_file_n_v = 'VVEL_BSOSE.OBCS_N'
