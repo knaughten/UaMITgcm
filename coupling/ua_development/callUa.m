@@ -102,7 +102,7 @@ if strcmp(UserVar.UaMITgcm.MITcoordinates,'latlon')
     lonGMIT(index) = lonGMIT(index) - 360;
     
     [UserVar.UaMITgcm.MITgcmCGridX,UserVar.UaMITgcm.MITgcmCGridY] = ll2psxy(latCMIT,lonCMIT,-71,0);
-    [UserVar.UaMITgcm.MITgcmGGridX,UserVar.UaMITgcm.MITgcmGGridY] = ll2psxy(latCMIT,lonCMIT,-71,0);
+    [UserVar.UaMITgcm.MITgcmGGridX,UserVar.UaMITgcm.MITgcmGGridY] = ll2psxy(latGMIT,lonGMIT,-71,0);
     
     UserVar.UaMITgcm.MITgcmCGridlon = lonCMIT;
     UserVar.UaMITgcm.MITgcmCGridlat = latCMIT;
