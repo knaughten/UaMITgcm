@@ -1,0 +1,49 @@
+#!/bin/bash
+
+CC='cc'
+FC='ftn'
+F90C='ftn'
+
+# test without NML TRMINATOR if namleists end in & as in PAS
+# MA2 - added alwaysuse mpi
+
+CPP='cpp -traditional -P'
+EXTENDED_SRC_FLAG='-Mextend'
+CHECK_FOR_LAPACK=t
+FC_CHECK=f
+
+if [ ${PE_ENV} == "CRAY" ]
+then 
+    GET_FC_VERSION="-V"
+
+    DEFINES='-DWORDLENGTH=4 -D_BYTESWAPIO -DHAVE_LAPACK -DNML_TERMINATOR -DALWAYS_USE_MPI'
+    INCLUDES='-I${NETCDF_DIR}/include -I${CRAY_MPICH_DIR}/include'
+    LIBS='-L${NETCDF_DIR}/lib -L${CRAY_MPICH_DIR}/include/lib'
+
+    NOOPTFLAGS='-O0'
+    NOOPTFILES=''
+
+    if test "x$IEEE" = x ; then   #- with optimisation:
+	    # no flags given to genmake2
+
+         #FOPTIM='-O2 -hfp0 -e0 -Ktrap=fp,unf'
+         FOPTIM='-O3 -hfp3 -Oipa5 -e0'
+    else
+        if test "x$DEVEL" = x ; then  #- no optimisation + IEEE :
+          FOPTIM='-O0  -hfp0'
+        else                          #- development/check options:
+          FOPTIM='-O0 -hfp0'
+          FOPTIM="$FOPTIM -g -Rbc -rm -hmsgs -hnegmsgs"
+        fi
+    fi
+
+
+    FFLAGS="$FFLAGS -em -ef  -h pic -dynamic"
+
+    CFLAGS="$CFLAGS -h pic -dynamic"
+
+
+else
+	    echo wrong compiler
+fi
+
