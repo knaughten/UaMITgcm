@@ -64,10 +64,10 @@ end
 if numel(UserVar.UaMITgcm.UaOutputTimes)==1
 	% allows for a single Ua output interval equal to the coupling timestep,
 	% e.g. monthly output and a 1 month coupling timestep
-	UserVar.UaMITgcm.ATStimeStepTarget=UserVar.UaMITgcm.UaOutputTimes(1);
+	UserVar.UaMITgcm.ATSdtMax=UserVar.UaMITgcm.UaOutputTimes(1);
 elseif numel(UserVar.UaMITgcm.UaOutputTimes)>1
 	% this covers multiple Ua outputs within a single coupling timestep
-	UserVar.UaMITgcm.ATStimeStepTarget=min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
+	UserVar.UaMITgcm.ATSdtMax=min(UserVar.UaMITgcm.UaOutputTimes(2:end)-UserVar.UaMITgcm.UaOutputTimes(1:end-1));
 else
 	error('Not enough input values in UaOutputTimes');
 end
@@ -102,7 +102,7 @@ if strcmp(UserVar.UaMITgcm.MITcoordinates,'latlon')
     lonGMIT(index) = lonGMIT(index) - 360;
     
     [UserVar.UaMITgcm.MITgcmCGridX,UserVar.UaMITgcm.MITgcmCGridY] = ll2psxy(latCMIT,lonCMIT,-71,0);
-    [UserVar.UaMITgcm.MITgcmGGridX,UserVar.UaMITgcm.MITgcmGGridY] = ll2psxy(latCMIT,lonCMIT,-71,0);
+    [UserVar.UaMITgcm.MITgcmGGridX,UserVar.UaMITgcm.MITgcmGGridY] = ll2psxy(latGMIT,lonGMIT,-71,0);
     
     UserVar.UaMITgcm.MITgcmCGridlon = lonCMIT;
     UserVar.UaMITgcm.MITgcmCGridlat = latCMIT;

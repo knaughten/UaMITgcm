@@ -6,30 +6,31 @@ persistent BCsFig
 narginchk(5,5)
 nargoutchk(2,2)
 
-
+%% JDR 13/02/2024: remove these checks because they do not work with the compiled
+%% version of Ua-MITgcm. Instead, users should make sure they use the correct
+%% form of DefineBoundaryConditions.m, as specified below.
 % does DefineBoundaryConditions.m exist in the run directory?
 % if so then use that instead of DefineBCs.m
 % Update: assume it exists, because checking breaks the compiled version.
 
-
 %if exist(fullfile(cd,'DefineBoundaryConditions.m'),'file')
     
-    fprintf(' Using DefineBoundaryConditions.m to define boundary conditions \n')
-    
-    N=nargout('DefineBoundaryConditions');
-    
-    switch N
-        
-        case 1
-            
-            BCs=DefineBoundaryConditions(UserVar,CtrlVar,MUA,BCs,CtrlVar.time,F.s,F.b,F.h,F.S,F.B,F.ub,F.vb,F.ud,F.vd,F.GF);
-            
-        case 2
-            
-            [UserVar,BCs]=DefineBoundaryConditions(UserVar,CtrlVar,MUA,BCs,CtrlVar.time,F.s,F.b,F.h,F.S,F.B,F.ub,F.vb,F.ud,F.vd,F.GF);
-            
-    end
-    
+    % fprintf(' Using DefineBoundaryConditions.m to define boundary conditions \n')
+    % 
+    % N=nargout('DefineBoundaryConditions');
+    % 
+    % switch N
+    % 
+    %     case 1
+    % 
+    %         BCs=DefineBoundaryConditions(UserVar,CtrlVar,MUA,F,BCs);
+    % 
+    %     case 2
+    % 
+    %         [UserVar,BCs]=DefineBoundaryConditions(UserVar,CtrlVar,MUA,F,BCs);
+    % 
+    % end
+    % 
     
 %else
     
@@ -55,6 +56,8 @@ nargoutchk(2,2)
 %    BCs.hTiedNodeB=hTiedNodeB;
     
 %end
+
+[UserVar,BCs]=DefineBoundaryConditions(UserVar,CtrlVar,MUA,F,BCs);
 
 switch lower(CtrlVar.FlowApproximation)
     

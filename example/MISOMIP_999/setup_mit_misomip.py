@@ -7,7 +7,7 @@ import numpy as np
 from scipy.io import loadmat
 import sys
 # Get mitgcm_python in the path
-mitgcmpythonpath='../../uamitgcm_archer2/tools/'
+mitgcmpythonpath='../../UaMITgcm_archer2/tools/'
 sys.path.append(mitgcmpythonpath)
 from mitgcm_python.file_io import write_binary
 from mitgcm_python.utils import z_to_xyz, calc_hfac

@@ -3,17 +3,19 @@
 # USER VARIABLES
 # Path to correct version of Matlab
 # For running executable on Archer2, tested 2021a or later
-MATLAB_PATH=/usr/local/MATLAB/R2022b
+MATLAB_PATH=/path/to/local/matlab/folder
 # Path to UaMITgcm repository
-REPO_DIR=$HOME/UaMITgcm/UaMITgcm_archer2
+REPO_DIR=/path/to/local/copy/of/uamitgcm/github/repository
 # Path to Ua build directory (will be created if it doesn't exist)
-UA_BUILD=$HOME/UaMITgcm/UaBuild
+UA_BUILD=$PWD/UaBuild
 # Path to configuration-specific Ua files to overwrite
 UA_CASE_UPDATES=$PWD/ua_custom
 # Path to Ua source directory (default use the one inside UaMITgcm)
 UA_SOURCE=$REPO_DIR/UaSource_beta_19Jan2024
 # Path to coupling-specific Ua files to overwrite
-UA_COUPLING_UPDATES=$REPO_DIR/coupling/ua_development
+# This folder has been discontinued and all changes to the ua code 
+# are now included in the ua_custom folder in the example directory
+# UA_COUPLING_UPDATES=$REPO_DIR/coupling/ua_development
 
 if [ -e $UA_BUILD ]; then
     # Empty the directory
@@ -30,7 +32,6 @@ cp `find $UA_SOURCE/UaUtilities/ -name "*.m"` $UA_BUILD
 cp `find $UA_SOURCE/NewestVertexBisection/ -name "*.m"` $UA_BUILD
 cp `find $UA_SOURCE/Mesh2d/ -name "*.m"` $UA_BUILD
 # Also copy everything from updates folders
-cp -r $UA_COUPLING_UPDATES/* $UA_BUILD
 cp -r $UA_CASE_UPDATES/* $UA_BUILD
 
 # Create the executable

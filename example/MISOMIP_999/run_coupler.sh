@@ -11,9 +11,9 @@
 
 # USER VARIABLES
 # Path to UaMITgcm repository
-REPO_DIR=$WORK/uamitgcm/uamitgcm_archer2
+REPO_DIR=$WORK/UaMITgcm/UaMITgcm_archer2
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
-MIT_SOURCE=$REPO_DIR/MITgcm_67g
+MIT_SOURCE=$REPO_DIR/MITgcm_68r
 
 echo 'Coupler starts '`date` >> jobs.log
 

@@ -1,11 +1,13 @@
+MISOMIP_999 version 13 Feb 2024. Tested with Ua version beta_19Jan2024 and MITgcm version 68r
+
 Clone the UaMITgcm repository to Compile-Machine (where you will compile Ua) and Run-Machine (where you will run everything). Make sure to use git clone --recursive instead of just git clone, so you get the submodules.
 
 Install Matlab Runtime on Run-Machine:
-Assuming you're using Archer, you will need version 2017a:
-wget http://ssd.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
+Assuming you're using Archer2, you can install any recent version (tested >2021a). For version 2023:
+wget "https://ssd.mathworks.com/supportfiles/downloads/R2023b/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2023b_Update_5_glnxa64.zip" $HOME/
+unzip $HOME/MATLAB_Runtime_R2023b_Update_5_glnxa64.zip -d $HOME/MATLAB_Runtime_temp
 If you want another version for a different machine, they're all available here https://uk.mathworks.com/products/compiler/matlab-runtime.html. 
-Follow instructions here to unzip and install; https://uk.mathworks.com/help/compiler/install-the-matlab-runtime.html On Archer, make sure you install to a folder in /work rather than /home.
-
+Follow instructions here to unzip and install; https://uk.mathworks.com/help/compiler/install-the-matlab-runtime.html On Archer2, make sure you install to a folder in /work rather than /home.
 
 Set some variables specific to your filesystem (all within this example/MISOMIP_999 directory):
 For Compile-Machine:
@@ -33,7 +35,7 @@ Go to Compile-Machine.
 ./compile_ua.sh
 rsync -avCPr -e ssh Ua <Run-Machine>:<path_to_UaMITgcm>/example/MISOMIP_999/ua_run/
 Go back to Run-Machine.
-cp MISOMIP_999-RestartFile.mat ua_run/
+cp ua_custom/MISOMIP_999-RestartFile.mat ua_run/
 (note this will get overwritten during simulations. Make sure to rename to your new experiment name.)
 
 Run the model:

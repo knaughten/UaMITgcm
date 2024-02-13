@@ -1,4 +1,4 @@
-function [UserVar,as,ab]=DefineMassBalance(UserVar,CtrlVar,MUA,time,s,b,h,S,B,rho,rhow,GF)
+function [UserVar,as,ab]=DefineMassBalance(UserVar,CtrlVar,MUA,F)
 
 persistent DTbmelt
 
@@ -22,9 +22,10 @@ persistent DTbmelt
 % The units of as and ab are water equivalent per time, i.e. usually
 % as and ab will have the same units as velocity (something like m/yr or m/day).
 %
+x = MUA.coordinates(:,1); y = MUA.coordinates(:,2);
 
 %% Surface accumulation
-as=0.3; 
+as= 0*x + 0.3; 
 
 %% Basal melt
 if isempty(DTbmelt)
@@ -32,22 +33,26 @@ if isempty(DTbmelt)
         UserVar.UaMITgcm.MITgcmCGridY(:),UserVar.UaMITgcm.MITgcmMelt(:),'linear');
 end
 
-x = MUA.coordinates(:,1); y = MUA.coordinates(:,2);
 ab=DTbmelt(x,y);
+%ab = 0*x;
 
 %% Only melt/accumulate strictly floating elements, i.e. make sure that ab is zero unless 
 %   1) node is afloat,
 %   2) node belongs to element that is fully afloat.
-[GF,~,~,~]=IceSheetIceShelves(CtrlVar,MUA,GF);
-I = [find(GF.NodesCrossingGroundingLines(:)); find(GF.NodesUpstreamOfGroundingLines(:))];
-ab(I)=0;
-
+% [GF,~,~,~]=IceSheetIceShelves(CtrlVar,MUA,F.GF);
+% I = [find(GF.NodesCrossingGroundingLines(:)); find(GF.NodesUpstreamOfGroundingLines(:))];
+% ab(I)=0;
+% 
 %% Do not melt/accumulate isolated 'lakes' upstream of the main grounding line
-[~,LakeNodes]=LakeOrOcean(CtrlVar,GF,MUA.Boundary,MUA.connectivity,MUA.coordinates);
-ab(LakeNodes)=0;
+% [LakeNodes,OceanNodes,~,~] = LakeOrOcean3(CtrlVar,MUA,GF);
+% ab(LakeNodes)=0;
+
+%% Or simply:
+[MeltNodes,~]=SpecifyMeltNodes(CtrlVar,MUA,F.GF);
+ab(~MeltNodes) = 0;
 
 %% do not melt ice where ice thickness is less CtrlVar.ThickMin
-h=s-b;
+h=F.s-F.b;
 I=(h<CtrlVar.ThickMin & ab<0); ab(I)=0; 
 
 end

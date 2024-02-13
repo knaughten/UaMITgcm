@@ -3,9 +3,9 @@
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
 #SBATCH --time=1:00:00
-# SBATCH --mem=64gb
 
 ###############################################################
 # Run Ua.
@@ -15,11 +15,9 @@
 # -A <Archer budget>
 ###############################################################
 
-module load epcc-job-env
-
 # USER VARIABLE
 # Path to Matlab Compiler Runtime installation
-MCR=$WORK/MCR_2022b/R2022b/
+MCR=$WORK/MCR_2023b/R2023b/
 
 # Make sure MCR cache (as defined in Ua_MCR.sh) exists
 # If you want the cache in a different location, modify it here AND in ua_run/Ua_MCR.sh

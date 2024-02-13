@@ -25,7 +25,7 @@ ua_output_format = 'matlab'
 
 # Optional base directory to simplify definition of directories below
 # This variable won't be read by the coupler, so you don't have to use it.
-work_dir = '/work/n02/n02/rreese/uamitgcm/cases/'+expt_name+'/'
+work_dir = '/work/n02/n02/janryd69/UaMITgcm/cases/'+expt_name+'/'
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
 mit_case_dir = work_dir+'mitgcm_run/'
@@ -35,8 +35,7 @@ ua_exe_dir = work_dir+'ua_run/'
 output_dir = work_dir+'output/'
 
 ### Archer budget to charge jobs to
-budget_code = 'n02-TiPACCs'
-
+budget_code = 'n02-MRW011816'
 
 ###### 2. Coupling options ######
 
