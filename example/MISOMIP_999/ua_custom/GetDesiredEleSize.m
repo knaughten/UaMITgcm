@@ -9,8 +9,8 @@ nargoutchk(4,4)
 %% form of DefineDesiredEleSize.m, as specified below.
 % N=nargout('DefineDesiredEleSize');
 % 
-% InputEleSizeDesired=EleSizeDesired;
-% InputElementsToBeRefined=ElementsToBeRefined;
+InputEleSizeDesired=EleSizeDesired;
+InputElementsToBeRefined=ElementsToBeRefined;
 % 
 % switch N
 % 
