@@ -5,7 +5,7 @@
 ###### 1. Server workflow options ######
 
 ### Experiment name, this will be stamped on some files
-expt_name = 'PTDC_ARCHER2_999'
+expt_name = 'ASE_999'
 
 ### Specify how to run Ua. 2 options:
 ### 'compiled': using Matlab Compiler Runtime, with an executable
@@ -25,27 +25,29 @@ ua_output_format = 'matlab'
 # Optional base directory to simplify definition of directories below
 # This variable won't be read by the coupler, so you don't have to use it.
 work_dir = '/work/n02/n02/janryd69/UaMITgcm/cases/'+expt_name+'/'
+#work_dir = '/Volumes/mainJDRydt2/UaMITgcm_v2/cases/'+expt_name+'/'
 
 ### Path to the MITgcm case directory (containing run/, input/, etc.)
-mit_case_dir = work_dir+'mitgcm_run/'
+mit_case_dir = work_dir+'mitgcm_run'
 ### Path to the Ua directory containing executable
 ua_exe_dir = work_dir+'ua_run/'
 ### Path to the directory to centrally gather output
 output_dir = work_dir+'output/'
 
 ### Archer budget to charge jobs to
+#budget_code = 'n02-NER000719'
 budget_code = 'n02-PROPHET'
-
+#budget_code = 'n02-TiPACCs'
 
 ###### 2. Coupling options ######
 
 ### Total length of simulation (months)
-total_time = 276
+total_time = 2460
 ### Length of ocean spinup period (months)
-spinup_time = 24
+spinup_time = 60
 ### Length of coupling timestep (months)
 ### total_time and spinup_time must be evenly divisible by couple_step
-couple_step = 3
+couple_step = 1
 
 ### Restart type for MITgcm. 2 options:
 ### 'zero': MITgcm will start from time 0 every coupling segment.
@@ -102,7 +104,7 @@ pload_option = 'nearest'
 
 ### The next two variables only matter if pload_option = 'constant'.
 ### Set the constant temperature (C) and salinity (psu) to use.
-pload_temp = -1.
+pload_temp = -1.0
 pload_salt = 34.2
 
 ### Does the first Ua segment start from a restart file
@@ -111,6 +113,8 @@ ua_ini_restart = True
 
 
 ###### 3. MITgcm parameters ######
+
+coordinates = 'xy'
 
 ### Does your configuration of MITgcm include sea ice?
 use_seaice = False
@@ -127,11 +131,11 @@ use_ini_deltaTmom = False
 ### For the following variables, match their values to input/data.
 ### If they are unset there, search for their names in MITgcm's STDOUT.0000
 ### to find what they have been set to by default.
-deltaT = 120
+deltaT = 60
 hFacMin = 0.05
-hFacMinDr = 0.
+hFacMinDr = 0.0
 readBinaryPrec = 64
-rhoConst = 1024.
+rhoConst = 1028
 eosType = 'MDJWF'
 ### The following four variables only matter if eosType='LINEAR'.
 ### Note that Tref and Sref in input/data will be multiplied by
@@ -139,7 +143,7 @@ eosType = 'MDJWF'
 ### (eg set Tref: -1. instead of 36*-1.)
 tAlpha = 3.733e-5
 sBeta = 7.843e-4
-Tref = -1.
+Tref = -1.0
 Sref = 34.2
 ### Number of vertical sea ice layers; match SEAICE_multDim in data.seaice.
 ### Only matters if use_seaice=True.

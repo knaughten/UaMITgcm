@@ -1,4 +1,4 @@
-Set some variables specific to your filesystem (all within this PTDC_999 directory):
+Set some variables specific to your filesystem (all within this ASE_999 directory):
 
 For Compile-Machine:
 compile_ua.sh: MATLAB_PATH, REPO_DIR, UA_BUILD
@@ -29,9 +29,9 @@ Setup Ua:
 
 If not already done, go to Compile-Machine.
 ./compile_ua.sh
-scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/PTDC_777/ua_run/
+scp Ua <Run-Machine>:<path_to_UaMITgcm>/example/ASE_999/ua_run/
 Go back to Run-Machine.
-Copy restartfile PTDC_999-RestartFile.mat from ua_custom into ua_run and rename appropriately
+Copy restartfile ASE_999-RestartFile.mat from ua_custom into ua_run and rename appropriately
 
 ##################################################
 Run the model:

@@ -1,12 +1,11 @@
 #!/bin/sh
-#SBATCH --time=00:20:00
+#SBATCH --time=00:40:00
 #SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --partition=standard
-#SBATCH --qos=short
-#SBATCH --reservation=shortqos
+#SBATCH --qos=standard
 
 ###############################################################
 # Run Ua.
@@ -28,7 +27,7 @@ if [ ! -d $WORK/mcr_cache ]; then
   mkdir $WORK/mcr_cache
 fi
 
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 echo 'Ua starts '`date` >> jobs.log
 
 cd $UA_DIR
@@ -36,13 +35,13 @@ cd $UA_DIR
 srun --distribution=block:block --hint=nomultithread ./Ua_MCR.sh $MCR 1>>matlab_std.out 2>>matlab_err.out
 OUT=$?
 
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 if [ $OUT == 0 ]; then
     echo 'Ua ends '`date` >> jobs.log
     touch ua_finished
     if [ -e mitgcm_finished ] ; then
         # Ua was the last one to finish
-	sbatch -A $ACC run_coupler.sh
+ 	sbatch --export=ALL -A $ACC run_coupler.sh
     fi
     exit 0
 else

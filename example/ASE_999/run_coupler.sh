@@ -23,7 +23,7 @@ REPO_DIR=$WORK/UaMITgcm/UaMITgcm_archer2
 # Path to MITgcm source code: default is to use the version inside UaMITgcm
 MIT_SOURCE=$REPO_DIR/MITgcm_67k
 
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 echo 'Coupler starts '`date` >> jobs.log
 
 # Get various python files/packages in the path
@@ -36,7 +36,7 @@ XMIT=$REPO_DIR/tools/xmitgcm
 # MITgcmutils
 MITU=$MIT_SOURCE/utils/python/MITgcmutils
 # Note, also need PBS_O_WORKDIR in path so it sees config_options.py
-export PYTHONPATH=$PBS_O_WORKDIR:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
+export PYTHONPATH=$SLURM_SUBMIT_DIR:$COUPLEPY:$MITPY:$XMIT:$MITU:$PYTHONPATH
 
 echo $'\n''*****'`date`'*****' >> coupler_stdout
 
