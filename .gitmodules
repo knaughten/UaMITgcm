@@ -28,3 +28,7 @@
 [submodule "MITgcm_68r"]
 	path = MITgcm_68r
 	url = git@github.com:MITgcm/MITgcm.git
+[submodule "UaSource_R2025a"]
+	path = UaSource_R2025a
+	url = https://github.com/GHilmarG/UaSource.git
+	branch = master
