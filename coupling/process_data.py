@@ -619,7 +619,7 @@ def correct_next_obcs (grid, options):
     # Mask out the land and ice shelves, and area-average
     eta = mask_land_ice(eta, grid)
     eta_avg = area_average(eta, grid)
-    d_t = options.correct_obcs_steps
+    d_t = options.correct_obcs_steps * options.couple_step / 12
 
     if options.correct_obcs_steps != 1:
         # Average back over more than one coupling step
@@ -655,6 +655,7 @@ def correct_next_obcs (grid, options):
         eta_all = np.loadtxt(logfile)
         # Average over the last given number of steps
         eta_avg = np.mean(eta_all[-options.correct_obcs_steps:])
+        d_t = 1
 
     if options.obcs_transient:
         # Figure out the next year to process
