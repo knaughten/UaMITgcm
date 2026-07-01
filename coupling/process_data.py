@@ -670,7 +670,7 @@ def correct_next_obcs (grid, options):
             if fname is not None:
                 file_path = options.mit_run_dir + fname
                 print('Making copy of ' + file_path + '.master')
-                shutil.copy(file_path+'.master', file_path)
+                subprocess.check_call(['rsync', '-avzP', file_path+'.master', file_path])
         multi_year = False
         year = None
     if np.abs(eta_avg) > options.obcs_threshold:

@@ -310,7 +310,7 @@ def move_to_dir (fname, old_dir, new_dir):
 # Copy a file from one directory to another, without changing its name.
 def copy_to_dir (fname, old_dir, new_dir):
     try:
-        shutil.copy(old_dir+fname, new_dir+fname)
+        subprocess.check_call(['rsync', '-avzP', old_dir+fname, new_dir+fname])
     except(shutil.SameFileError):
         # They are already the same file (probably symlinks)
         pass
@@ -406,7 +406,7 @@ def move_processed_files (directory, tmpdir, prefixes, tstep):
 
 # Make a temporary copy of the given file with the suffix .tmp
 def make_tmp_copy (file_path):
-    shutil.copy(file_path, file_path+'.tmp')
+    subprocess.check_call(['rsync', '-avzP', file_path, file_path+'.tmp'])
 
 
 # Make a list of filenames in the given directory that start with the given string, and return in alphabetical order.
@@ -438,6 +438,6 @@ def copy_ua_restart (directory, restart_name):
             if os.path.isfile(orig_restart):
                 break
             orig_restart = input('That file does not exist. Try again: ')
-        shutil.copy(orig_restart, directory+restart_name)
+        subprocess.check_call(['rsync', '-avzP', orig_restart, directory+restart_name])
                 
                 

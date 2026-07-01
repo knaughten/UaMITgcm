@@ -5,7 +5,6 @@
 
 import sys
 import os
-import shutil
 import subprocess
 from coupling_utils import copy_to_dir, line_that_matters, replace_line, copy_ua_restart
 
@@ -61,15 +60,15 @@ def do_copy_case (old_name, new_name, check_restart=True):
     os.mkdir(new_build_dir)
     copy_to_dir('mitgcmuv', old_build_dir, new_build_dir)
     copy_to_dir('genmake.log', old_build_dir, new_build_dir)
-    shutil.copytree(old_mit_dir+'code/', new_mit_dir+'code/')
-    shutil.copytree(old_mit_dir+'input/', new_mit_dir+'input/')
-    shutil.copytree(old_scripts_dir, new_scripts_dir)
+    subprocess.check_call(['rsync', '-avzP', old_mit_dir+'code/', new_mit_dir+'code/'])
+    subprocess.check_call(['rsync', '-avzP', old_mit_dir+'input/', new_mit_dir+'input/')])
+    subprocess.check_call(['rsync', '-avzP', old_scripts_dir, new_scripts_dir])
     # Now call the prepare_run.sh script to reset the MITgcm run directory
     subprocess.check_output([new_scripts_dir+'prepare_run.sh', new_scripts_dir])
 
     # Ua custom source code directory, if it exists
     if os.path.isdir(old_dir+'ua_custom/'):
-        shutil.copytree(old_dir+'ua_custom/', new_dir+'ua_custom/')
+        subprocess.check_call(['rsync', '-avzP', old_dir+'ua_custom/', new_dir+'ua_custom/'])
 
     # Ua postprocessing directory, if it exists
     if os.path.isdir(old_uapost_dir):
