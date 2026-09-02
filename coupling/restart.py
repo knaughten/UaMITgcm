@@ -110,10 +110,50 @@ if __name__ == "__main__":
         copy_to_dir(fname, output_date_dir+'MITgcm/', options.mit_run_dir)
 
     if spinup or first_coupled:
-        # We are restarting within the spinup period. There is no Ua output yet.
-        # Clean the Ua run directory.
-        clean_ua(options.ua_exe_dir)
+        print('In spinup or first_coupled stage')
+        if spinup:
+            print('In spinup stage')                    
+            # We are restarting within the spinup period. There is either:
+                # 1. no Ua output yet, or
+                # 2. If the run already output some coupled stages this will need to be cleared out and replaced with original restart file
+            # Clean the Ua run directory.
+            clean_ua(options.ua_exe_dir)
+
+            # Check for Ua finished file - this is required for the coupler to run after MITgcm has finished
+            if not os.path.isfile('ua_finished'):
+                print('creating ua_finished file')
+                open('ua_finished', 'w').close()
+
+        if first_coupled:
+            print('In first_coupled stage')
+            # We are restarting within the first_coupled stage. There is either:
+                # 1. no Ua output yet, or
+                # 2. If the run already output some coupled stages this will need to be cleared out and replaced with original restart file
+            # Clean the Ua run directory.
+            clean_ua(options.ua_exe_dir)
+            
+            restart_name = None
+            for fname in os.listdir(options.ua_exe_dir):
+                if fname.endswith('RestartFile.mat'):
+                    restart_name = fname     
+            if options.ua_ini_restart:
+                make_tmp_copy(options.ua_exe_dir+restart_name)
+
+
     else:
+
+        # Remove unneccesary files from ua executable directory
+        for fname in os.listdir(options.ua_exe_dir):
+            # Don't delete the Ua executable, run script, options file
+            if fname in ['Ua', 'Ua_MCR.sh', 'options_for_ua']:
+                continue
+            # Delete everything else
+            path = options.ua_exe_dir+fname
+            if os.path.isfile(path):
+                os.remove(path)
+            elif os.path.isdir(path):
+                shutil.rmtree(path)
+                
         # Copy Ua restart file (saved at beginning of segment)
         for fname in os.listdir(output_date_dir+'Ua/'):
             if fname.endswith('RestartFile.mat'):
@@ -141,7 +181,10 @@ if __name__ == "__main__":
             continue
         if int(dname) >= int(date_code):
             # Now we can delete
-            shutil.rmtree(options.output_dir+dname)
+            # shutil.rmtree(options.output_dir+dname)
+
+            # Rename directory so we have a local copy
+            shutil.move(options.output_dir+dname,options.output_dir+'backup_'+dname)
 
     # Delete the "finished" file if it exists
     finifile = options.output_dir+options.finished_file
