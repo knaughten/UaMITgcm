@@ -9,7 +9,7 @@
 
 import sys
 import os
-import shutil
+import subprocess
 from copy_case import do_copy_case, parse_name
 from coupling_utils import copy_to_dir
 
@@ -79,7 +79,7 @@ for fname in os.listdir(old_uaexe_dir):
     elif old_name in fname:
         # Rename with new experiment name
         new_fname = fname.replace(old_name, new_name)
-        shutil.copy(old_uaexe_dir+fname, new_uaexe_dir+new_fname)
+        subprocess.check_call(['rsync', '-avzP', old_uaexe_dir+fname, new_uaexe_dir+new_fname])
     else:
         # Copy as normal
         copy_to_dir(fname, old_uaexe_dir, new_uaexe_dir)

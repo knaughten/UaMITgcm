@@ -32,3 +32,6 @@
 	path = UaSource_R2025a
 	url = https://github.com/GHilmarG/UaSource.git
 	branch = master
+[submodule "example/Ua-MITgcm_AMUND_melt-calibration"]
+	path = example/Ua-MITgcm_AMUND_melt-calibration
+	url = https://github.com/BradleyReed/Ua-MITgcm_AMUND_melt-calibration
