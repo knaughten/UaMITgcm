@@ -35,3 +35,6 @@
 [submodule "example/Ua-MITgcm_AMUND_melt-calibration"]
 	path = example/Ua-MITgcm_AMUND_melt-calibration
 	url = https://github.com/BradleyReed/Ua-MITgcm_AMUND_melt-calibration
+[submodule "MITgcm_69k"]
+	path = MITgcm_69k
+	url = git@github.com:MITgcm/MITgcm.git
